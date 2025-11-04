@@ -15,6 +15,12 @@ Please use this document to include any thoughts about our final project
 - We can try to predict stress score based on exercise, temperature, phase
 - Li: it contains self-reported symptoms (e.g. menstrual cycle phase, flow volume, color, appetite, stress, fatigue, etc.)
 
+planned analysis could be:
+Time-series plots of heart rate, sleep, and glucose across cycle days
+Histograms and density plots for hormone levels and symptoms
+Correlation matrices linking physiological and hormonal signals
+
+
 [Lifestyle and sleep patterns](https://www.kaggle.com/datasets/minahilfatima12328/lifestyle-and-sleep-patterns)
 - See what occupation, age, sex, exercise link to sleep disorder (often use logistic regression)
 
