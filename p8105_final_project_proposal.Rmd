@@ -18,7 +18,7 @@ Exploring the relationship between lifestyle factors and the menstrual cycle amo
 Half of the world's population experiences menstruation, yet irregular symptoms often lack clear underlying causes while significantly disrupting daily life. By analyzing data from young adult menstruators, we aim to understand relationships between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise.
 
 
-## Final products
+## Intended final products
 
 - **Webpage** with Home, Exploratory Analysis, Models, Report, and Screencast pages
 - **Exploratory analysis** of lifestyle factors (exercise, sleep, stress) and menstrual health patterns, including cycle length analysis and symptom correlations
