@@ -11,11 +11,256 @@ hormone=
   read_csv("data/hormones_and_selfreport.csv")
 ```
 
-##yue's interest: phase, lh, estrogen, appetite, fatigue
+##yue's interest: phase, lh, estrogen, moodswing, fatigue
+
 ```{r}
-my_int=
-  hormone|>
-  select(id,phase, lh, estrogen, appetite, fatigue )
-my_int
+my_int= 
+  hormone |>
+  select(id,phase, lh, estrogen,fatigue,moodswing)|>
+  mutate(
+    phase = factor(phase, levels = c("Follicular", "Fertility", "Luteal", "Menstrual")),
+    fatigue = factor(fatigue, 
+                     levels = c("Low", "Moderate", "High", "Very High")),
+    moodswing = factor(moodswing,
+                       levels = c("Very Low/Little", "Low", "Moderate", "High","Very High","Not at all"))
+  )
+phase_order <- c("Menstrual", "Follicular", "Fertility", "Luteal")
+
 ```
 
+first, explore relationship between LH and estrogen
+```{r}
+my_int_avg= 
+  my_int|>
+  group_by(phase)|>
+  summarise(
+    estrogen_mean = mean(estrogen, na.rm = TRUE),
+    lh_mean = mean(lh, na.rm = TRUE)
+  )|>
+  mutate(phase = factor(phase, levels = phase_order))|>
+  filter(!is.na(phase))
+
+# Plot the summarized data
+ggplot(my_int_avg, aes(x = phase)) +
+  geom_line(aes(y = estrogen_mean, color = "Estrogen", group = 1), size = 1) +
+  geom_line(aes(y = lh_mean, color = "LH", group = 1), size = 1) +
+  geom_point(aes(y = estrogen_mean, color = "Estrogen"), size = 3) +
+  geom_point(aes(y = lh_mean, color = "LH"), size = 3) +
+  labs(
+    title = "Estrogen and LH Levels Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Hormone Level",
+    color = "Hormone"
+  ) +
+  scale_color_manual(values = c("Estrogen" = "red", "LH" = "blue")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+#estrogen surge at fertility(actually it should be called ovulation)
+#lh also peak at ovulation
+
+fatigue and moodswing
+```{r}
+my_int=
+  my_int|>
+  filter(!is.na(phase))
+fatigue_summary <- my_int %>%
+  group_by(phase) %>%
+  summarise(
+    n = n(),
+    avg_fatigue = mean(as.numeric(fatigue), na.rm = TRUE),
+    avg_moodswing = mean(as.numeric(moodswing), na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+mood_summary <- my_int %>%
+  group_by(phase) %>%
+  count(moodswing) %>%
+  mutate(percentage = n / sum(n) * 100)
+
+fatigue_summary
+mood_summary
+```
+
+```{r}
+# Remove NA phases AND NA moodswing/fatigue values
+my_int_clean <- my_int |>
+  filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue))
+
+# Now recalculate summaries
+fatigue_summary <- my_int_clean %>%
+  group_by(phase) %>%
+  summarise(
+    n = n(),
+    avg_fatigue = mean(as.numeric(fatigue), na.rm = TRUE),
+    avg_moodswing = mean(as.numeric(moodswing), na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+mood_summary <- my_int_clean %>%
+  group_by(phase) %>%
+  count(moodswing) %>%
+  mutate(percentage = n / sum(n) * 100)
+
+fatigue_summary
+mood_summary
+```
+```{r}
+ggplot(my_int_clean, aes(x = factor(phase, levels = phase_order), fill = fatigue)) +
+  geom_bar(position = "fill") +
+  labs(title = "Fatigue Levels by Phase",
+       x = "Phase", y = "Proportion") +
+  theme_minimal()
+
+ggplot(my_int_clean, aes(x = factor(phase, levels = phase_order), fill = moodswing)) +
+  geom_bar(position = "fill") +
+  labs(title = "Mood Swing Levels by Phase",
+       x = "Phase", y = "Proportion") +
+  theme_minimal()
+```
+
+##this two bar graph show the proportion of fatigue and moodswing among four phases, but they are hard to read. 
+
+#so i aim to change the catogorical value (low, moderate, high) to 1,2,3, and so on. i want to sum and avrage. to show a typical cahnge of fatigue and mood in four phases. 
+
+```{r}
+# Convert moodswing and fatigue to numeric intensity scores
+my_int_numeric <- my_int_clean %>%
+  mutate(
+    moodswing_num = case_when(
+      moodswing == "Very Low/Little" ~ 1,
+      moodswing == "Low" ~ 2,
+      moodswing == "Moderate" ~ 3,
+      moodswing == "High" ~ 4,
+      moodswing == "Very High" ~ 5,
+      TRUE ~ NA_real_
+    ),
+    fatigue_num = case_when(
+      fatigue == "Low" ~ 1,
+      fatigue == "Moderate" ~ 2,
+      fatigue == "High" ~ 3,
+      fatigue == "Very High" ~ 4,
+      TRUE ~ NA_real_
+    )
+  )
+
+# Calculate average intensity by phase
+symptom_means <- my_int_numeric %>%
+  group_by(phase = factor(phase, levels = phase_order)) %>%
+  summarise(
+    avg_moodswing = mean(moodswing_num, na.rm = TRUE),
+    avg_fatigue = mean(fatigue_num, na.rm = TRUE),
+    n = n(),
+    .groups = 'drop'
+  )
+
+symptom_means
+```
+
+```{r}
+# Mood swing single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
+  geom_line(color = "purple", size = 1.5, alpha = 0.7) +
+  geom_point(color = "purple", size = 3) +
+  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = "bold") +
+  labs(
+    title = "Average Mood Swing Intensity Across Menstrual Cycle Phases",
+    subtitle = "Higher values indicate more severe mood swings (Scale: 1-4)",
+    x = "Menstrual Cycle Phase",
+    y = "Average Mood Swing Intensity"
+  ) +
+  ylim(1, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+```
+```{r}
+# Fatigue single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
+  geom_line(color = "darkorange", size = 1.5, alpha = 0.7) +
+  geom_point(color = "darkorange", size = 3) +
+  geom_text(aes(label = round(avg_fatigue, 2)), vjust = -1, size = 4, fontface = "bold") +
+  labs(
+    title = "Average Fatigue Intensity Across Menstrual Cycle Phases",
+    subtitle = "Higher values indicate more severe fatigue (Scale: 1-4)",
+    x = "Menstrual Cycle Phase",
+    y = "Average Fatigue Intensity"
+  ) +
+  ylim(1, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+```
+
+## for the test, i want to test if moodswing and fatigue have statsitically difference between those four phases. 
+```{r}
+# Kruskal-Wallis Test (non-parametric alternative to ANOVA)
+kruskal_mood <- kruskal.test(moodswing_num ~ phase, data = my_int_numeric)
+kruskal_fatigue <- kruskal.test(fatigue_num ~ phase, data = my_int_numeric)
+
+cat("Mood Swing - Kruskal-Wallis Test:\n")
+print(kruskal_mood)
+cat("\nFatigue - Kruskal-Wallis Test:\n")
+print(kruskal_fatigue)
+# Install and load required package for post-hoc tests
+if (!require(dunn.test)) install.packages("dunn.test")
+library(dunn.test)
+
+# Dunn's post-hoc test with Bonferroni correction
+dunn_mood <- dunn.test(my_int_numeric$moodswing_num, 
+                       my_int_numeric$phase, 
+                       method = "bonferroni")
+dunn_fatigue <- dunn.test(my_int_numeric$fatigue_num, 
+                          my_int_numeric$phase, 
+                          method = "bonferroni")
+
+cat("\nMood Swing - Dunn's Post-Hoc Test:\n")
+print(dunn_mood)
+cat("\nFatigue - Dunn's Post-Hoc Test:\n")
+print(dunn_fatigue)
+```
+
+```{r}
+pairwise_mood <- pairwise.wilcox.test(my_int_numeric$moodswing_num, 
+                                     my_int_numeric$phase, 
+                                     p.adjust.method = "bonferroni")
+pairwise_fatigue <- pairwise.wilcox.test(my_int_numeric$fatigue_num, 
+                                        my_int_numeric$phase, 
+                                        p.adjust.method = "bonferroni")
+
+cat("\nMood Swing - Pairwise Wilcoxon Tests:\n")
+print(pairwise_mood)
+cat("\nFatigue - Pairwise Wilcoxon Tests:\n")
+print(pairwise_fatigue)
+```
+```{r}
+# Calculate effect size (epsilon-squared for Kruskal-Wallis)
+if (!require(rcompanion)) install.packages("rcompanion")
+library(rcompanion)
+
+effect_size_mood <- epsilonSquared(my_int_numeric$moodswing_num, my_int_numeric$phase)
+effect_size_fatigue <- epsilonSquared(my_int_numeric$fatigue_num, my_int_numeric$phase)
+
+cat("Effect Sizes:\n")
+cat("Mood Swing - Epsilon-squared:", round(effect_size_mood, 3), "\n")
+cat("Fatigue - Epsilon-squared:", round(effect_size_fatigue, 3), "\n")
+
+# Interpret effect size
+interpret_effect_size <- function(epsilon2) {
+  if (epsilon2 < 0.01) cat("Negligible effect\n")
+  else if (epsilon2 < 0.04) cat("Small effect\n")
+  else if (epsilon2 < 0.16) cat("Moderate effect\n")
+  else cat("Large effect\n")
+}
+
+cat("Mood Swing effect size: ")
+interpret_effect_size(effect_size_mood)
+cat("Fatigue effect size: ")
+interpret_effect_size(effect_size_fatigue)
+```
