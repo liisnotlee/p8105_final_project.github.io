@@ -268,20 +268,20 @@ $(document).ready(function () {
 
 
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
+## ✔ ggplot2   4.0.0     ✔ tibble    3.2.1
 ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────── tidyverse_conflicts() ──
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 <pre class="r"><code>hormone=
   read_csv(&quot;data/hormones_and_selfreport.csv&quot;)</code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────
+## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -289,25 +289,418 @@ $(document).ready(function () {
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>##yue’s interest: phase, lh, estrogen, appetite, fatigue</p>
+<p>##yue’s interest: phase, lh, estrogen, moodswing, fatigue</p>
+<pre class="r"><code>my_int= 
+  hormone |&gt;
+  select(id,phase, lh, estrogen,fatigue,moodswing)|&gt;
+  mutate(
+    phase = factor(phase, levels = c(&quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;, &quot;Menstrual&quot;)),
+    fatigue = factor(fatigue, 
+                     levels = c(&quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Very High&quot;)),
+    moodswing = factor(moodswing,
+                       levels = c(&quot;Very Low/Little&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;,&quot;Very High&quot;,&quot;Not at all&quot;))
+  )
+phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)</code></pre>
+<p>first, explore relationship between LH and estrogen</p>
+<pre class="r"><code>my_int_avg= 
+  my_int|&gt;
+  group_by(phase)|&gt;
+  summarise(
+    estrogen_mean = mean(estrogen, na.rm = TRUE),
+    lh_mean = mean(lh, na.rm = TRUE)
+  )|&gt;
+  mutate(phase = factor(phase, levels = phase_order))|&gt;
+  filter(!is.na(phase))
+
+# Plot the summarized data
+ggplot(my_int_avg, aes(x = phase)) +
+  geom_line(aes(y = estrogen_mean, color = &quot;Estrogen&quot;, group = 1), size = 1) +
+  geom_line(aes(y = lh_mean, color = &quot;LH&quot;, group = 1), size = 1) +
+  geom_point(aes(y = estrogen_mean, color = &quot;Estrogen&quot;), size = 3) +
+  geom_point(aes(y = lh_mean, color = &quot;LH&quot;), size = 3) +
+  labs(
+    title = &quot;Estrogen and LH Levels Across Menstrual Cycle Phases&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Hormone Level&quot;,
+    color = &quot;Hormone&quot;
+  ) +
+  scale_color_manual(values = c(&quot;Estrogen&quot; = &quot;red&quot;, &quot;LH&quot; = &quot;blue&quot;)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+#estrogen surge at fertility(actually it should be called ovulation) #lh
+also peak at ovulation</p>
+<p>fatigue and moodswing</p>
 <pre class="r"><code>my_int=
-  hormone|&gt;
-  select(id,phase, lh, estrogen, appetite, fatigue )
-my_int</code></pre>
-<pre><code>## # A tibble: 5,659 × 6
-##       id phase         lh estrogen appetite fatigue        
-##    &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;          
-##  1     1 Follicular   2.9     94.2 Low      High           
-##  2     1 Follicular   1.2    226.  Low      High           
-##  3     1 Follicular   3.5    277.  Very Low Very High      
-##  4     1 Fertility    1.8    322.  Low      High           
-##  5     1 Fertility    4.6    245.  Very Low High           
-##  6     1 Fertility    5      365.  Low      Moderate       
-##  7     1 Fertility    5      365.  Moderate Low            
-##  8     1 Fertility    5      365.  Moderate Low            
-##  9     1 Fertility    4.6    222.  Very Low Very Low/Little
-## 10     1 Luteal       3       63.6 Very Low Very Low/Little
-## # ℹ 5,649 more rows</code></pre>
+  my_int|&gt;
+  filter(!is.na(phase))
+fatigue_summary &lt;- my_int %&gt;%
+  group_by(phase) %&gt;%
+  summarise(
+    n = n(),
+    avg_fatigue = mean(as.numeric(fatigue), na.rm = TRUE),
+    avg_moodswing = mean(as.numeric(moodswing), na.rm = TRUE),
+    .groups = &#39;drop&#39;
+  )
+
+mood_summary &lt;- my_int %&gt;%
+  group_by(phase) %&gt;%
+  count(moodswing) %&gt;%
+  mutate(percentage = n / sum(n) * 100)
+
+fatigue_summary</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   phase          n avg_fatigue avg_moodswing
+##   &lt;fct&gt;      &lt;int&gt;       &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Follicular  1386        2.26          3.41
+## 2 Fertility   1281        2.25          3.49
+## 3 Luteal      1912        2.21          3.58
+## 4 Menstrual   1079        2.33          3.11</code></pre>
+<pre class="r"><code>mood_summary</code></pre>
+<pre><code>## # A tibble: 28 × 4
+## # Groups:   phase [4]
+##    phase      moodswing           n percentage
+##    &lt;fct&gt;      &lt;fct&gt;           &lt;int&gt;      &lt;dbl&gt;
+##  1 Follicular Very Low/Little   208      15.0 
+##  2 Follicular Low               146      10.5 
+##  3 Follicular Moderate          140      10.1 
+##  4 Follicular High               53       3.82
+##  5 Follicular Very High          21       1.52
+##  6 Follicular Not at all        271      19.6 
+##  7 Follicular &lt;NA&gt;              547      39.5 
+##  8 Fertility  Very Low/Little   175      13.7 
+##  9 Fertility  Low               112       8.74
+## 10 Fertility  Moderate          128       9.99
+## # ℹ 18 more rows</code></pre>
+<pre class="r"><code># Remove NA phases AND NA moodswing/fatigue values
+my_int_clean &lt;- my_int |&gt;
+  filter(!is.na(phase) &amp; !is.na(moodswing) &amp; !is.na(fatigue))
+
+# Now recalculate summaries
+fatigue_summary &lt;- my_int_clean %&gt;%
+  group_by(phase) %&gt;%
+  summarise(
+    n = n(),
+    avg_fatigue = mean(as.numeric(fatigue), na.rm = TRUE),
+    avg_moodswing = mean(as.numeric(moodswing), na.rm = TRUE),
+    .groups = &#39;drop&#39;
+  )
+
+mood_summary &lt;- my_int_clean %&gt;%
+  group_by(phase) %&gt;%
+  count(moodswing) %&gt;%
+  mutate(percentage = n / sum(n) * 100)
+
+fatigue_summary</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   phase          n avg_fatigue avg_moodswing
+##   &lt;fct&gt;      &lt;int&gt;       &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Follicular   603        2.26          3.36
+## 2 Fertility    507        2.25          3.34
+## 3 Luteal       811        2.21          3.53
+## 4 Menstrual    482        2.32          3.17</code></pre>
+<pre class="r"><code>mood_summary</code></pre>
+<pre><code>## # A tibble: 24 × 4
+## # Groups:   phase [4]
+##    phase      moodswing           n percentage
+##    &lt;fct&gt;      &lt;fct&gt;           &lt;int&gt;      &lt;dbl&gt;
+##  1 Follicular Very Low/Little   116      19.2 
+##  2 Follicular Low               127      21.1 
+##  3 Follicular Moderate          126      20.9 
+##  4 Follicular High               53       8.79
+##  5 Follicular Very High          20       3.32
+##  6 Follicular Not at all        161      26.7 
+##  7 Fertility  Very Low/Little    95      18.7 
+##  8 Fertility  Low               103      20.3 
+##  9 Fertility  Moderate          115      22.7 
+## 10 Fertility  High               54      10.7 
+## # ℹ 14 more rows</code></pre>
+<pre class="r"><code>ggplot(my_int_clean, aes(x = factor(phase, levels = phase_order), fill = fatigue)) +
+  geom_bar(position = &quot;fill&quot;) +
+  labs(title = &quot;Fatigue Levels by Phase&quot;,
+       x = &quot;Phase&quot;, y = &quot;Proportion&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(my_int_clean, aes(x = factor(phase, levels = phase_order), fill = moodswing)) +
+  geom_bar(position = &quot;fill&quot;) +
+  labs(title = &quot;Mood Swing Levels by Phase&quot;,
+       x = &quot;Phase&quot;, y = &quot;Proportion&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<p>##this two bar graph show the proportion of fatigue and moodswing
+among four phases, but they are hard to read.</p>
+<p>#so i aim to change the catogorical value (low, moderate, high) to
+1,2,3, and so on. i want to sum and avrage. to show a typical cahnge of
+fatigue and mood in four phases.</p>
+<pre class="r"><code># Convert moodswing and fatigue to numeric intensity scores
+my_int_numeric &lt;- my_int_clean %&gt;%
+  mutate(
+    moodswing_num = case_when(
+      moodswing == &quot;Very Low/Little&quot; ~ 1,
+      moodswing == &quot;Low&quot; ~ 2,
+      moodswing == &quot;Moderate&quot; ~ 3,
+      moodswing == &quot;High&quot; ~ 4,
+      moodswing == &quot;Very High&quot; ~ 5,
+      TRUE ~ NA_real_
+    ),
+    fatigue_num = case_when(
+      fatigue == &quot;Low&quot; ~ 1,
+      fatigue == &quot;Moderate&quot; ~ 2,
+      fatigue == &quot;High&quot; ~ 3,
+      fatigue == &quot;Very High&quot; ~ 4,
+      TRUE ~ NA_real_
+    )
+  )
+
+# Calculate average intensity by phase
+symptom_means &lt;- my_int_numeric %&gt;%
+  group_by(phase = factor(phase, levels = phase_order)) %&gt;%
+  summarise(
+    avg_moodswing = mean(moodswing_num, na.rm = TRUE),
+    avg_fatigue = mean(fatigue_num, na.rm = TRUE),
+    n = n(),
+    .groups = &#39;drop&#39;
+  )
+
+symptom_means</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   phase      avg_moodswing avg_fatigue     n
+##   &lt;fct&gt;              &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;
+## 1 Menstrual           2.57        2.32   482
+## 2 Follicular          2.40        2.26   603
+## 3 Fertility           2.42        2.25   507
+## 4 Luteal              2.54        2.21   811</code></pre>
+<pre class="r"><code># Mood swing single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
+  geom_line(color = &quot;purple&quot;, size = 1.5, alpha = 0.7) +
+  geom_point(color = &quot;purple&quot;, size = 3) +
+  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = &quot;bold&quot;) +
+  labs(
+    title = &quot;Average Mood Swing Intensity Across Menstrual Cycle Phases&quot;,
+    subtitle = &quot;Higher values indicate more severe mood swings (Scale: 1-4)&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Average Mood Swing Intensity&quot;
+  ) +
+  ylim(1, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = &quot;bold&quot;),
+    panel.grid.major = element_line(color = &quot;grey90&quot;)
+  )</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code># Fatigue single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
+  geom_line(color = &quot;darkorange&quot;, size = 1.5, alpha = 0.7) +
+  geom_point(color = &quot;darkorange&quot;, size = 3) +
+  geom_text(aes(label = round(avg_fatigue, 2)), vjust = -1, size = 4, fontface = &quot;bold&quot;) +
+  labs(
+    title = &quot;Average Fatigue Intensity Across Menstrual Cycle Phases&quot;,
+    subtitle = &quot;Higher values indicate more severe fatigue (Scale: 1-4)&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Average Fatigue Intensity&quot;
+  ) +
+  ylim(1, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = &quot;bold&quot;),
+    panel.grid.major = element_line(color = &quot;grey90&quot;)
+  )</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<div
+id="for-the-test-i-want-to-test-if-moodswing-and-fatigue-have-statsitically-difference-between-those-four-phases."
+class="section level2">
+<h2>for the test, i want to test if moodswing and fatigue have
+statsitically difference between those four phases.</h2>
+<pre class="r"><code># Kruskal-Wallis Test (non-parametric alternative to ANOVA)
+kruskal_mood &lt;- kruskal.test(moodswing_num ~ phase, data = my_int_numeric)
+kruskal_fatigue &lt;- kruskal.test(fatigue_num ~ phase, data = my_int_numeric)
+
+cat(&quot;Mood Swing - Kruskal-Wallis Test:\n&quot;)</code></pre>
+<pre><code>## Mood Swing - Kruskal-Wallis Test:</code></pre>
+<pre class="r"><code>print(kruskal_mood)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  moodswing_num by phase
+## Kruskal-Wallis chi-squared = 7.4651, df = 3, p-value = 0.05846</code></pre>
+<pre class="r"><code>cat(&quot;\nFatigue - Kruskal-Wallis Test:\n&quot;)</code></pre>
+<pre><code>## 
+## Fatigue - Kruskal-Wallis Test:</code></pre>
+<pre class="r"><code>print(kruskal_fatigue)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  fatigue_num by phase
+## Kruskal-Wallis chi-squared = 4.3521, df = 3, p-value = 0.2259</code></pre>
+<pre class="r"><code># Install and load required package for post-hoc tests
+if (!require(dunn.test)) install.packages(&quot;dunn.test&quot;)</code></pre>
+<pre><code>## Loading required package: dunn.test</code></pre>
+<pre class="r"><code>library(dunn.test)
+
+# Dunn&#39;s post-hoc test with Bonferroni correction
+dunn_mood &lt;- dunn.test(my_int_numeric$moodswing_num, 
+                       my_int_numeric$phase, 
+                       method = &quot;bonferroni&quot;)</code></pre>
+<pre><code>##   Kruskal-Wallis rank sum test
+## 
+## data: x and group
+## Kruskal-Wallis chi-squared = 7.4651, df = 3, p-value = 0.06
+## 
+## 
+##                            Comparison of x by group                            
+##                                  (Bonferroni)                                  
+## Col Mean-|
+## Row Mean |   Fertilit   Follicul     Luteal
+## ---------+---------------------------------
+## Follicul |   0.462187
+##          |     1.0000
+##          |
+##   Luteal |  -1.492312  -2.076564
+##          |     0.4069     0.1135
+##          |
+## Menstrua |  -1.717792  -2.255491  -0.379275
+##          |     0.2575     0.0723     1.0000
+## 
+## alpha = 0.05
+## Reject Ho if p &lt;= alpha/2</code></pre>
+<pre class="r"><code>dunn_fatigue &lt;- dunn.test(my_int_numeric$fatigue_num, 
+                          my_int_numeric$phase, 
+                          method = &quot;bonferroni&quot;)</code></pre>
+<pre><code>##   Kruskal-Wallis rank sum test
+## 
+## data: x and group
+## Kruskal-Wallis chi-squared = 4.3521, df = 3, p-value = 0.23
+## 
+## 
+##                            Comparison of x by group                            
+##                                  (Bonferroni)                                  
+## Col Mean-|
+## Row Mean |   Fertilit   Follicul     Luteal
+## ---------+---------------------------------
+## Follicul |  -0.184470
+##          |     1.0000
+##          |
+##   Luteal |   0.694468   0.937920
+##          |     1.0000     1.0000
+##          |
+## Menstrua |  -1.260487  -1.130506  -2.077905
+##          |     0.6225     0.7748     0.1132
+## 
+## alpha = 0.05
+## Reject Ho if p &lt;= alpha/2</code></pre>
+<pre class="r"><code>cat(&quot;\nMood Swing - Dunn&#39;s Post-Hoc Test:\n&quot;)</code></pre>
+<pre><code>## 
+## Mood Swing - Dunn&#39;s Post-Hoc Test:</code></pre>
+<pre class="r"><code>print(dunn_mood)</code></pre>
+<pre><code>## $chi2
+## [1] 7.465111
+## 
+## $Z
+## [1]  0.4621873 -1.4923129 -2.0765647 -1.7177924 -2.2554913 -0.3792752
+## 
+## $P
+## [1] 0.32197351 0.06780857 0.01892087 0.04291725 0.01205126 0.35224174
+## 
+## $P.adjusted
+## [1] 1.00000000 0.40685143 0.11352525 0.25750349 0.07230753 1.00000000
+## 
+## $comparisons
+## [1] &quot;Fertility - Follicular&quot; &quot;Fertility - Luteal&quot;     &quot;Follicular - Luteal&quot;   
+## [4] &quot;Fertility - Menstrual&quot;  &quot;Follicular - Menstrual&quot; &quot;Luteal - Menstrual&quot;</code></pre>
+<pre class="r"><code>cat(&quot;\nFatigue - Dunn&#39;s Post-Hoc Test:\n&quot;)</code></pre>
+<pre><code>## 
+## Fatigue - Dunn&#39;s Post-Hoc Test:</code></pre>
+<pre class="r"><code>print(dunn_fatigue)</code></pre>
+<pre><code>## $chi2
+## [1] 4.35211
+## 
+## $Z
+## [1] -0.1844703  0.6944687  0.9379209 -1.2604877 -1.1305062 -2.0779056
+## 
+## $P
+## [1] 0.42682228 0.24369416 0.17414254 0.10374674 0.12913149 0.01885903
+## 
+## $P.adjusted
+## [1] 1.0000000 1.0000000 1.0000000 0.6224805 0.7747890 0.1131542
+## 
+## $comparisons
+## [1] &quot;Fertility - Follicular&quot; &quot;Fertility - Luteal&quot;     &quot;Follicular - Luteal&quot;   
+## [4] &quot;Fertility - Menstrual&quot;  &quot;Follicular - Menstrual&quot; &quot;Luteal - Menstrual&quot;</code></pre>
+<pre class="r"><code>pairwise_mood &lt;- pairwise.wilcox.test(my_int_numeric$moodswing_num, 
+                                     my_int_numeric$phase, 
+                                     p.adjust.method = &quot;bonferroni&quot;)
+pairwise_fatigue &lt;- pairwise.wilcox.test(my_int_numeric$fatigue_num, 
+                                        my_int_numeric$phase, 
+                                        p.adjust.method = &quot;bonferroni&quot;)
+
+cat(&quot;\nMood Swing - Pairwise Wilcoxon Tests:\n&quot;)</code></pre>
+<pre><code>## 
+## Mood Swing - Pairwise Wilcoxon Tests:</code></pre>
+<pre class="r"><code>print(pairwise_mood)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
+## 
+## data:  my_int_numeric$moodswing_num and my_int_numeric$phase 
+## 
+##           Follicular Fertility Luteal
+## Fertility 1.00       -         -     
+## Luteal    0.22       0.79      -     
+## Menstrual 0.16       0.52      1.00  
+## 
+## P value adjustment method: bonferroni</code></pre>
+<pre class="r"><code>cat(&quot;\nFatigue - Pairwise Wilcoxon Tests:\n&quot;)</code></pre>
+<pre><code>## 
+## Fatigue - Pairwise Wilcoxon Tests:</code></pre>
+<pre class="r"><code>print(pairwise_fatigue)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using Wilcoxon rank sum test with continuity correction 
+## 
+## data:  my_int_numeric$fatigue_num and my_int_numeric$phase 
+## 
+##           Follicular Fertility Luteal
+## Fertility 1.00       -         -     
+## Luteal    1.00       1.00      -     
+## Menstrual 1.00       1.00      0.22  
+## 
+## P value adjustment method: bonferroni</code></pre>
+<pre class="r"><code># Calculate effect size (epsilon-squared for Kruskal-Wallis)
+if (!require(rcompanion)) install.packages(&quot;rcompanion&quot;)</code></pre>
+<pre><code>## Loading required package: rcompanion</code></pre>
+<pre class="r"><code>library(rcompanion)
+
+effect_size_mood &lt;- epsilonSquared(my_int_numeric$moodswing_num, my_int_numeric$phase)
+effect_size_fatigue &lt;- epsilonSquared(my_int_numeric$fatigue_num, my_int_numeric$phase)
+
+cat(&quot;Effect Sizes:\n&quot;)</code></pre>
+<pre><code>## Effect Sizes:</code></pre>
+<pre class="r"><code>cat(&quot;Mood Swing - Epsilon-squared:&quot;, round(effect_size_mood, 3), &quot;\n&quot;)</code></pre>
+<pre><code>## Mood Swing - Epsilon-squared: 0.003</code></pre>
+<pre class="r"><code>cat(&quot;Fatigue - Epsilon-squared:&quot;, round(effect_size_fatigue, 3), &quot;\n&quot;)</code></pre>
+<pre><code>## Fatigue - Epsilon-squared: 0.002</code></pre>
+<pre class="r"><code># Interpret effect size
+interpret_effect_size &lt;- function(epsilon2) {
+  if (epsilon2 &lt; 0.01) cat(&quot;Negligible effect\n&quot;)
+  else if (epsilon2 &lt; 0.04) cat(&quot;Small effect\n&quot;)
+  else if (epsilon2 &lt; 0.16) cat(&quot;Moderate effect\n&quot;)
+  else cat(&quot;Large effect\n&quot;)
+}
+
+cat(&quot;Mood Swing effect size: &quot;)</code></pre>
+<pre><code>## Mood Swing effect size:</code></pre>
+<pre class="r"><code>interpret_effect_size(effect_size_mood)</code></pre>
+<pre><code>## Negligible effect</code></pre>
+<pre class="r"><code>cat(&quot;Fatigue effect size: &quot;)</code></pre>
+<pre><code>## Fatigue effect size:</code></pre>
+<pre class="r"><code>interpret_effect_size(effect_size_fatigue)</code></pre>
+<pre><code>## Negligible effect</code></pre>
+</div>
 
 
 
