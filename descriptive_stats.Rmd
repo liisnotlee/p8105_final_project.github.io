@@ -1,0 +1,126 @@
+---
+title: "Demographic Data"
+output: html_document
+date: "2025-11-15"
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(dplyr)
+library(gt)
+library(stringr)
+```
+
+```{r}
+demographic_data <- read.csv("data/subject-info.csv", header = TRUE) %>%
+  clean_names() %>%
+  mutate(
+    education = str_trim(education),
+    education_ranked = case_when(
+      education == "High school degree or equivalent (e.g. GED)" ~ "High School",
+      education == "Some university/ post-secondary, no degree" ~ "Some College",
+      education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
+      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
+      TRUE ~ "Other"),
+    education_ranked = factor(
+      education_ranked,
+      levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c("Non-existant", "Low", "Medium", "High"),
+      ordered = TRUE))
+ 
+#Making plots and Tables 
+#Table of Mean Age at first period (Range), Race Count (%), Gender (%), Sexually Active (%)
+#Age
+age_row = demographic_data %>%
+  summarise(variable = "Age at First Period",
+    subgroup = "",
+    value = sprintf(
+      "%.1f (%d–%d)",
+      mean(age_of_first_menarche, na.rm = TRUE),
+      min(age_of_first_menarche, na.rm = TRUE),
+      max(age_of_first_menarche, na.rm = TRUE)))
+
+#Race
+ethnicity_rows = demographic_data %>%
+  count(ethnicity) %>%
+  mutate(variable = "Ethnicity",
+    subgroup = ethnicity,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Gender
+gender_rows = demographic_data %>%
+  count(gender) %>%
+  mutate(variable = "Gender",
+    subgroup = gender,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Sexually Active 
+sex_rows = demographic_data %>%
+  count(sexually_active) %>%
+  mutate(variable = "Sexually Active",
+    subgroup = sexually_active,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Education 
+education_rows = demographic_data %>%
+  count(education_ranked) %>%
+  mutate(variable = "Education", 
+         subgroup = education_ranked,
+         value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Combined
+summary_table = bind_rows(
+  age_row,
+  ethnicity_rows,
+  gender_rows,
+  education_rows,
+  sex_rows)
+
+#GT table
+summary_table_gt = summary_table %>%
+  gt() %>%
+  cols_label(variable = "",
+    subgroup = "",
+    value = "Value") %>%
+  tab_options(table.font.size = px(14),
+    data_row.padding = px(6)) %>%
+  tab_style(style = cell_text(weight = "bold"),
+    locations = cells_body(columns = variable))
+summary_table_gt
+
+#Boxplot - age at menarche
+menarche_plot = ggplot(demographic_data, aes(x = "", y = age_of_first_menarche)) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Age of Menarche",
+    y = "Age (years)",
+    x = "") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+
+#Education and self report menstrual health literacy 
+education_health_lit = ggplot(demographic_data, aes(x = education_ranked, fill = self_report_menstrual_health_literacy)) +
+  geom_bar(position = "fill") +  # "fill" makes it proportional
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Self-Reported Menstrual Health Literacy by Education Level",
+    x = "Education Level",
+    y = "Percentage",
+    fill = "Menstrual Health Literacy"
+  ) +
+  theme_minimal(base_size = 14)
+
+education_health_lit
+
+```
+
+
+
