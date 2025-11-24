@@ -312,13 +312,14 @@ participants have better sleep length, 7-8 hours.</p>
 <p>Combine the sleep and stress score</p>
 <pre class="r"><code># join two data sets, using inner join
 sleep_score1 = sleep_score |&gt;
-  select(id,study_interval, day_in_study, overall_score)
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes)
 
 sleep1 = sleep|&gt;
    select(id,study_interval, sleep_start_day_in_study, timeinbed) |&gt;
    mutate(day_in_study = sleep_start_day_in_study) |&gt;
   select(-sleep_start_day_in_study)
 stress_score1 = stress_score |&gt;
+  filter(calculation_failed == &quot;FALSE&quot;)|&gt;
   select(id, study_interval, day_in_study, stress_score)|&gt;
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
@@ -329,18 +330,20 @@ sum(is.na(sleep_stress$overall_score))</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code>sum(is.na(sleep_stress$stress_score))</code></pre>
 <pre><code>## [1] 0</code></pre>
+<p>Showing the sleep score and stress score changes</p>
 <pre class="r"><code># graphs to show the score across ids
 sleep_stress|&gt;
-  group_by(id, study_interval) |&gt;
+  group_by(id) |&gt; 
   summarize(
     mean_sleep_score = mean(overall_score, na.rm = TRUE),
     mean_stress_score = mean(stress_score, na.rm = TRUE),
     .groups = &quot;drop&quot;
   ) |&gt;
   ggplot(aes(x = id, mean_sleep_score)) +
-  geom_line(aes(y = mean_sleep_score, color = &quot;mean_sleep_score&quot;) )+
-  geom_line(aes(y = mean_stress_score, color = &quot;mean_stress_score&quot;)) +
-  facet_grid(~study_interval)</code></pre>
+  geom_smooth(aes(y = mean_sleep_score, color = &quot;mean_sleep_score&quot;), se= FALSE )+
+  geom_smooth(aes(y = mean_stress_score, color = &quot;mean_stress_score&quot;), se = FALSE) </code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
 <p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Load and clean the hormone data for menstrual phases</p>
 <pre class="r"><code>hormone1 = hormone |&gt;
@@ -356,10 +359,17 @@ phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertili
 <p>Joined data with the phase in hormone dataset</p>
 <pre class="r"><code>sleep_stress_hormone =
   inner_join(sleep_stress,hormone1, join_by(id, day_in_study))</code></pre>
-<p>Now explore the changes of the stress score with the menstrual
-cycle</p>
-<pre class="r"><code>sleep_stress_hormone |&gt;
-  group_by(phase, study_interval) |&gt;
+<p>Now explore the changes of the stress score with the menstrual cycle.
+The participants slept best during the menstrual time, probably a good
+sign to rest well during this time. The lowest sleep score were recorded
+during ovulation/ fertility time in which the increased estrogen and lh
+levels may contribute to this low sleep quality. The higher stress score
+the less stressful people experience. In this study, the participants
+showed the least stressful during folicular period , as the bodies are
+full of energy. The most stressful time is during luteal period.</p>
+<pre class="r"><code>plot_1 = 
+  sleep_stress_hormone |&gt;
+  group_by(phase) |&gt;
   summarize(
     mean_sleep_score = mean(overall_score, na.rm = TRUE),
     mean_stress_score = mean(stress_score, na.rm = TRUE),
@@ -377,17 +387,179 @@ cycle</p>
     phase = factor(phase, levels = phase_order)
   ) |&gt;
   ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
-    geom_line(linewidth= 1) +
+    geom_smooth(linewidth= 1) +
     geom_point(size = 3) +
-    facet_wrap(~study_interval) +
     labs(color = &quot;Metric&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
     labs(
-    title = &quot;Stress and Sleep Score Across Menstrual Cycle Phases&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;score&quot;
+    y = &quot;Score&quot;
   ) +
     theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+  theme(legend.position = &quot;bottom&quot;,
+    axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_2  =
+  sleep_stress_hormone |&gt;
+  group_by(phase) |&gt;
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = &quot;LH&quot;,
+                    mean_estrogen     = &quot;Estrogen&quot;),
+    phase = factor(phase, levels = phase_order)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Level&quot;
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+    axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_1+ plot_2</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : span too small.  fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at 0.985</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 2.015</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : There are other near singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.  fewer
+## data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used at
+## 0.985</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 2.015</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal condition
+## number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other near
+## singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : span too small.  fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at 0.985</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 2.015</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : There are other near singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.  fewer
+## data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used at
+## 0.985</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 2.015</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal condition
+## number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other near
+## singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf
+## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : span too small.  fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at 0.985</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 2.015</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : There are other near singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.  fewer
+## data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used at
+## 0.985</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 2.015</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal condition
+## number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other near
+## singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : span too small.  fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at 0.985</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 2.015</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : There are other near singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.  fewer
+## data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used at
+## 0.985</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 2.015</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal condition
+## number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if (is.null(newdata)) object$x
+## else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other near
+## singularities as well. 4.0602</code></pre>
+<pre><code>## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf
+## Warning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning
+## -Inf</code></pre>
 <p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>Variation of sleep score across menstrual cycle phases</p>
 <pre class="r"><code>sleep_stress_hormone |&gt;
@@ -445,7 +617,7 @@ each</p>
   ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
     geom_line(size = 1) +
     geom_point(size = 3) +
-    facet_grid(~ study_interval + metric) +
+    facet_grid(study_interval ~ metric) +
     labs(color = &quot;Ethnicity&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
     labs(
     title = &quot;stress and sleep score Across Menstrual Cycle Phases&quot;,
@@ -498,32 +670,32 @@ summary(m1)</code></pre>
 ## Formula: stress_score ~ phase + study_interval + (1 | id)
 ##    Data: sleep_stress_hormone2
 ## 
-## REML criterion at convergence: 38094.9
+## REML criterion at convergence: 25467.2
 ## 
 ## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.7802 -0.0763  0.1818  0.4430  2.5553 
+##      Min       1Q   Median       3Q      Max 
+## -12.2890  -0.5480   0.0429   0.6122   2.7105 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance Std.Dev.
-##  id       (Intercept) 154.5    12.43   
-##  Residual             451.8    21.26   
-## Number of obs: 4243, groups:  id, 36
+##  id       (Intercept) 13.29    3.646   
+##  Residual             42.21    6.497   
+## Number of obs: 3852, groups:  id, 36
 ## 
 ## Fixed effects:
-##                  Estimate Std. Error t value
-## (Intercept)    2338.42783  825.56947   2.833
-## phaseFertility   -1.51133    0.96011  -1.574
-## phaseLuteal      -0.70965    0.89320  -0.795
-## phaseMenstrual    0.02759    1.02919   0.027
-## study_interval   -1.12243    0.40815  -2.750
+##                 Estimate Std. Error t value
+## (Intercept)    958.58490  265.99425   3.604
+## phaseFertility  -0.86808    0.30820  -2.817
+## phaseLuteal     -0.92857    0.28599  -3.247
+## phaseMenstrual  -0.04541    0.32905  -0.138
+## study_interval  -0.43592    0.13150  -3.315
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) phsFrt phsLtl phsMns
-## phaseFrtlty  0.028                     
-## phaseLuteal  0.013  0.542              
-## phaseMnstrl  0.015  0.479  0.517       
-## study_ntrvl -1.000 -0.029 -0.013 -0.016</code></pre>
+## phaseFrtlty  0.023                     
+## phaseLuteal  0.007  0.540              
+## phaseMnstrl  0.010  0.478  0.516       
+## study_ntrvl -1.000 -0.024 -0.008 -0.011</code></pre>
 <pre class="r"><code>sleep_stress_hormone_add =
   sleep_score1 |&gt;
     inner_join(hormone1,      by = join_by(id, day_in_study)) |&gt;
@@ -557,256 +729,256 @@ sleep_stress_hormone_add |&gt;
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">1</td>
-<td align="right">1.4</td>
-<td align="right">8.4</td>
-<td align="right">5.5</td>
-<td align="right">2.2</td>
-</tr>
-<tr class="even">
 <td align="right">2</td>
-<td align="right">7.5</td>
+<td align="right">8.0</td>
 <td align="right">8.4</td>
 <td align="right">6.8</td>
 <td align="right">5.3</td>
 </tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">5.5</td>
-<td align="right">5.4</td>
-<td align="right">5.1</td>
-<td align="right">5.8</td>
-</tr>
 <tr class="even">
+<td align="right">3</td>
+<td align="right">5.3</td>
+<td align="right">4.7</td>
+<td align="right">4.7</td>
+<td align="right">5.6</td>
+</tr>
+<tr class="odd">
 <td align="right">6</td>
 <td align="right">7.3</td>
-<td align="right">6.9</td>
+<td align="right">6.8</td>
 <td align="right">6.5</td>
-<td align="right">6.6</td>
+<td align="right">6.9</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">7</td>
 <td align="right">7.5</td>
 <td align="right">7.1</td>
 <td align="right">7.7</td>
 <td align="right">7.7</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">8</td>
 <td align="right">6.8</td>
 <td align="right">7.7</td>
 <td align="right">6.0</td>
-<td align="right">7.1</td>
+<td align="right">7.0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">9</td>
 <td align="right">7.4</td>
-<td align="right">7.6</td>
+<td align="right">7.7</td>
 <td align="right">6.9</td>
 <td align="right">6.7</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">10</td>
-<td align="right">7.6</td>
+<td align="right">7.5</td>
 <td align="right">7.3</td>
 <td align="right">6.8</td>
 <td align="right">7.8</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">12</td>
 <td align="right">7.1</td>
 <td align="right">7.3</td>
 <td align="right">6.8</td>
 <td align="right">7.4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">13</td>
-<td align="right">7.1</td>
-<td align="right">6.7</td>
-<td align="right">7.6</td>
+<td align="right">6.9</td>
+<td align="right">6.5</td>
+<td align="right">7.5</td>
 <td align="right">7.2</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">14</td>
-<td align="right">7.7</td>
-<td align="right">7.3</td>
-<td align="right">7.3</td>
+<td align="right">7.6</td>
+<td align="right">7.5</td>
+<td align="right">7.2</td>
 <td align="right">7.8</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">15</td>
 <td align="right">5.2</td>
-<td align="right">6.1</td>
+<td align="right">5.9</td>
 <td align="right">6.4</td>
 <td align="right">6.5</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">16</td>
-<td align="right">7.4</td>
-<td align="right">6.5</td>
 <td align="right">7.3</td>
+<td align="right">6.5</td>
+<td align="right">7.2</td>
 <td align="right">7.3</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">18</td>
 <td align="right">6.5</td>
 <td align="right">7.0</td>
 <td align="right">6.8</td>
-<td align="right">7.2</td>
+<td align="right">7.1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">20</td>
 <td align="right">7.7</td>
 <td align="right">7.4</td>
 <td align="right">7.2</td>
 <td align="right">6.9</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">22</td>
-<td align="right">6.4</td>
+<td align="right">6.3</td>
 <td align="right">7.3</td>
-<td align="right">7.5</td>
+<td align="right">7.3</td>
 <td align="right">7.6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">24</td>
 <td align="right">4.9</td>
-<td align="right">4.9</td>
-<td align="right">4.4</td>
 <td align="right">5.0</td>
+<td align="right">4.4</td>
+<td align="right">4.7</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">26</td>
 <td align="right">6.7</td>
-<td align="right">6.5</td>
+<td align="right">6.4</td>
 <td align="right">6.1</td>
 <td align="right">6.7</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
-<td align="right">6.2</td>
-<td align="right">6.6</td>
-<td align="right">7.0</td>
-<td align="right">6.9</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="right">6.3</td>
 <td align="right">5.6</td>
-<td align="right">5.4</td>
-<td align="right">8.8</td>
+<td align="right">5.7</td>
+<td align="right">6.6</td>
+<td align="right">6.7</td>
 </tr>
 <tr class="odd">
+<td align="right">29</td>
+<td align="right">6.2</td>
+<td align="right">5.6</td>
+<td align="right">5.2</td>
+<td align="right">8.4</td>
+</tr>
+<tr class="even">
 <td align="right">30</td>
-<td align="right">6.9</td>
-<td align="right">7.0</td>
-<td align="right">7.4</td>
-<td align="right">7.0</td>
-</tr>
-<tr class="even">
-<td align="right">32</td>
-<td align="right">7.3</td>
-<td align="right">7.2</td>
 <td align="right">6.8</td>
-<td align="right">7.6</td>
+<td align="right">6.6</td>
+<td align="right">7.1</td>
+<td align="right">6.8</td>
 </tr>
 <tr class="odd">
+<td align="right">32</td>
+<td align="right">7.4</td>
+<td align="right">7.2</td>
+<td align="right">6.6</td>
+<td align="right">7.7</td>
+</tr>
+<tr class="even">
 <td align="right">33</td>
-<td align="right">6.9</td>
+<td align="right">7.0</td>
 <td align="right">7.2</td>
 <td align="right">7.0</td>
 <td align="right">7.0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">34</td>
 <td align="right">7.8</td>
-<td align="right">7.0</td>
-<td align="right">7.0</td>
 <td align="right">7.1</td>
-</tr>
-<tr class="odd">
-<td align="right">37</td>
-<td align="right">6.4</td>
-<td align="right">6.5</td>
-<td align="right">7.9</td>
-<td align="right">4.8</td>
+<td align="right">7.0</td>
+<td align="right">6.9</td>
 </tr>
 <tr class="even">
+<td align="right">37</td>
+<td align="right">6.2</td>
+<td align="right">6.1</td>
+<td align="right">7.7</td>
+<td align="right">4.8</td>
+</tr>
+<tr class="odd">
 <td align="right">38</td>
-<td align="right">7.5</td>
+<td align="right">7.3</td>
 <td align="right">7.2</td>
 <td align="right">7.1</td>
 <td align="right">7.1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">39</td>
-<td align="right">7.6</td>
-<td align="right">6.2</td>
+<td align="right">6.8</td>
+<td align="right">5.3</td>
+<td align="right">5.8</td>
+<td align="right">5.9</td>
+</tr>
+<tr class="odd">
+<td align="right">40</td>
+<td align="right">7.8</td>
+<td align="right">6.9</td>
 <td align="right">6.6</td>
-<td align="right">6.1</td>
+<td align="right">7.6</td>
 </tr>
 <tr class="even">
-<td align="right">40</td>
-<td align="right">8.7</td>
-<td align="right">7.0</td>
-<td align="right">7.0</td>
-<td align="right">8.8</td>
-</tr>
-<tr class="odd">
 <td align="right">41</td>
 <td align="right">7.6</td>
-<td align="right">6.9</td>
+<td align="right">6.8</td>
 <td align="right">7.7</td>
 <td align="right">7.5</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">42</td>
 <td align="right">6.6</td>
 <td align="right">6.4</td>
 <td align="right">7.1</td>
 <td align="right">7.0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">43</td>
-<td align="right">6.3</td>
+<td align="right">6.2</td>
 <td align="right">7.0</td>
 <td align="right">7.3</td>
 <td align="right">7.4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
 <td align="right">7.5</td>
 <td align="right">7.4</td>
-<td align="right">6.9</td>
+<td align="right">6.8</td>
 <td align="right">7.3</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">46</td>
 <td align="right">6.7</td>
-<td align="right">6.1</td>
 <td align="right">5.8</td>
+<td align="right">5.6</td>
 <td align="right">6.0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">47</td>
 <td align="right">7.2</td>
-<td align="right">6.8</td>
+<td align="right">6.9</td>
 <td align="right">7.5</td>
-<td align="right">7.5</td>
-</tr>
-<tr class="odd">
-<td align="right">48</td>
-<td align="right">6.8</td>
-<td align="right">6.2</td>
-<td align="right">7.2</td>
-<td align="right">7.1</td>
+<td align="right">7.4</td>
 </tr>
 <tr class="even">
+<td align="right">48</td>
+<td align="right">6.7</td>
+<td align="right">6.5</td>
+<td align="right">7.2</td>
+<td align="right">7.0</td>
+</tr>
+<tr class="odd">
 <td align="right">50</td>
 <td align="right">7.0</td>
 <td align="right">7.1</td>
 <td align="right">6.9</td>
 <td align="right">7.0</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">7.9</td>
+<td align="right">3.2</td>
+<td align="right">NA</td>
 </tr>
 </tbody>
 </table>
@@ -828,6 +1000,27 @@ sleep_stress_hormone_add |&gt;
 <pre><code>## `summarise()` has grouped output by &#39;phase&#39;. You can override using the
 ## `.groups` argument.</code></pre>
 <p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>See the correlation in sleep score file</p>
+<pre class="r"><code>sleep_score |&gt;
+  group_by(id)|&gt;
+  summarise(mean_deep_sleep = mean(deep_sleep_in_minutes),
+            mean_overall_score = mean(overall_score))|&gt;
+  ggplot(aes(x= mean_overall_score, y = mean_deep_sleep )) +
+  geom_point()</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
+<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>NOT WORKING_try to put all in one scale</p>
+<p>See time in bed and deep sleep vs menstrual cycle</p>
+<pre class="r"><code>sleep_stress_hormone_add |&gt;
+  group_by(phase)|&gt;
+   summarize(timeinbed = mean(timeinbed/60, na.rm = TRUE),
+             deep_sleep_in_minutes = mean(deep_sleep_in_minutes/60, na.rm = TRUE)
+             )|&gt;
+  ggplot(aes(x= phase)) +
+  geom_line(aes( y = deep_sleep_in_minutes, group = 1),color = &quot;blue&quot;,  linewidth = 0.8) +
+  geom_line(aes(y = timeinbed, group = 1), color = &quot;red&quot;, linewidth = 0.8)</code></pre>
+<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 
 
 

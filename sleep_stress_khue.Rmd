@@ -10,6 +10,7 @@ library(modelr)
 library(mgcv)
 library(dplyr)
 library(tidyr)
+library(patchwork)
 
 set.seed(1)
 #library(readxl)
@@ -62,13 +63,14 @@ Combine the sleep and stress score
 ```{r}
 # join two data sets, using inner join
 sleep_score1 = sleep_score |>
-  select(id,study_interval, day_in_study, overall_score)
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes)
 
 sleep1 = sleep|>
    select(id,study_interval, sleep_start_day_in_study, timeinbed) |>
    mutate(day_in_study = sleep_start_day_in_study) |>
   select(-sleep_start_day_in_study)
 stress_score1 = stress_score |>
+  filter(calculation_failed == "FALSE")|>
   select(id, study_interval, day_in_study, stress_score)|>
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
@@ -79,21 +81,20 @@ sum(is.na(sleep_stress$overall_score))
 sum(is.na(sleep_stress$stress_score))
 ```
 
+Showing the sleep score and stress score changes 
 
 ```{r}
 # graphs to show the score across ids
 sleep_stress|>
-  group_by(id, study_interval) |>
+  group_by(id) |> 
   summarize(
     mean_sleep_score = mean(overall_score, na.rm = TRUE),
     mean_stress_score = mean(stress_score, na.rm = TRUE),
     .groups = "drop"
   ) |>
   ggplot(aes(x = id, mean_sleep_score)) +
-  geom_line(aes(y = mean_sleep_score, color = "mean_sleep_score") )+
-  geom_line(aes(y = mean_stress_score, color = "mean_stress_score")) +
-  facet_grid(~study_interval)
-  
+  geom_smooth(aes(y = mean_sleep_score, color = "mean_sleep_score"), se= FALSE )+
+  geom_smooth(aes(y = mean_stress_score, color = "mean_stress_score"), se = FALSE) 
 
 ```
 
@@ -119,13 +120,15 @@ sleep_stress_hormone =
   inner_join(sleep_stress,hormone1, join_by(id, day_in_study))
 ```
 
-Now explore the changes of the stress score with the menstrual cycle
+Now explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
+The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
 
 
 ```{r}
 
-sleep_stress_hormone |>
-  group_by(phase, study_interval) |>
+plot_1 = 
+  sleep_stress_hormone |>
+  group_by(phase) |>
   summarize(
     mean_sleep_score = mean(overall_score, na.rm = TRUE),
     mean_stress_score = mean(stress_score, na.rm = TRUE),
@@ -143,18 +146,49 @@ sleep_stress_hormone |>
     phase = factor(phase, levels = phase_order)
   ) |>
   ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
-    geom_line(linewidth= 1) +
+    geom_smooth(linewidth= 1) +
     geom_point(size = 3) +
-    facet_wrap(~study_interval) +
     labs(color = "Metric", y = "Mean Score", x = "Phase") +
     labs(
-    title = "Stress and Sleep Score Across Menstrual Cycle Phases",
     x = "Menstrual Cycle Phase",
-    y = "score"
+    y = "Score"
   ) +
     theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
 
+plot_2  =
+  sleep_stress_hormone |>
+  group_by(phase) |>
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = "LH",
+                    mean_estrogen     = "Estrogen"),
+    phase = factor(phase, levels = phase_order)
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_1+ plot_2
 ```
 
 Variation of sleep score across menstrual cycle phases
@@ -229,7 +263,7 @@ sleep_stress_hormone2 |>
   ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
     geom_line(size = 1) +
     geom_point(size = 3) +
-    facet_grid(~ study_interval + metric) +
+    facet_grid(study_interval ~ metric) +
     labs(color = "Ethnicity", y = "Mean Score", x = "Phase") +
     labs(
     title = "stress and sleep score Across Menstrual Cycle Phases",
@@ -311,3 +345,79 @@ sleep_stress_hormone_add |>
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+See the correlation in sleep score file
+```{r}
+sleep_score |>
+  group_by(id)|>
+  summarise(mean_deep_sleep = mean(deep_sleep_in_minutes),
+            mean_overall_score = mean(overall_score))|>
+  ggplot(aes(x= mean_overall_score, y = mean_deep_sleep )) +
+  geom_point()
+```
+
+
+NOT WORKING_try to put all in one scale
+```{r, include= FALSE}
+
+sleep_stress_hormone_plot = 
+  sleep_stress_hormone |>
+  group_by(phase) |>
+  summarize(
+    mean_sleep_score = mean(overall_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = "drop"
+  ) 
+### create new vars
+left_vars  <- c("mean_sleep_score", "mean_stress_score")
+right_vars <- c("mean_lh")
+### scale
+scaleFactor <- max(sleep_stress_hormone_plot[, right_vars], na.rm = TRUE)/
+               max(sleep_stress_hormone_plot[, left_vars],  na.rm = TRUE)
+scaleFactor2 = max(sleep_stress_hormone_plot[,"mean_estrogen"])/ max(sleep_stress_hormone_plot[,"mean_stress_score"])
+## create plot
+sleep_stress_hormone_plot|>
+   pivot_longer(cols = starts_with("mean"),
+               names_to = "metric",
+               values_to = "value")|>
+    mutate(phase = factor(phase, levels = phase_order),
+    value_plot = case_when(metric == "mean_lh" ~ value / scaleFactor,  # scale lh up
+                           metric == "mean_estrogen" ~ value/scaleFactor2,
+                           metric %in% c("mean_sleep_score", "mean_stress_score") ~ value -30)
+    )|>
+  ggplot(aes(x = phase))+
+  geom_smooth(aes(y = value_plot, color = metric, group = metric), size = 1) +
+    scale_y_continuous(
+    name = "Sleep & Stress Score (left axis)",
+    #limits = c(65, 80),                #range of sleep score
+    sec.axis = sec_axis( ~ . * scaleFactor,
+  name = "Hormone Levels (LH & Estrogen)",
+  breaks = c(0, 10, 50, 100))) +
+  scale_color_manual(
+    values = c(
+      "mean_sleep_score" = "blue",
+      "mean_stress_score" = "darkgreen",
+      "mean_lh" = "red",
+      "mean_estrogen" = "purple"
+    )
+  ) +
+  theme_minimal(base_size = 14) 
+
+```
+
+
+See time in bed and deep sleep vs menstrual cycle
+
+```{r}
+sleep_stress_hormone_add |>
+  group_by(phase)|>
+   summarize(timeinbed = mean(timeinbed/60, na.rm = TRUE),
+             deep_sleep_in_minutes = mean(deep_sleep_in_minutes/60, na.rm = TRUE)
+             )|>
+  ggplot(aes(x= phase)) +
+  geom_line(aes( y = deep_sleep_in_minutes, group = 1),color = "blue",  linewidth = 0.8) +
+  geom_line(aes(y = timeinbed, group = 1), color = "red", linewidth = 0.8)
+```
+
