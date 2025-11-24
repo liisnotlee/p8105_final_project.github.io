@@ -11,6 +11,8 @@ library(mgcv)
 library(dplyr)
 library(tidyr)
 library(patchwork)
+library(lme4)
+library(lmerTest)
 
 set.seed(1)
 #library(readxl)
@@ -38,6 +40,8 @@ sleep       = read_csv("data/sleep.csv") |>
 stress_score = read_csv("data/stress_score.csv") |>
   janitor::clean_names()
 hormone = read_csv("data/hormones_and_selfreport.csv") |>
+  janitor::clean_names()
+exercise = read_csv("data/exercise.csv") |>
   janitor::clean_names()
 ```
 
@@ -75,7 +79,31 @@ stress_score1 = stress_score |>
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
 sleep_stress = inner_join(sleep_score1, stress_score1, join_by("id", "study_interval", "day_in_study"))
- 
+ # cleaning exercise from Anu
+exercise_clean = exercise|>
+  distinct()|>
+  select(id, study_interval, start_day_in_study, 
+         activityname, calories, duration, activeduration, 
+         averageheartrate, steps, elevationgain)
+
+# Aggregate to daily level
+exercise_daily = exercise_clean %>%
+  group_by(id, study_interval, start_day_in_study) %>%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = max(averageheartrate, na.rm = TRUE),
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  rename(day_in_study = start_day_in_study)
+exercise_daily1 = exercise_daily |>
+  select(id, day_in_study, total_active_min, study_interval)
 # check of na values
 sum(is.na(sleep_stress$overall_score))
 sum(is.na(sleep_stress$stress_score))
@@ -83,7 +111,7 @@ sum(is.na(sleep_stress$stress_score))
 
 Showing the sleep score and stress score changes 
 
-```{r}
+```{r, warning=FALSE}
 # graphs to show the score across ids
 sleep_stress|>
   group_by(id) |> 
@@ -124,7 +152,7 @@ Now explore the changes of the stress score with the menstrual cycle. The partic
 The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
 
 
-```{r}
+```{r, warning= FALSE}
 
 plot_1 = 
   sleep_stress_hormone |>
@@ -278,6 +306,7 @@ sleep_stress_hormone2 |>
  
 
 ```{r}
+dodge <- position_dodge(width = 0.5)
 sleep_stress_hormone2 |>
   select(id, ethnicity, stress_score, overall_score) |>
   drop_na()|>
@@ -289,32 +318,25 @@ sleep_stress_hormone2 |>
   mutate(
     metric = recode(metric,
       overall_score = "Sleep Score",
-      stress_score  = "Stress Score"
+      stress_score  = "Stress Score",
     )
   ) |>
   ggplot(aes(x = ethnicity, y = value, fill = metric)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  labs(y = "Score", fill = "Metric")
-
-```
-
-```{r}
-library(lme4)
-
-#  model
-m1 <- lmer(stress_score ~ phase + study_interval + (1 | id), data = sleep_stress_hormone2)
-summary(m1)
+  geom_violin(position = dodge,alpha = 0.5, trim = TRUE) +
+  geom_boxplot(width = 0.5, alpha= 0.1)+
+    labs(y = "Score", fill = "Metric")
 
 ```
 
 
 
-```{r}
+```{r, include=FALSE}
 sleep_stress_hormone_add =
   sleep_score1 |>
     inner_join(hormone1,      by = join_by(id, day_in_study)) |>
     inner_join(sleep1,        by = join_by(id, study_interval, day_in_study)) |>
-    inner_join(stress_score1, by = join_by(id, study_interval, day_in_study))
+    inner_join(stress_score1, by = join_by(id, study_interval, day_in_study)) |>
+    inner_join(exercise_daily1, by = join_by(id, study_interval, day_in_study))
 
 # create a table
 sleep_stress_hormone_add |>
@@ -334,6 +356,7 @@ sleep_stress_hormone_add |>
   summarize(
     timeinbed = mean(timeinbed/60)
   )|> 
+   mutate(phase = factor(phase, levels = phase_order))|>
   ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.2) +
@@ -410,14 +433,79 @@ sleep_stress_hormone_plot|>
 
 See time in bed and deep sleep vs menstrual cycle
 
-```{r}
-sleep_stress_hormone_add |>
+```{r, warning=FALSE}
+coeff = 5.5 # 5 is the best overlap
+timeinbed_color = "red"
+deep_sleep_color = "blue"
+plot_3 = sleep_stress_hormone_add |>
+  mutate(phase = factor(phase, levels = phase_order))|>
   group_by(phase)|>
    summarize(timeinbed = mean(timeinbed/60, na.rm = TRUE),
-             deep_sleep_in_minutes = mean(deep_sleep_in_minutes/60, na.rm = TRUE)
+             deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
              )|>
-  ggplot(aes(x= phase)) +
-  geom_line(aes( y = deep_sleep_in_minutes, group = 1),color = "blue",  linewidth = 0.8) +
-  geom_line(aes(y = timeinbed, group = 1), color = "red", linewidth = 0.8)
+   ggplot(aes(x= phase)) +
+  geom_smooth(aes(y = timeinbed,group = 1), color = timeinbed_color, linewidth = 0.8) +
+  geom_smooth(aes( y = deep_sleep_in_minutes, group = 1), color = deep_sleep_color, linewidth = 0.8)+
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Time in bed (hours)",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name="Deep sleep (hours)")
+  ) +
+  theme(
+    axis.title.y = element_text(color = timeinbed_color, size=13),
+    axis.title.y.right = element_text(color = deep_sleep_color, size=13)
+  )
+plot_3
+plot_1 + plot_2 + plot_3
 ```
+ 
+Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
+It will be good to link with exercising activities. 
 
+```{r}
+coeff = 1 # 5 is the best overlap
+total_active_min_color= "red"
+stress_score_color = "blue"
+sleep_stress_hormone_add |>
+  mutate(phase = factor(phase, levels = phase_order))|>
+  group_by(phase)|>
+   summarize(total_active_min = mean(total_active_min, na.rm = TRUE),
+             stress_score = mean(stress_score*coeff, na.rm = TRUE)
+             )|>
+   ggplot(aes(x= phase)) +
+  geom_line(aes(y = total_active_min,group = 1), color = total_active_min_color, linewidth = 0.8) +
+  geom_line(aes( y = stress_score , group = 1), color = deep_sleep_color, linewidth = 0.8)+
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Active time(minutes))",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name="Stress score")
+  ) +
+  theme(
+    axis.title.y = element_text(color = total_active_min_color, size=13),
+    axis.title.y.right = element_text(color = stress_score_color, size=13)
+  )
+```
+We need to check if the exercise activities/ time link to stress score?
+
+We have 
+`stress score`, `sleep score`, `phase`, `excersise time`, `estrogen`, `lh`
+
+We can try to predict the stress score based on phase, time in bed, deep sleep time?
+Is there a way to link exercise vs symptom? Maybe Anu did this analysis?
+Do we include study_interval as the random effect? Maybe not.
+```{r}
+#  model
+m1 <- lmer(stress_score ~ phase + timeinbed + total_active_min +(1 | id) + moodswing, data = sleep_stress_hormone_add)
+summary(m1) 
+# etracting coefficient
+coefficients_values = fixed.effects(m1)
+intercept_values = random.effects(m1)
+fitted_stress_score = fitted.values(m1)
+# check the residuals
+qqnorm(residuals(m1)) 
+
+```
