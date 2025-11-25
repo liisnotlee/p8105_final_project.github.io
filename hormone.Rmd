@@ -20,7 +20,7 @@ my_int=
   mutate(
     phase = factor(phase, levels = c("Follicular", "Fertility", "Luteal", "Menstrual")),
     fatigue = factor(fatigue, 
-                     levels = c("Low", "Moderate", "High", "Very High")),
+                     levels = c("Low", "Moderate", "High", "Very High", "Not at all")),
     moodswing = factor(moodswing,
                        levels = c("Very Low/Little", "Low", "Moderate", "High","Very High","Not at all"))
   )
@@ -74,11 +74,12 @@ my_int_clean <- my_int |>
 
 #so i aim to change the catogorical value (low, moderate, high) to 1,2,3, and so on. i want to sum and avrage. to show a typical cahnge of fatigue and mood in four phases. 
 
-```{r, include=FALSE}
+```{r}
 # Convert moodswing and fatigue to numeric intensity scores
 my_int_numeric <- my_int_clean %>%
   mutate(
     moodswing_num = case_when(
+      moodswing == "Not at all" ~0,
       moodswing == "Very Low/Little" ~ 1,
       moodswing == "Low" ~ 2,
       moodswing == "Moderate" ~ 3,
@@ -87,6 +88,7 @@ my_int_numeric <- my_int_clean %>%
       TRUE ~ NA_real_
     ),
     fatigue_num = case_when(
+      fatigue == "Not at all" ~0,
       fatigue == "Low" ~ 1,
       fatigue == "Moderate" ~ 2,
       fatigue == "High" ~ 3,
