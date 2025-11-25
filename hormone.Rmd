@@ -428,7 +428,77 @@ ggplot(my_i_avg, aes(x = phase, y = avg_appetite, group = 1)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
+#the not at all strongly affect the curve. so i tried another scatter plot for each (delete the not at all)
+
 ```{r}
+my_i_filtered <- my_i %>%
+  filter(flow_volume != "Not at all", flow_color != "Not at all") %>%
+  mutate(
+    # Flow volume numeric mapping
+    flow_volume_num = case_when(
+      flow_volume == "Spotting / Very Light" ~ 1,
+      flow_volume == "Light" ~ 2,
+      flow_volume == "Moderate" ~ 3,
+      flow_volume == "Somewhat Heavy" ~ 4,
+      flow_volume == "Heavy" ~ 5,
+      flow_volume == "Very Heavy" ~ 6,
+      TRUE ~ NA_real_
+    ),
+    # Flow color numeric mapping
+    flow_color_num = case_when(
+      flow_color == "Pink" ~ 1,
+      flow_color == "Bright Red" ~ 2,
+      flow_color == "Dark Brown / Dark Red" ~ 3,
+      flow_color == "Grey" ~ 4,
+      flow_color == "Black" ~ 5,
+      flow_color == "Other" ~ 6,
+      TRUE ~ NA_real_
+    )
+  )
+phase_order <- c("Menstrual", "Follicular", "Fertility", "Luteal")
+
+avg_flow <- my_i_filtered %>%
+  group_by(phase = factor(phase, levels = phase_order)) %>%
+  summarise(
+    avg_flow_volume = mean(flow_volume_num, na.rm = TRUE),
+    avg_flow_color = mean(flow_color_num, na.rm = TRUE),
+    .groups = 'drop'
+  )
+flow_volume_levels <- c("Spotting / Very Light", "Light", "Moderate", 
+                        "Somewhat Heavy", "Heavy", "Very Heavy")
+
+ggplot(avg_flow, aes(x = phase, y = avg_flow_volume, group = 1)) +
+  geom_line(color = "blue", size = 1.5) +
+  geom_point(color = "red", size = 3) +
+  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
+  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_volume_levels) +
+  labs(title = "Average Flow Volume Across Menstrual Cycle Phases (excluding 'Not at all')",
+       x = "Phase", y = "Flow Volume") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Flow Color
+flow_color_levels <- c("Pink", "Bright Red", "Dark Brown / Dark Red", "Grey",
+                       "Black", "Other")
+
+ggplot(avg_flow, aes(x = phase, y = avg_flow_color, group = 1)) +
+  geom_line(color = "darkgreen", size = 1.5) +
+  geom_point(color = "red", size = 3) +
+  geom_text(aes(label = round(avg_flow_color,2)), vjust = -0.5) +
+  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_color_levels) +
+  labs(title = "Average Flow Color Across Menstrual Cycle Phases (excluding 'Not at all')",
+       x = "Phase", y = "Flow Color") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
+
+```{r}
+#(with the not at all data)
 library(dplyr)
 library(tidyr)
 
