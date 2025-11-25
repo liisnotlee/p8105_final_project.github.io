@@ -24,3 +24,5 @@ Li: 1. updated site.yml file 2. done all descriptive stats (age, weight, height)
 TODO: - interactivity over charts (hover to show n) - combine findings into report summary
 
 Test connection - li post repo name change
+
+Anu: conducted exploratory analysis to see if there are any worthwile relationships to further study. Conducted inferential analysis on exercise and menstrual symptoms.
