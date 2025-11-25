@@ -303,10 +303,329 @@ exercise time, exercise activities, and menstrual phases.</p>
 <li>hormones_and_selfreport.csv</li>
 <li>exercise.csv</li>
 </ul>
-<div id="data-importcleaningmerging" class="section level3">
-<h3>Data import/cleaning/merging</h3>
+<div id="load-libraries" class="section level3">
+<h3>Load libraries</h3>
 <pre class="r"><code># Load libraries
 library(tidyverse)</code></pre>
+</div>
+<div id="data-importcleaningmerging" class="section level3">
+<h3>Data import/cleaning/merging</h3>
+<pre class="r"><code># Read data
+exercise = read_csv(&quot;./data/exercise.csv&quot;)</code></pre>
+<pre><code>## Rows: 7282 Columns: 26
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (6): activityname, activitylevel, logtype, manualvaluesspecified, hear...
+## dbl  (13): id, study_interval, start_day_in_study, last_modified_day_in_stud...
+## lgl   (4): is_weekend, hasgps, shouldfetchdetails, hasactivezoneminutes
+## time  (3): start_timestamp, last_modified_timestamp, original_start_timestamp
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>hormones = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;)</code></pre>
+<pre><code>## Rows: 5659 Columns: 22
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
+## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
+## lgl  (1): is_weekend
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code># Clean and un-duplicate exercise data
+exercise_clean = exercise %&gt;%
+  distinct() %&gt;%
+  select(id, study_interval, start_day_in_study, 
+         activityname, calories, duration, activeduration, 
+         averageheartrate, steps, elevationgain)
+
+# Aggregate to daily level
+exercise_daily = exercise_clean %&gt;%
+  group_by(id, study_interval, start_day_in_study) %&gt;%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = max(averageheartrate, na.rm = TRUE),
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = &quot;, &quot;),
+    .groups = &quot;drop&quot;
+  ) %&gt;%
+  rename(day_in_study = start_day_in_study)</code></pre>
+<pre><code>## Warning: There were 6 warnings in `summarise()`.
+## The first warning was:
+## ℹ In argument: `max_heartrate = max(averageheartrate, na.rm = TRUE)`.
+## ℹ In group 924: `id = 30`, `study_interval = 2024`, `start_day_in_study = 861`.
+## Caused by warning in `max()`:
+## ! no non-missing arguments to max; returning -Inf
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5 remaining warnings.</code></pre>
+<pre class="r"><code># Convert Likert scales to numeric
+likert_to_num &lt;- c(&quot;Very Low/Little&quot; = 1, &quot;Low&quot; = 2, &quot;Moderate&quot; = 3, 
+                   &quot;High&quot; = 4, &quot;Very High&quot; = 5)
+
+hormones_clean = hormones %&gt;%
+  mutate(
+    stress_num = recode(stress, !!!likert_to_num),
+    fatigue_num = recode(fatigue, !!!likert_to_num),
+    cramps_num = recode(cramps, !!!likert_to_num),
+    sleepissue_num = recode(sleepissue, !!!likert_to_num),
+    exerciselevel_num = recode(exerciselevel, !!!likert_to_num),
+    appetite_num = recode(appetite, !!!likert_to_num),
+    bloating_num = recode(bloating, !!!likert_to_num),
+    # Order phase factor for proper plotting
+    phase = factor(phase, levels = c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;))
+  )</code></pre>
+<pre><code>## Warning: There were 7 warnings in `mutate()`.
+## The first warning was:
+## ℹ In argument: `stress_num = recode(...)`.
+## Caused by warning:
+## ! Unreplaced values treated as NA as `.x` is not compatible.
+## Please specify replacements exhaustively or supply `.default`.
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 6 remaining warnings.</code></pre>
+<pre class="r"><code># Merge datasets
+merged_data = hormones_clean %&gt;%
+  left_join(exercise_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) %&gt;%
+  mutate(
+    total_calories = replace_na(total_calories, 0),
+    total_duration_min = replace_na(total_duration_min, 0),
+    total_active_min = replace_na(total_active_min, 0),
+    total_steps = replace_na(total_steps, 0),
+    n_sessions = replace_na(n_sessions, 0),
+    total_elevation = replace_na(total_elevation, 0),
+    # Binary: did they exercise today?
+    exercised_today = ifelse(n_sessions &gt; 0, &quot;Yes&quot;, &quot;No&quot;)
+    # %&gt;% 
+    # filter(!is.na(phase)) # maybe filter out phase that is NA?
+  )</code></pre>
+</div>
+<div id="analysis" class="section level3">
+<h3>Analysis</h3>
+</div>
+<div id="exercise-duration-and-calories-burned-across-phases"
+class="section level3">
+<h3>1. Exercise duration and calories burned across phases</h3>
+<pre class="r"><code># Boxplot: Exercise duration by phase
+ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
+       aes(x = phase, y = total_duration_min, fill = phase)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(alpha = 0.1, width = 0.2) +
+  facet_wrap(~study_interval) +
+  labs(title = &quot;Exercise Duration Across Menstrual Phases&quot;,
+       x = &quot;Menstrual Phase&quot;, 
+       y = &quot;Total Exercise Duration (minutes)&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code># Boxplot: Calories burned by phase (faceted by study interval)
+ggplot(merged_data %&gt;% filter(total_calories &gt; 0), 
+       aes(x = phase, y = total_calories, fill = phase)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~study_interval) +
+  labs(title = &quot;Exercise Calories by Phase&quot;,
+       x = &quot;Menstrual Phase&quot;, 
+       y = &quot;Calories Burned&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+</div>
+<div id="heart-rate-during-exercise-across-phases"
+class="section level3">
+<h3>Heart rate during exercise across phases</h3>
+<pre class="r"><code># Average heart rate during exercise by phase
+ggplot(merged_data %&gt;% filter(!is.na(avg_heartrate)), 
+       aes(x = phase, y = avg_heartrate, fill = phase)) +
+  geom_boxplot(width = 0.2, alpha = 0.8) +
+  facet_wrap(~study_interval) +
+  labs(title = &quot;Exercise Intensity (Heart Rate) by Menstrual Phase&quot;,
+       x = &quot;Menstrual Phase&quot;, 
+       y = &quot;Average Heart Rate (bpm)&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="likelihood-of-exercising-across-phases" class="section level3">
+<h3>Likelihood of exercising across phases</h3>
+<pre class="r"><code># Calculate total proportion of days where exercise sessions &gt; 0 
+exercise_likelihood = merged_data %&gt;%
+  group_by(phase, study_interval) %&gt;%
+  summarise(
+    total_days = n(), # total no. of observations
+    exercise_days = sum(n_sessions &gt; 0), # total no. of sessions logged on that day
+    proportion = exercise_days / total_days, 
+    .groups = &quot;drop&quot;
+  )
+
+ggplot(exercise_likelihood, aes(x = phase, y = proportion, fill = phase)) +
+  geom_col(alpha = 0.8) +
+  geom_text(aes(label = scales::percent(proportion, accuracy = 0.1)), 
+            vjust = -0.5) +
+  facet_wrap(~study_interval) +
+  labs(title = &quot;Likelihood of Exercising by Menstrual Phase&quot;,
+       x = &quot;Menstrual Phase&quot;, 
+       y = &quot;Proportion of Days with Exercise&quot;) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 0.7)) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale range
+## (`geom_col()`).</code></pre>
+<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale range
+## (`geom_text()`).</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="hormone-levels-vs.-exercise-duration" class="section level3">
+<h3>Hormone levels vs. exercise duration</h3>
+<pre class="r"><code># NOT TO INCLUDE, DOES NOT REALLY OFFER ANY INSIGHT
+# Estrogen vs exercise duration
+ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
+       aes(x = estrogen, y = total_duration_min, color = phase)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, linetype = &quot;dashed&quot;) +
+  labs(title = &quot;Estrogen Level vs Exercise Duration&quot;,
+       x = &quot;Estrogen (ng/mL)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;,
+       color = &quot;Phase&quot;) +
+  theme_minimal()</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale range
+## (`stat_smooth()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># LH (luteinizing hormone) vs exercise
+ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
+       aes(x = lh, y = total_duration_min, color = phase)) +
+  geom_point(alpha = 0.5) +
+  labs(title = &quot;Luteinizing Hormone vs Exercise Duration&quot;,
+       subtitle = &quot;LH goes down during ovulation/fertility&quot;,
+       x = &quot;LH (mIU/mL)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;,
+       color = &quot;Phase&quot;) +
+  theme_minimal()</code></pre>
+<pre><code>## Warning: Removed 91 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code># Progesterone (PdG) vs exercise duration
+ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0 &amp; !is.na(pdg)), 
+       aes(x = pdg, y = total_duration_min, color = phase)) +
+  geom_point(alpha = 0.5) +
+  labs(title = &quot;Progesterone (PdG) vs Exercise Duration&quot;,
+       subtitle = &quot;PdG goes up in luteal phase&quot;,
+       x = &quot;PdG (mcg/mL)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;,
+       color = &quot;Phase&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+</div>
+<div id="comparing-menstrual-symptoms-to-exercise-duration"
+class="section level3">
+<h3>Comparing menstrual symptoms to exercise duration</h3>
+<pre class="r"><code># Stress vs Exercise
+ggplot(merged_data %&gt;% filter(!is.na(stress_num) &amp; total_duration_min &gt; 0), 
+       aes(x = factor(stress_num), y = total_duration_min, fill = phase)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = &quot;Self-Reported Stress vs Exercise Duration&quot;,
+       x = &quot;Stress Level (1=Very Low, 5=Very High)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;,
+       fill = &quot;Phase&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># Fatigue vs. exercise
+ggplot(merged_data %&gt;% filter(!is.na(fatigue_num) &amp; total_duration_min &gt; 0), 
+       aes(x = factor(fatigue_num), y = total_duration_min)) +
+  geom_boxplot(alpha = 0.7, fill = &quot;steelblue&quot;) +
+  labs(title = &quot;Fatigue Level vs Exercise Duration&quot;,
+       x = &quot;Fatigue (1=Very Low, 5=Very High)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre class="r"><code># Cramps vs Exercise (tried to observe by menstrual phases, too little data, plots don&#39;t generate nicely)
+ggplot(merged_data %&gt;% filter(!is.na(cramps_num), total_duration_min &gt; 0), 
+       aes(x = factor(cramps_num), y = total_duration_min)) +
+  geom_boxplot(fill = &quot;steelblue&quot;, alpha = 0.7) +
+  # geom_jitter(alpha = 0.2, width = 0.2) +  # Add points to see data
+  labs(title = &quot;Cramp Severity vs Exercise Duration&quot;,
+       x = &quot;Cramps (1=Very Low, 5=Very High)&quot;, 
+       y = &quot;Exercise Duration (min)&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-6-3.png" width="672" />
+### Comparing self-reported exercise results to objective measures</p>
+<pre class="r"><code># Don&#39;t really see any relationship. Same average durations reported across all groups
+# No alignment between exercise intensity and actual exercise duration
+
+ggplot(merged_data %&gt;% filter(!is.na(exerciselevel_num), total_duration_min &gt; 0), 
+       aes(x = exerciselevel_num, y = total_duration_min)) +
+  geom_jitter(alpha = 0.3, width = 0.2, height = 0, color = &quot;steelblue&quot;) +
+  geom_smooth(method = &quot;lm&quot;, se = TRUE, color = &quot;darkblue&quot;) +
+  labs(title = &quot;Self-Reported vs Objective Exercise Level&quot;,
+       subtitle = &quot;How well does perception match Fitbit data?&quot;,
+       x = &quot;Self-Reported Exercise Level (1=Very Low, 5=Very High)&quot;, 
+       y = &quot;Fitbit-Measured Duration (min)&quot;) +
+  theme_minimal()</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div
+id="spaghetti-plot-looking-at-individual-exercise-durations-over-different-phases"
+class="section level1">
+<h1>Spaghetti plot: looking at individual exercise durations over
+different phases</h1>
+<pre class="r"><code># Mean exercise by phase for each participant
+individual_patterns = merged_data %&gt;%
+  group_by(id, phase) %&gt;%
+  summarise(mean_duration = mean(total_duration_min, na.rm = TRUE),
+            .groups = &quot;drop&quot;)
+
+ggplot(individual_patterns, aes(x = phase, y = mean_duration, group = id)) +
+  geom_line(alpha = 0.3) +
+  geom_point(alpha = 0.3) +
+  stat_summary(aes(group = 1), fun = mean, geom = &quot;line&quot;, 
+               color = &quot;red&quot;, size = 1.5) +
+  stat_summary(aes(group = 1), fun = mean, geom = &quot;point&quot;, 
+               color = &quot;red&quot;, size = 3) +
+  labs(title = &quot;Individual Exercise Patterns Across Phases&quot;,
+       subtitle = &quot;Red line = group mean&quot;,
+       x = &quot;Menstrual Phase&quot;, 
+       y = &quot;Mean Exercise Duration (min)&quot;) +
+  theme_minimal()</code></pre>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="exercise_hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code># Don&#39;t really see much variation, seems exercise duration does not change dramatically across phases</code></pre>
+<div id="summary-statistics" class="section level3">
+<h3>Summary statistics</h3>
+<pre class="r"><code>merged_data %&gt;%
+  group_by(phase) %&gt;%
+  summarise(
+    n_observations = n(),
+    mean_duration = mean(total_duration_min, na.rm = TRUE),
+    sd_duration = sd(total_duration_min, na.rm = TRUE),
+    mean_calories = mean(total_calories, na.rm = TRUE),
+    mean_heartrate = mean(avg_heartrate, na.rm = TRUE),
+    percent_exercised = mean(n_sessions &gt; 0) * 100,
+    mean_stress = mean(stress_num, na.rm = TRUE),
+    mean_fatigue = mean(fatigue_num, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  )</code></pre>
+<pre><code>## # A tibble: 5 × 9
+##   phase    n_observations mean_duration sd_duration mean_calories mean_heartrate
+##   &lt;fct&gt;             &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Menstru…           1079          19.0        39.0          64.4           110.
+## 2 Follicu…           1386          21.1        43.1          76.8           109.
+## 3 Fertili…           1281          22.5        45.3          79.5           110.
+## 4 Luteal             1912          18.9        38.3          61.5           111.
+## 5 &lt;NA&gt;                  1          39.3        NA           258             123 
+## # ℹ 3 more variables: percent_exercised &lt;dbl&gt;, mean_stress &lt;dbl&gt;,
+## #   mean_fatigue &lt;dbl&gt;</code></pre>
+</div>
+<div id="inferential-analysis" class="section level3">
+<h3>Inferential analysis</h3>
+</div>
 </div>
 
 

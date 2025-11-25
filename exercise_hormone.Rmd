@@ -20,7 +20,7 @@ library(tidyverse)
 ```
 
 ### Data import/cleaning/merging
-```{r}
+```{r, message = FALSE, warning = FALSE}
 
 # Read data
 exercise = read_csv("./data/exercise.csv")
@@ -64,6 +64,7 @@ hormones_clean = hormones %>%
     exerciselevel_num = recode(exerciselevel, !!!likert_to_num),
     appetite_num = recode(appetite, !!!likert_to_num),
     bloating_num = recode(bloating, !!!likert_to_num),
+    moodswing_num = recode(moodswing, !!!likert_to_num),
     # Order phase factor for proper plotting
     phase = factor(phase, levels = c("Menstrual", "Follicular", "Fertility", "Luteal"))
   )
@@ -80,9 +81,9 @@ merged_data = hormones_clean %>%
     total_elevation = replace_na(total_elevation, 0),
     # Binary: did they exercise today?
     exercised_today = ifelse(n_sessions > 0, "Yes", "No")
-    # %>% 
-    # filter(!is.na(phase)) # maybe filter out phase that is NA?
-  )
+  ) %>% 
+  filter(!is.na(phase)) # maybe filter out phase that is NA?
+  
 ```
 
 
@@ -280,4 +281,155 @@ merged_data %>%
   )
 ```
 
+**IMPORTANT**: Should 2024 data be included? Any testing that requires the independence assumption would be violated. 
+- For descriptives, can facet them by interval, or do weighted descriptives, so each individual contributes equally to the analysis
+
 ### Inferential analysis
+```{r}
+# install.packages("lme4")
+# install.packages("lmerTest")
+# install.packages("broom.mixed")
+# install.packages("ggeffects")
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(ggeffects)
+```
+
+```{r}
+# Preparing analysis dataset
+analysis_data = merged_data %>%
+  mutate(study_interval = factor(study_interval))
+
+# Checking data structure
+cat("Total observations:", nrow(analysis_data), "\n")
+cat("Unique participants:", n_distinct(analysis_data$id), "\n")
+cat("Study intervals:", unique(analysis_data$study_interval), "\n")
+```
+#### Exercising and symptoms
+
+- Let's see if exercising helps with symptom severity
+- Doing mixed-effect modelling
+- Want to know effect of exercise on symptoms are controlling for individual differences
+- Included phase and ID to account for differences in symptoms by phase and individual differences
+```{r}
+# Model 1: Exercise → cramps
+model_cramps = lmer(cramps_num ~ total_duration_min + phase + (1|id), 
+                     data = analysis_data,
+                     REML = FALSE)
+summary(model_cramps)
+
+# Model 2: Exercise → fatigue
+model_fatigue = lmer(fatigue_num ~ total_duration_min + phase + (1|id), 
+                      data = analysis_data,
+                      REML = FALSE)
+summary(model_fatigue)
+
+# Model 3: Exercise → stress
+model_stress = lmer(stress_num ~ total_duration_min + phase + (1|id), 
+                     data = analysis_data,
+                     REML = FALSE)
+summary(model_stress)
+
+# Model 4: Exercise → mood swings
+model_mood = lmer(moodswing_num ~ total_duration_min + phase + (1|id), 
+                   data = analysis_data,
+                   REML = FALSE)
+summary(model_mood)
+
+# Model 5: Exercise → sleep issues
+model_sleep = lmer(sleepissue_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_sleep)
+
+# Model 6: Exercise → bloating
+model_bloating = lmer(bloating_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_bloating)
+
+# Model 7: Exercise → appetite
+model_appetite = lmer(appetite_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_appetite)
+
+ 
+```
+
+```{r}
+# Cleaning results:
+# Extract coefficients for exercise effect
+results_summary = bind_rows(
+  tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
+  tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
+  tidy(model_stress, effects = "fixed") %>% mutate(outcome = "Stress"),
+  tidy(model_mood, effects = "fixed") %>% mutate(outcome = "Mood swings"),
+  tidy(model_sleep, effects = "fixed") %>% mutate(outcome = "Sleep issues"),
+  tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
+  tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite")
+) %>%
+  filter(term == "total_duration_min") %>%
+  select(outcome, estimate, std.error, statistic, p.value) %>%
+  mutate(
+    significant = ifelse(p.value < 0.05, "Yes", "No"),
+    p.value = format.pval(p.value, digits = 3, eps = 0.001)
+  )
+
+print("Summary of exercise effects on symptoms:")
+print(results_summary)
+```
+#### Testing for interaction
+- Looking at whether any of the above symptoms differ by phase
+- Interaction is insignificant in all models
+```{r}
+# Interaction models
+# Cramps
+model_cramps_int = lmer(cramps_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+summary(model_cramps_int)
+
+# Testing if interaction is significant
+anova(model_cramps, model_cramps_int)
+
+# Fatigue
+model_fatigue_int =  lmer(fatigue_num ~ total_duration_min * phase + (1|id), 
+                          data = analysis_data,
+                          REML = FALSE)
+anova(model_fatigue, model_fatigue_int)
+
+# Stress
+model_stress_int = lmer(stress_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_stress, model_stress_int)
+
+# Moodswing
+model_mood_int = lmer(moodswing_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_mood, model_mood_int)
+
+# Sleepissue
+model_sleep_int = lmer(sleepissue_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_sleep, model_sleep_int)
+
+# bloating
+model_bloating_int = lmer(bloating_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_bloating, model_bloating_int)
+
+# appetite
+model_appetite_int = lmer(appetite_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_appetite, model_appetite_int)
+```
+
+
+
