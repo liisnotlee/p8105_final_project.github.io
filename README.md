@@ -22,8 +22,6 @@ TODO List for all
 4.  Meetings scheduled til 12/6/25 [<https://www.when2meet.com/?33734494-BJcvE>]
 
 
-Progress update:
+TODO：
 
-Li: 1. updated site.yml file 2. done all descriptive stats (age, weight, height) 3. set color theme for plots to be pastel2
-
-Anu: conducted exploratory analysis to see if there are any worthwile relationships to further study. Conducted inferential analysis on exercise and menstrual symptoms.
+1. add site ignore (remove data files)

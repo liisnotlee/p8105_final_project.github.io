@@ -16,6 +16,8 @@ navbar:
         href: sleep_stress_khue.html
       - text: "Exercise"
         href: exercise_hormone.html
+    - text: "Proposal"
+      href: proposal.html
   right:
     - text: "Meet the Team"
       href: about.html
