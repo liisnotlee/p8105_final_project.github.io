@@ -17,11 +17,10 @@ TODO List for all
     2.  Data Summary + Cleaning Process [Li]
     3.  EDA by sections [Yue]
     4.  Models by sections [Anu]
-    5.  Discussion + Limitations [by section] [Khue in charge]
+    5.  Discussion + Limitations [by section] [Khue]
 3.  Final touch up + Review
-4.  Meetings scheduled til 12/6/25 [<https://www.when2meet.com/?33734494-BJcvE>]
-
 
 TODO：
 
 1. add site ignore (remove data files)
+2. index page separate with css
