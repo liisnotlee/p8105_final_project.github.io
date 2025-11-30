@@ -1,8 +1,16 @@
 ---
-title: "Data"
+title: "Report"
 ---
 
-# Data Sources
+# Motivation
+
+# Related Work
+
+# Questions
+
+
+# Data 
+## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
 
@@ -22,17 +30,15 @@ The original dataset contains 23 structured tables organized by signal category.
 
 In total, we have 4 dataframes: `subject_info` (demographics data), `hormone_symptoms` (hormone and symtoms data), `sleep_stress` (sleep and stress related data), and `exercise` (exercise related data). For different analyses, we merged these dataframes by participant `id` as needed.
 
-# Data Cleaning Process
-
-Load necessary libraries
 
 ```{r load-lib, message=FALSE}
+# Load necessary libraries
 library(tidyverse)
 library(patchwork)
 library(ggsci)
 ```
 
-## `subject_info` - Subject-Relevant Data
+### `subject_info` - Subject-Relevant Data
 
 *Overview:*
 
@@ -46,13 +52,8 @@ It contains a total of 62 observations of 19 variables. Some key variables are t
 - Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study) 
 - Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
 
-*Steps:*
 
-1.  Cleaned up data from `height_and_weight.csv` into a dataframe called `ht_wt` which contains 42 observations of 7 variables.
-    1.  Some participants were enrolled in both 2022 and 2024, so they had baseline records of height and weight for both years (like `height_2022` and `height_2024`); hence, we took the averages and added two columns as `avg_height` and `avg_weight`.
-    2.  Checked data completeness. **Noted a lot of missing values for baseline height and weight, which might cause incomplete/biased data representation for participant characteristics summary. Noted that only 24 participants have at least one record of weight and height.**
-
-```{r ht-and-wt, message=FALSE}
+```{r ht-and-wt, include=FALSE}
 ht_wt = read_csv("data/height_and_weight.csv")|> 
   janitor::clean_names() |> 
   # calculate mean height/weight
@@ -64,24 +65,8 @@ ht_wt = read_csv("data/height_and_weight.csv")|>
   ungroup()
 ```
 
-```{r missing-value-ht-wt}
-# at least contain one ht and wt
-ht_wt |>
-  count(!is.na(avg_height) & !is.na(avg_weight))|> 
-  knitr::kable()
 
-ht_wt |>
-  summarise(
-    missing_ht = sum(is.na(avg_height)),
-    missing_wt = sum(is.na(avg_weight)),
-    missing_both = sum(is.na(avg_weight) & is.na(avg_height))
-  ) |> 
-  knitr::kable()
-```
-
-2.  Extracted participants study enrollment information from `hormones_and_selfreport.csv` and created a `study_flag` dataframe to represent the study year(s) participants were enrolled in (`0`=No, `1`=Yes). The `study_flag` dataframe only contains 3 variables: `id`, `study_2022` and `study_2024`.
-
-```{r, message=FALSE}
+```{r, include=FALSE}
 # import csv file
 hormones_and_selfreport = read_csv("data/hormones_and_selfreport.csv") |> 
   janitor::clean_names() 
@@ -97,13 +82,8 @@ study_flag <- hormones_and_selfreport  |>
   )
 ```
 
-3.  Merged `ht_wt` and `study_flag` with `subject_info` from `subject-info.csv` by participant's `id`.
-    1.  Used `pivot_long` for height, weight and study year variables (`1`=2022 only, `2`=2024 only, `3`=both 2022 and 2024). **Noted that participcants in 2024 were a subset of participants in 2022. In other words, there was no new participants in study 2024.** Because we used `pivot_long`, now if a participant was enrolled in both years, she will have 2 rows representing each year.
-    2.  Ensured all variables are in the correct type (e.g. numerics for age, height, weight, etc.)
-    3.  Calculated age based on enrollment study year.
-    4.  Calculated BMI for partcipants with both weight and height records.
 
-```{r}
+```{r, include=FALSE}
 # read in subject-info.csv
 subject_info_raw = read_csv("data/subject-info.csv") |> 
   janitor::clean_names()
@@ -156,14 +136,12 @@ subject_info <- subject_info_raw  |>
 ```
 
 
-## `hormone` - Hormone & Self-reported Data
+
+### `hormone` - Hormone & Self-reported Data
 *Overview:*
 
-*Steps:*
 
-1. Factor variables, 
-2. Convert categorical variable values to discrete numeric intensity scores (integer) (e.g. `moodswing` and `fatigue`)
-```{r, message = FALSE}
+```{r, include=FALSE}
 hormone_symptoms <- 
   read_csv("data/hormones_and_selfreport.csv") |> 
   janitor::clean_names() |> 
@@ -231,3 +209,10 @@ hormone_symptoms <-
   )
 
 ```
+
+# EDA
+
+# Modelling
+
+# Discussion
+## Limitation
