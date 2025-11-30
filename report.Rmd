@@ -8,8 +8,8 @@ title: "Report"
 
 # Questions
 
+# Data
 
-# Data 
 ## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
@@ -28,10 +28,20 @@ The original dataset contains 23 structured tables organized by signal category.
     -   `sleep.csv`: sleep stages, time in bed
     -   `sleep_score.csv`
 
-In total, we have 4 dataframes: `subject_info` (demographics data), `hormone_symptoms` (hormone and symtoms data), `sleep_stress` (sleep and stress related data), and `exercise` (exercise related data). For different analyses, we merged these dataframes by participant `id` as needed.
+------------------------------------------------------------------------
 
+In total, we have 4 dataframes:
 
-```{r load-lib, message=FALSE}
+1.  `subject_info` (demographics data)
+2.  `hormone_symptoms` (hormone and symtoms data)
+3.  `sleep_stress` (sleep and stress related data)
+4.  `exercise` (exercise related data).
+
+For different analyses, we merged the dataframes above by participant `id` as needed.
+
+------------------------------------------------------------------------
+
+```{r load-lib, include=FALSE}
 # Load necessary libraries
 library(tidyverse)
 library(patchwork)
@@ -40,18 +50,15 @@ library(ggsci)
 
 ### `subject_info` - Subject-Relevant Data
 
-*Overview:*
-
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
 
 It contains a total of 62 observations of 19 variables. Some key variables are the following:
 
-- `id`: participant's unique identifier 
-- Age relevant variables: `birth_year` and `age_of_first_menarche` 
-- Height and weight related variables: `avg_height`, `avg_weight`, `bmi` 
-- Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study) 
-- Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
-
+-   `id`: participant's unique identifier
+-   Age relevant variables: `birth_year` and `age_of_first_menarche`
+-   Height and weight related variables: `avg_height`, `avg_weight`, `bmi`
+-   Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study)
+-   Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
 
 ```{r ht-and-wt, include=FALSE}
 ht_wt = read_csv("data/height_and_weight.csv")|> 
@@ -64,7 +71,6 @@ ht_wt = read_csv("data/height_and_weight.csv")|>
   ) |>
   ungroup()
 ```
-
 
 ```{r, include=FALSE}
 # import csv file
@@ -81,7 +87,6 @@ study_flag <- hormones_and_selfreport  |>
     values_fill = 0  
   )
 ```
-
 
 ```{r, include=FALSE}
 # read in subject-info.csv
@@ -135,11 +140,9 @@ subject_info <- subject_info_raw  |>
   )
 ```
 
+### `hormone_symptoms` - Hormone & Self-reported Data
 
-
-### `hormone` - Hormone & Self-reported Data
-*Overview:*
-
+[TODO] add overview
 
 ```{r, include=FALSE}
 hormone_symptoms <- 
@@ -215,4 +218,5 @@ hormone_symptoms <-
 # Modelling
 
 # Discussion
+
 ## Limitation

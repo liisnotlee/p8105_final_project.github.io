@@ -156,7 +156,7 @@ subject_info <- subject_info_raw  |>
 ```
 
 
-## `hormone` - Hormone & Self-reported Data
+## `hormone_symptoms` - Hormone & Self-reported Data
 *Overview:*
 
 *Steps:*
