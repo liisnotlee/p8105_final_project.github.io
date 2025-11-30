@@ -17,7 +17,7 @@ navbar:
       - text: "Exercise"
         href: exercise_hormone.html
     - text: "Proposal"
-      href: proposal.html
+      href: p8105_final_project_proposal.html
   right:
     - text: "Meet the Team"
       href: about.html
