@@ -32,6 +32,7 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -220,6 +221,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -252,7 +256,9 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown-header">Report</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -264,8 +270,12 @@ $(document).ready(function () {
     <li>
       <a href="hormone.html">Hormone</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -284,6 +294,14 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Participants Characteristics</h1>
@@ -293,18 +311,8 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(patchwork)
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
 library(ggsci)</code></pre>
 <p>Set plot theme</p>
 <pre class="r"><code>theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
@@ -346,7 +354,7 @@ both 2022 and 2024, keep the latest one as enrollment year</li>
   ) |&gt;
   ungroup()</code></pre>
 <pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
 ## 
@@ -394,7 +402,7 @@ data</h3>
 <pre class="r"><code>hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
   janitor::clean_names() </code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -424,7 +432,7 @@ data</h3>
 subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche
@@ -896,6 +904,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

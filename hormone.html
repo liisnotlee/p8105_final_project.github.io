@@ -31,6 +31,7 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -219,6 +220,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -251,7 +255,9 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown-header">Report</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -263,8 +269,12 @@ $(document).ready(function () {
     <li>
       <a href="hormone.html">Hormone</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -282,6 +292,14 @@ $(document).ready(function () {
 </div><!--/.navbar -->
 
 <div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
 
@@ -318,11 +336,6 @@ ggplot(my_int_avg, aes(x = phase)) +
   scale_color_manual(values = c(&quot;Estrogen&quot; = &quot;red&quot;, &quot;LH&quot; = &quot;blue&quot;)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 #estrogen surge at fertility(actually it should be called ovulation) #lh
 also peak at ovulation</p>
@@ -454,17 +467,14 @@ statsitically difference between those four phases.</h2>
 phases.</p>
 <p>#Fatigue intensity also differs significantly across phases.</p>
 <p>#swich approach: longtidual changes</p>
-<pre class="r"><code>library(lme4)</code></pre>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## 
-## Attaching package: &#39;Matrix&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
-## 
-##     expand, pack, unpack</code></pre>
-<pre class="r"><code># Moodswing model
+<pre class="r"><code>library(lme4)
+
+
+# Moodswing model
 m1 &lt;- lmer(moodswing_num ~ phase + (1 | id), data = my_int_numeric)
 summary(m1)</code></pre>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
 ## Formula: moodswing_num ~ phase + (1 | id)
 ##    Data: my_int_numeric
 ## 
@@ -481,11 +491,13 @@ summary(m1)</code></pre>
 ## Number of obs: 2846, groups:  id, 42
 ## 
 ## Fixed effects:
-##                 Estimate Std. Error t value
-## (Intercept)     1.464274   0.163291   8.967
-## phaseFertility -0.002881   0.057834  -0.050
-## phaseLuteal     0.131908   0.052991   2.489
-## phaseMenstrual  0.358361   0.061177   5.858
+##                  Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)     1.464e+00  1.633e-01  4.512e+01   8.967 1.38e-11 ***
+## phaseFertility -2.881e-03  5.783e-02  2.805e+03  -0.050   0.9603    
+## phaseLuteal     1.319e-01  5.299e-02  2.807e+03   2.489   0.0129 *  
+## phaseMenstrual  3.584e-01  6.118e-02  2.806e+03   5.858 5.24e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) phsFrt phsLtl
@@ -495,7 +507,8 @@ summary(m1)</code></pre>
 <pre class="r"><code># Fatigue model
 m2 &lt;- lmer(fatigue_num ~ phase + (1 | id), data = my_int_numeric)
 summary(m2)</code></pre>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
 ## Formula: fatigue_num ~ phase + (1 | id)
 ##    Data: my_int_numeric
 ## 
@@ -512,11 +525,13 @@ summary(m2)</code></pre>
 ## Number of obs: 2846, groups:  id, 42
 ## 
 ## Fixed effects:
-##                 Estimate Std. Error t value
-## (Intercept)     1.802643   0.113967  15.817
-## phaseFertility -0.003221   0.052461  -0.061
-## phaseLuteal     0.068168   0.048058   1.418
-## phaseMenstrual  0.273951   0.055487   4.937
+##                  Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)     1.803e+00  1.140e-01  4.746e+01  15.817  &lt; 2e-16 ***
+## phaseFertility -3.221e-03  5.246e-02  2.806e+03  -0.061    0.951    
+## phaseLuteal     6.817e-02  4.806e-02  2.811e+03   1.418    0.156    
+## phaseMenstrual  2.740e-01  5.549e-02  2.809e+03   4.937 8.39e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) phsFrt phsLtl
@@ -644,12 +659,12 @@ ggplot(my_i_plot, aes(x = phase, y = flow_volume_num)) +
        x = &quot;Phase&quot;) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## Warning: Removed 460 rows containing non-finite outside the scale range
-## (`stat_summary()`).
-## Removed 460 rows containing non-finite outside the scale range
-## (`stat_summary()`).</code></pre>
-<pre><code>## Warning: Removed 460 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 460 rows containing non-finite outside the scale
+## range (`stat_summary()`).
+## Removed 460 rows containing non-finite outside the scale
+## range (`stat_summary()`).</code></pre>
+<pre><code>## Warning: Removed 460 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code># 2) FLOW COLOR
 ggplot(my_i_plot, aes(x = phase, y = flow_color_num)) +
@@ -665,12 +680,12 @@ ggplot(my_i_plot, aes(x = phase, y = flow_color_num)) +
        x = &quot;Phase&quot;) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## Warning: Removed 510 rows containing non-finite outside the scale range
-## (`stat_summary()`).</code></pre>
-<pre><code>## Warning: Removed 510 rows containing non-finite outside the scale range
-## (`stat_summary()`).</code></pre>
-<pre><code>## Warning: Removed 510 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 510 rows containing non-finite outside the scale
+## range (`stat_summary()`).</code></pre>
+<pre><code>## Warning: Removed 510 rows containing non-finite outside the scale
+## range (`stat_summary()`).</code></pre>
+<pre><code>## Warning: Removed 510 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
 <pre class="r"><code># 3) APPETITE
 ggplot(my_i_plot, aes(x = phase, y = appetite_num)) +
@@ -686,12 +701,12 @@ ggplot(my_i_plot, aes(x = phase, y = appetite_num)) +
        x = &quot;Phase&quot;) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## Warning: Removed 226 rows containing non-finite outside the scale range
-## (`stat_summary()`).</code></pre>
-<pre><code>## Warning: Removed 226 rows containing non-finite outside the scale range
-## (`stat_summary()`).</code></pre>
-<pre><code>## Warning: Removed 226 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 226 rows containing non-finite outside the scale
+## range (`stat_summary()`).</code></pre>
+<pre><code>## Warning: Removed 226 rows containing non-finite outside the scale
+## range (`stat_summary()`).</code></pre>
+<pre><code>## Warning: Removed 226 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
 <pre class="r"><code>#give them order to do the avereage graph
 my_i_num &lt;- my_i %&gt;%
@@ -781,7 +796,70 @@ ggplot(my_i_avg, aes(x = phase, y = avg_appetite, group = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-17-3.png" width="672" /></p>
-<pre class="r"><code>library(dplyr)
+<p>#the not at all strongly affect the curve. so i tried another scatter
+plot for each (delete the not at all)</p>
+<pre class="r"><code>my_i_filtered &lt;- my_i %&gt;%
+  filter(flow_volume != &quot;Not at all&quot;, flow_color != &quot;Not at all&quot;) %&gt;%
+  mutate(
+    # Flow volume numeric mapping
+    flow_volume_num = case_when(
+      flow_volume == &quot;Spotting / Very Light&quot; ~ 1,
+      flow_volume == &quot;Light&quot; ~ 2,
+      flow_volume == &quot;Moderate&quot; ~ 3,
+      flow_volume == &quot;Somewhat Heavy&quot; ~ 4,
+      flow_volume == &quot;Heavy&quot; ~ 5,
+      flow_volume == &quot;Very Heavy&quot; ~ 6,
+      TRUE ~ NA_real_
+    ),
+    # Flow color numeric mapping
+    flow_color_num = case_when(
+      flow_color == &quot;Pink&quot; ~ 1,
+      flow_color == &quot;Bright Red&quot; ~ 2,
+      flow_color == &quot;Dark Brown / Dark Red&quot; ~ 3,
+      flow_color == &quot;Grey&quot; ~ 4,
+      flow_color == &quot;Black&quot; ~ 5,
+      flow_color == &quot;Other&quot; ~ 6,
+      TRUE ~ NA_real_
+    )
+  )
+phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)
+
+avg_flow &lt;- my_i_filtered %&gt;%
+  group_by(phase = factor(phase, levels = phase_order)) %&gt;%
+  summarise(
+    avg_flow_volume = mean(flow_volume_num, na.rm = TRUE),
+    avg_flow_color = mean(flow_color_num, na.rm = TRUE),
+    .groups = &#39;drop&#39;
+  )
+flow_volume_levels &lt;- c(&quot;Spotting / Very Light&quot;, &quot;Light&quot;, &quot;Moderate&quot;, 
+                        &quot;Somewhat Heavy&quot;, &quot;Heavy&quot;, &quot;Very Heavy&quot;)
+
+ggplot(avg_flow, aes(x = phase, y = avg_flow_volume, group = 1)) +
+  geom_line(color = &quot;blue&quot;, size = 1.5) +
+  geom_point(color = &quot;red&quot;, size = 3) +
+  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
+  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_volume_levels) +
+  labs(title = &quot;Average Flow Volume Across Menstrual Cycle Phases (excluding &#39;Not at all&#39;)&quot;,
+       x = &quot;Phase&quot;, y = &quot;Flow Volume&quot;) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre class="r"><code># Flow Color
+flow_color_levels &lt;- c(&quot;Pink&quot;, &quot;Bright Red&quot;, &quot;Dark Brown / Dark Red&quot;, &quot;Grey&quot;,
+                       &quot;Black&quot;, &quot;Other&quot;)
+
+ggplot(avg_flow, aes(x = phase, y = avg_flow_color, group = 1)) +
+  geom_line(color = &quot;darkgreen&quot;, size = 1.5) +
+  geom_point(color = &quot;red&quot;, size = 3) +
+  geom_text(aes(label = round(avg_flow_color,2)), vjust = -0.5) +
+  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_color_levels) +
+  labs(title = &quot;Average Flow Color Across Menstrual Cycle Phases (excluding &#39;Not at all&#39;)&quot;,
+       x = &quot;Phase&quot;, y = &quot;Flow Color&quot;) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
+<pre class="r"><code>#(with the not at all data)
+library(dplyr)
 library(tidyr)
 
 # FLOW VOLUME
@@ -845,7 +923,7 @@ summary(clmm_flowvol)</code></pre>
 ## data:    my_i
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
-##  logit flexible  3091 -1801.42 3622.83 824(3300) 1.79e-03 1.6e+02
+##  logit flexible  3091 -1801.42 3622.83 824(3300) 2.08e-03 1.6e+02
 ## 
 ## Random effects:
 ##  Groups Name        Variance Std.Dev.
@@ -854,7 +932,7 @@ summary(clmm_flowvol)</code></pre>
 ## 
 ## Coefficients:
 ##                Estimate Std. Error z value Pr(&gt;|z|)    
-## phaseFertility  -1.5928     0.2016   -7.90  2.8e-15 ***
+## phaseFertility  -1.5928     0.2016   -7.90 2.79e-15 ***
 ## phaseLuteal     -2.1400     0.2072  -10.33  &lt; 2e-16 ***
 ## phaseMenstrual   3.1333     0.1423   22.02  &lt; 2e-16 ***
 ## ---
@@ -863,11 +941,11 @@ summary(clmm_flowvol)</code></pre>
 ## Threshold coefficients:
 ##                                  Estimate Std. Error z value
 ## Not at all|Spotting / Very Light   1.5725     0.1712   9.183
-## Spotting / Very Light|Light        2.5094     0.1802  13.927
-## Light|Moderate                     3.3266     0.1904  17.476
-## Moderate|Somewhat Heavy            4.4350     0.2065  21.477
-## Somewhat Heavy|Heavy               5.2151     0.2229  23.398
-## Heavy|Very Heavy                   6.5315     0.2810  23.243
+## Spotting / Very Light|Light        2.5094     0.1802  13.926
+## Light|Moderate                     3.3266     0.1904  17.475
+## Moderate|Somewhat Heavy            4.4350     0.2065  21.475
+## Somewhat Heavy|Heavy               5.2151     0.2229  23.396
+## Heavy|Very Heavy                   6.5315     0.2810  23.241
 ## (2568 observations deleted due to missingness)</code></pre>
 <pre class="r"><code># Flow Color
 clmm_flowcolor &lt;- clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRUE)</code></pre>
@@ -880,7 +958,7 @@ clmm_flowcolor &lt;- clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRU
 ## data:    my_i
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
-##  logit flexible  3041 -1733.01 3486.03 909(3636) 5.72e-03 7.1e+02
+##  logit flexible  3041 -1733.01 3486.03 891(3564) 2.66e-03 7.1e+02
 ## 
 ## Random effects:
 ##  Groups Name        Variance Std.Dev.
@@ -889,20 +967,20 @@ clmm_flowcolor &lt;- clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRU
 ## 
 ## Coefficients:
 ##                Estimate Std. Error z value Pr(&gt;|z|)    
-## phaseFertility  -1.5180     0.2030   -7.48 7.46e-14 ***
-## phaseLuteal     -2.8931     0.2764  -10.47  &lt; 2e-16 ***
-## phaseMenstrual   2.1435     0.1280   16.75  &lt; 2e-16 ***
+## phaseFertility  -1.5180     0.2029  -7.481 7.39e-14 ***
+## phaseLuteal     -2.8931     0.2764 -10.467  &lt; 2e-16 ***
+## phaseMenstrual   2.1435     0.1280  16.751  &lt; 2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Threshold coefficients:
 ##                                  Estimate Std. Error z value
-## Not at all|Pink                    1.3511     0.1493   9.047
-## Pink|Bright Red                    1.4809     0.1506   9.833
-## Bright Red|Dark Brown / Dark Red   2.3963     0.1587  15.103
-## Dark Brown / Dark Red|Grey         4.3868     0.1903  23.048
-## Grey|Black                         4.4633     0.1926  23.174
-## Black|Other                        4.5599     0.1957  23.302
+## Not at all|Pink                    1.3511     0.1493   9.048
+## Pink|Bright Red                    1.4809     0.1506   9.835
+## Bright Red|Dark Brown / Dark Red   2.3963     0.1586  15.105
+## Dark Brown / Dark Red|Grey         4.3868     0.1903  23.053
+## Grey|Black                         4.4633     0.1926  23.178
+## Black|Other                        4.5598     0.1957  23.306
 ## (2618 observations deleted due to missingness)</code></pre>
 <pre class="r"><code># Appetite
 clmm_app &lt;- clmm(appetite ~ phase + (1 | id), data = my_i, Hess = TRUE)
@@ -913,7 +991,7 @@ summary(clmm_app)</code></pre>
 ## data:    my_i
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
-##  logit flexible  3325 -3615.00 7246.01 603(2993) 1.93e-03 9.3e+01
+##  logit flexible  3325 -3615.00 7246.01 603(2993) 1.73e-03 9.3e+01
 ## 
 ## Random effects:
 ##  Groups Name        Variance Std.Dev.
@@ -922,18 +1000,18 @@ summary(clmm_app)</code></pre>
 ## 
 ## Coefficients:
 ##                Estimate Std. Error z value Pr(&gt;|z|)    
-## phaseFertility  0.15449    0.09974   1.549    0.121    
-## phaseLuteal     0.36579    0.09153   3.996 6.43e-05 ***
-## phaseMenstrual  0.11871    0.10474   1.133    0.257    
+## phaseFertility  0.15449    0.09975   1.549    0.121    
+## phaseLuteal     0.36579    0.09154   3.996 6.44e-05 ***
+## phaseMenstrual  0.11871    0.10475   1.133    0.257    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Threshold coefficients:
 ##                Estimate Std. Error z value
-## Very Low|Low    -3.5037     0.2131 -16.444
-## Low|Moderate    -1.0604     0.1969  -5.386
-## Moderate|High    1.8759     0.1988   9.438
-## High|Very High   4.3591     0.2247  19.398
+## Very Low|Low    -3.5037     0.2132 -16.431
+## Low|Moderate    -1.0604     0.1971  -5.381
+## Moderate|High    1.8759     0.1989   9.430
+## High|Very High   4.3591     0.2249  19.384
 ## (2334 observations deleted due to missingness)</code></pre>
 <p>#interpretation: Flow volume and flow color: strong differences
 across phases (p &lt; 0.001, Friedman).</p>
@@ -976,6 +1054,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

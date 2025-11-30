@@ -32,6 +32,7 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -220,6 +221,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -252,7 +256,9 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown-header">Report</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -264,8 +270,12 @@ $(document).ready(function () {
     <li>
       <a href="hormone.html">Hormone</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -283,6 +293,14 @@ $(document).ready(function () {
 </div><!--/.navbar -->
 
 <div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
 
@@ -311,28 +329,11 @@ library(tidyverse)</code></pre>
 <div id="data-importcleaningmerging" class="section level3">
 <h3>Data import/cleaning/merging</h3>
 <pre class="r"><code># Read data
-exercise = read_csv(&quot;./data/exercise.csv&quot;)</code></pre>
-<pre><code>## Rows: 7282 Columns: 26
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr   (6): activityname, activitylevel, logtype, manualvaluesspecified, hear...
-## dbl  (13): id, study_interval, start_day_in_study, last_modified_day_in_stud...
-## lgl   (4): is_weekend, hasgps, shouldfetchdetails, hasactivezoneminutes
-## time  (3): start_timestamp, last_modified_timestamp, original_start_timestamp
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>hormones = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;)</code></pre>
-<pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
-## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
-## lgl  (1): is_weekend
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code># Clean and un-duplicate exercise data
+exercise = read_csv(&quot;./data/exercise.csv&quot;)
+hormones = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;)
+
+
+# Clean and un-duplicate exercise data
 exercise_clean = exercise %&gt;%
   distinct() %&gt;%
   select(id, study_interval, start_day_in_study, 
@@ -354,15 +355,9 @@ exercise_daily = exercise_clean %&gt;%
     activity_types = paste(unique(activityname), collapse = &quot;, &quot;),
     .groups = &quot;drop&quot;
   ) %&gt;%
-  rename(day_in_study = start_day_in_study)</code></pre>
-<pre><code>## Warning: There were 6 warnings in `summarise()`.
-## The first warning was:
-## ℹ In argument: `max_heartrate = max(averageheartrate, na.rm = TRUE)`.
-## ℹ In group 924: `id = 30`, `study_interval = 2024`, `start_day_in_study = 861`.
-## Caused by warning in `max()`:
-## ! no non-missing arguments to max; returning -Inf
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5 remaining warnings.</code></pre>
-<pre class="r"><code># Convert Likert scales to numeric
+  rename(day_in_study = start_day_in_study)
+
+# Convert Likert scales to numeric
 likert_to_num &lt;- c(&quot;Very Low/Little&quot; = 1, &quot;Low&quot; = 2, &quot;Moderate&quot; = 3, 
                    &quot;High&quot; = 4, &quot;Very High&quot; = 5)
 
@@ -375,17 +370,12 @@ hormones_clean = hormones %&gt;%
     exerciselevel_num = recode(exerciselevel, !!!likert_to_num),
     appetite_num = recode(appetite, !!!likert_to_num),
     bloating_num = recode(bloating, !!!likert_to_num),
+    moodswing_num = recode(moodswing, !!!likert_to_num),
     # Order phase factor for proper plotting
     phase = factor(phase, levels = c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;))
-  )</code></pre>
-<pre><code>## Warning: There were 7 warnings in `mutate()`.
-## The first warning was:
-## ℹ In argument: `stress_num = recode(...)`.
-## Caused by warning:
-## ! Unreplaced values treated as NA as `.x` is not compatible.
-## Please specify replacements exhaustively or supply `.default`.
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 6 remaining warnings.</code></pre>
-<pre class="r"><code># Merge datasets
+  )
+
+# Merge datasets
 merged_data = hormones_clean %&gt;%
   left_join(exercise_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) %&gt;%
   mutate(
@@ -397,9 +387,8 @@ merged_data = hormones_clean %&gt;%
     total_elevation = replace_na(total_elevation, 0),
     # Binary: did they exercise today?
     exercised_today = ifelse(n_sessions &gt; 0, &quot;Yes&quot;, &quot;No&quot;)
-    # %&gt;% 
-    # filter(!is.na(phase)) # maybe filter out phase that is NA?
-  )</code></pre>
+  ) %&gt;% 
+  filter(!is.na(phase)) # maybe filter out phase that is NA?</code></pre>
 </div>
 <div id="analysis" class="section level3">
 <h3>Analysis</h3>
@@ -469,10 +458,6 @@ ggplot(exercise_likelihood, aes(x = phase, y = proportion, fill = phase)) +
   scale_y_continuous(labels = scales::percent, limits = c(0, 0.7)) +
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
-<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale range
-## (`geom_col()`).</code></pre>
-<pre><code>## Warning: Removed 1 row containing missing values or values outside the scale range
-## (`geom_text()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="hormone-levels-vs.-exercise-duration" class="section level3">
@@ -489,10 +474,10 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
 <pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale range
-## (`stat_smooth()`).</code></pre>
-<pre><code>## Warning: Removed 92 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale
+## range (`stat_smooth()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code># LH (luteinizing hormone) vs exercise
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
@@ -504,8 +489,8 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        y = &quot;Exercise Duration (min)&quot;,
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Removed 91 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 91 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 <pre class="r"><code># Progesterone (PdG) vs exercise duration
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0 &amp; !is.na(pdg)), 
@@ -590,11 +575,12 @@ ggplot(individual_patterns, aes(x = phase, y = mean_duration, group = id)) +
        x = &quot;Menstrual Phase&quot;, 
        y = &quot;Mean Exercise Duration (min)&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2
+## 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where
+## this warning was generated.</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code># Don&#39;t really see much variation, seems exercise duration does not change dramatically across phases</code></pre>
 <div id="summary-statistics" class="section level3">
@@ -612,19 +598,521 @@ ggplot(individual_patterns, aes(x = phase, y = mean_duration, group = id)) +
     mean_fatigue = mean(fatigue_num, na.rm = TRUE),
     .groups = &quot;drop&quot;
   )</code></pre>
-<pre><code>## # A tibble: 5 × 9
+<pre><code>## # A tibble: 4 × 9
 ##   phase    n_observations mean_duration sd_duration mean_calories mean_heartrate
 ##   &lt;fct&gt;             &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;
 ## 1 Menstru…           1079          19.0        39.0          64.4           110.
 ## 2 Follicu…           1386          21.1        43.1          76.8           109.
 ## 3 Fertili…           1281          22.5        45.3          79.5           110.
 ## 4 Luteal             1912          18.9        38.3          61.5           111.
-## 5 &lt;NA&gt;                  1          39.3        NA           258             123 
 ## # ℹ 3 more variables: percent_exercised &lt;dbl&gt;, mean_stress &lt;dbl&gt;,
 ## #   mean_fatigue &lt;dbl&gt;</code></pre>
+<p><strong>IMPORTANT</strong>: Should 2024 data be included? Any testing
+that requires the independence assumption would be violated. - For
+descriptives, can facet them by interval, or do weighted descriptives,
+so each individual contributes equally to the analysis</p>
 </div>
 <div id="inferential-analysis" class="section level3">
 <h3>Inferential analysis</h3>
+<pre class="r"><code># install.packages(&quot;lme4&quot;)
+# install.packages(&quot;lmerTest&quot;)
+# install.packages(&quot;broom.mixed&quot;)
+# install.packages(&quot;ggeffects&quot;)
+library(lme4)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre class="r"><code>library(lmerTest)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lmerTest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lme4&#39;:
+## 
+##     lmer</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     step</code></pre>
+<pre class="r"><code>library(broom.mixed)
+library(ggeffects)</code></pre>
+<pre class="r"><code># Preparing analysis dataset
+analysis_data = merged_data %&gt;%
+  mutate(study_interval = factor(study_interval))
+
+# Checking data structure
+cat(&quot;Total observations:&quot;, nrow(analysis_data), &quot;\n&quot;)</code></pre>
+<pre><code>## Total observations: 5658</code></pre>
+<pre class="r"><code>cat(&quot;Unique participants:&quot;, n_distinct(analysis_data$id), &quot;\n&quot;)</code></pre>
+<pre><code>## Unique participants: 42</code></pre>
+<pre class="r"><code>cat(&quot;Study intervals:&quot;, unique(analysis_data$study_interval), &quot;\n&quot;)</code></pre>
+<pre><code>## Study intervals: 1 2</code></pre>
+<div id="exercising-and-symptoms" class="section level4">
+<h4>Exercising and symptoms</h4>
+<ul>
+<li>Let’s see if exercising helps with symptom severity</li>
+<li>Doing mixed-effect modelling</li>
+<li>Want to know effect of exercise on symptoms are controlling for
+individual differences</li>
+<li>Included phase and ID to account for differences in symptoms by
+phase and individual differences</li>
+</ul>
+<pre class="r"><code># Model 1: Exercise → cramps
+model_cramps = lmer(cramps_num ~ total_duration_min + phase + (1|id), 
+                     data = analysis_data,
+                     REML = FALSE)
+summary(model_cramps)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: cramps_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    4586.4    4624.6   -2286.2    4572.4      1744 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.6350 -0.5855 -0.1603  0.3530  4.3904 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.4656   0.6823  
+##  Residual             0.7425   0.8617  
+## Number of obs: 1751, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.493e+00  1.142e-01  4.705e+01  21.830   &lt;2e-16 ***
+## total_duration_min -4.985e-04  9.181e-04  1.734e+03  -0.543    0.587    
+## phaseFollicular    -8.831e-01  6.326e-02  1.737e+03 -13.960   &lt;2e-16 ***
+## phaseFertility     -7.192e-01  6.430e-02  1.730e+03 -11.185   &lt;2e-16 ***
+## phaseLuteal        -5.279e-01  5.651e-02  1.736e+03  -9.342   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.052                     
+## phaseFllclr -0.204 -0.055              
+## phaseFrtlty -0.199  0.005  0.454       
+## phaseLuteal -0.230 -0.007  0.502  0.496</code></pre>
+<pre class="r"><code># Model 2: Exercise → fatigue
+model_fatigue = lmer(fatigue_num ~ total_duration_min + phase + (1|id), 
+                      data = analysis_data,
+                      REML = FALSE)
+summary(model_fatigue)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: fatigue_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    7827.5    7869.2   -3906.7    7813.5      2880 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.5089 -0.6706 -0.0066  0.6295  3.9228 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.5668   0.7528  
+##  Residual             0.8300   0.9110  
+## Number of obs: 2887, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.955e+00  1.227e-01  4.895e+01  24.089   &lt;2e-16 ***
+## total_duration_min -1.901e-03  8.422e-04  2.875e+03  -2.257   0.0241 *  
+## phaseFollicular    -6.115e-02  5.239e-02  2.857e+03  -1.167   0.2432    
+## phaseFertility     -6.333e-02  5.378e-02  2.856e+03  -1.178   0.2390    
+## phaseLuteal        -7.055e-02  4.909e-02  2.857e+03  -1.437   0.1508    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.041                     
+## phaseFllclr -0.226 -0.060              
+## phaseFrtlty -0.218 -0.015  0.543       
+## phaseLuteal -0.241 -0.005  0.588  0.574</code></pre>
+<pre class="r"><code># Model 3: Exercise → stress
+model_stress = lmer(stress_num ~ total_duration_min + phase + (1|id), 
+                     data = analysis_data,
+                     REML = FALSE)
+summary(model_stress)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: stress_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    8293.4    8335.2   -4139.7    8279.4      2876 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.7190 -0.7434 -0.0908  0.7007  3.0422 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.3266   0.5715  
+##  Residual             0.9899   0.9949  
+## Number of obs: 2883, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.998e+00  9.886e-02  5.696e+01  30.331   &lt;2e-16 ***
+## total_duration_min -2.206e-03  9.202e-04  2.882e+03  -2.397   0.0166 *  
+## phaseFollicular     7.152e-03  5.714e-02  2.860e+03   0.125   0.9004    
+## phaseFertility      1.440e-02  5.867e-02  2.858e+03   0.245   0.8061    
+## phaseLuteal        -7.964e-02  5.375e-02  2.860e+03  -1.482   0.1385    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.053                     
+## phaseFllclr -0.312 -0.058              
+## phaseFrtlty -0.302 -0.013  0.548       
+## phaseLuteal -0.331 -0.005  0.592  0.578</code></pre>
+<pre class="r"><code># Model 4: Exercise → mood swings
+model_mood = lmer(moodswing_num ~ total_duration_min + phase + (1|id), 
+                   data = analysis_data,
+                   REML = FALSE)
+summary(model_mood)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: moodswing_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    6184.1    6224.3   -3085.1    6170.1      2281 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.4219 -0.6849 -0.1048  0.5828  4.2400 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.4916   0.7012  
+##  Residual             0.8190   0.9050  
+## Number of obs: 2288, groups:  id, 41
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.311e+00  1.191e-01  4.987e+01  19.403  &lt; 2e-16 ***
+## total_duration_min -5.892e-04  9.131e-04  2.278e+03  -0.645 0.518848    
+## phaseFollicular    -2.072e-01  5.767e-02  2.265e+03  -3.593 0.000334 ***
+## phaseFertility     -1.734e-01  5.912e-02  2.264e+03  -2.934 0.003383 ** 
+## phaseLuteal        -3.923e-02  5.407e-02  2.265e+03  -0.726 0.468157    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.050                     
+## phaseFllclr -0.247 -0.053              
+## phaseFrtlty -0.240 -0.020  0.527       
+## phaseLuteal -0.261 -0.003  0.561  0.553</code></pre>
+<pre class="r"><code># Model 5: Exercise → sleep issues
+model_sleep = lmer(sleepissue_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_sleep)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: sleepissue_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    7205.4    7246.6   -3595.7    7191.4      2660 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.7843 -0.5894 -0.2066  0.6642  4.2065 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.6808   0.8251  
+##  Residual             0.8175   0.9042  
+## Number of obs: 2667, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.522e+00  1.342e-01  4.834e+01  18.800  &lt; 2e-16 ***
+## total_duration_min -7.420e-04  8.594e-04  2.651e+03  -0.863  0.38799    
+## phaseFollicular    -4.898e-02  5.402e-02  2.637e+03  -0.907  0.36464    
+## phaseFertility      1.756e-01  5.553e-02  2.636e+03   3.162  0.00159 ** 
+## phaseLuteal         2.222e-02  5.080e-02  2.638e+03   0.438  0.66178    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.039                     
+## phaseFllclr -0.210 -0.055              
+## phaseFrtlty -0.204 -0.011  0.544       
+## phaseLuteal -0.226 -0.008  0.586  0.572</code></pre>
+<pre class="r"><code># Model 6: Exercise → bloating
+model_bloating = lmer(bloating_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_bloating)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: bloating_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    5626.1    5666.1   -2806.0    5612.1      2227 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.9140 -0.5243 -0.0863  0.6667  3.8210 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.6264   0.7915  
+##  Residual             0.6746   0.8213  
+## Number of obs: 2234, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.569e+00  1.291e-01  4.834e+01  19.899  &lt; 2e-16 ***
+## total_duration_min  1.433e-04  8.014e-04  2.213e+03   0.179    0.858    
+## phaseFollicular    -3.824e-01  5.263e-02  2.207e+03  -7.266 5.11e-13 ***
+## phaseFertility     -2.706e-01  5.375e-02  2.206e+03  -5.034 5.20e-07 ***
+## phaseLuteal        -2.129e-01  4.905e-02  2.207e+03  -4.341 1.48e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.035                     
+## phaseFllclr -0.189 -0.070              
+## phaseFrtlty -0.186 -0.013  0.509       
+## phaseLuteal -0.206 -0.015  0.546  0.536</code></pre>
+<pre class="r"><code># Model 7: Exercise → appetite
+model_appetite = lmer(appetite_num ~ total_duration_min + phase + (1|id), 
+                    data = analysis_data,
+                    REML = FALSE)
+summary(model_appetite)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: appetite_num ~ total_duration_min + phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    6302.0    6344.4   -3144.0    6288.0      3167 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.9918 -0.7419 -0.0336  0.5376  4.0591 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.1326   0.3642  
+##  Residual             0.4069   0.6378  
+## Number of obs: 3174, groups:  id, 42
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         2.964e+00  6.212e-02  5.694e+01  47.715   &lt;2e-16 ***
+## total_duration_min -5.608e-04  5.656e-04  3.174e+03  -0.991   0.3216    
+## phaseFollicular    -1.624e-02  3.516e-02  3.143e+03  -0.462   0.6442    
+## phaseFertility      3.886e-02  3.564e-02  3.136e+03   1.091   0.2755    
+## phaseLuteal         8.416e-02  3.270e-02  3.139e+03   2.574   0.0101 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) ttl_d_ phsFll phsFrt
+## ttl_drtn_mn -0.055                     
+## phaseFllclr -0.312 -0.055              
+## phaseFrtlty -0.306 -0.012  0.549       
+## phaseLuteal -0.334 -0.004  0.592  0.582</code></pre>
+<pre class="r"><code># Cleaning results:
+# Extract coefficients for exercise effect
+results_summary = bind_rows(
+  tidy(model_cramps, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Cramps&quot;),
+  tidy(model_fatigue, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Fatigue&quot;),
+  tidy(model_stress, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Stress&quot;),
+  tidy(model_mood, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Mood swings&quot;),
+  tidy(model_sleep, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Sleep issues&quot;),
+  tidy(model_bloating, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Bloating&quot;),
+  tidy(model_appetite, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Appetite&quot;)
+) %&gt;%
+  filter(term == &quot;total_duration_min&quot;) %&gt;%
+  select(outcome, estimate, std.error, statistic, p.value) %&gt;%
+  mutate(
+    significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;),
+    p.value = format.pval(p.value, digits = 3, eps = 0.001)
+  )
+
+print(&quot;Summary of exercise effects on symptoms:&quot;)</code></pre>
+<pre><code>## [1] &quot;Summary of exercise effects on symptoms:&quot;</code></pre>
+<pre class="r"><code>print(results_summary)</code></pre>
+<pre><code>## # A tibble: 7 × 6
+##   outcome       estimate std.error statistic p.value significant
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      
+## 1 Cramps       -0.000499  0.000918    -0.543 0.5872  No         
+## 2 Fatigue      -0.00190   0.000842    -2.26  0.0241  Yes        
+## 3 Stress       -0.00221   0.000920    -2.40  0.0166  Yes        
+## 4 Mood swings  -0.000589  0.000913    -0.645 0.5188  No         
+## 5 Sleep issues -0.000742  0.000859    -0.863 0.3880  No         
+## 6 Bloating      0.000143  0.000801     0.179 0.8581  No         
+## 7 Appetite     -0.000561  0.000566    -0.991 0.3216  No</code></pre>
+</div>
+<div id="testing-for-interaction" class="section level4">
+<h4>Testing for interaction</h4>
+<ul>
+<li>Looking at whether any of the above symptoms differ by phase</li>
+<li>Interaction is insignificant in all models</li>
+</ul>
+<pre class="r"><code># Interaction models
+# Cramps
+model_cramps_int = lmer(cramps_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+summary(model_cramps_int)</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
+##   method [lmerModLmerTest]
+## Formula: cramps_num ~ total_duration_min * phase + (1 | id)
+##    Data: analysis_data
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    4587.3    4642.0   -2283.6    4567.3      1741 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.6637 -0.5763 -0.1561  0.3615  4.3968 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.4602   0.6784  
+##  Residual             0.7405   0.8605  
+## Number of obs: 1751, groups:  id, 42
+## 
+## Fixed effects:
+##                                      Estimate Std. Error         df t value
+## (Intercept)                         2.517e+00  1.142e-01  4.803e+01  22.044
+## total_duration_min                 -3.634e-03  1.758e-03  1.736e+03  -2.067
+## phaseFollicular                    -9.276e-01  6.644e-02  1.736e+03 -13.963
+## phaseFertility                     -7.411e-01  6.737e-02  1.729e+03 -11.001
+## phaseLuteal                        -5.570e-01  5.948e-02  1.734e+03  -9.365
+## total_duration_min:phaseFollicular  4.888e-03  2.205e-03  1.724e+03   2.217
+## total_duration_min:phaseFertility   2.829e-03  2.744e-03  1.718e+03   1.031
+## total_duration_min:phaseLuteal      3.651e-03  2.341e-03  1.721e+03   1.560
+##                                    Pr(&gt;|t|)    
+## (Intercept)                          &lt;2e-16 ***
+## total_duration_min                   0.0389 *  
+## phaseFollicular                      &lt;2e-16 ***
+## phaseFertility                       &lt;2e-16 ***
+## phaseLuteal                          &lt;2e-16 ***
+## total_duration_min:phaseFollicular   0.0268 *  
+## total_duration_min:phaseFertility    0.3027    
+## total_duration_min:phaseLuteal       0.1190    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##                   (Intr) ttl_d_ phsFll phsFrt phsLtl ttl_drtn_mn:phsFl
+## ttl_drtn_mn       -0.111                                              
+## phaseFllclr       -0.219  0.188                                       
+## phaseFrtlty       -0.211  0.189  0.450                                
+## phaseLuteal       -0.243  0.217  0.498  0.490                         
+## ttl_drtn_mn:phsFl  0.089 -0.760 -0.306 -0.153 -0.175                  
+## ttl_drtn_mn:phsFr  0.069 -0.603 -0.119 -0.303 -0.134  0.487           
+## ttl_drtn_:L        0.081 -0.709 -0.144 -0.139 -0.316  0.564           
+##                   ttl_drtn_mn:phsFr
+## ttl_drtn_mn                        
+## phaseFllclr                        
+## phaseFrtlty                        
+## phaseLuteal                        
+## ttl_drtn_mn:phsFl                  
+## ttl_drtn_mn:phsFr                  
+## ttl_drtn_:L        0.453</code></pre>
+<pre class="r"><code># Testing if interaction is significant
+anova(model_cramps, model_cramps_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_cramps: cramps_num ~ total_duration_min + phase + (1 | id)
+## model_cramps_int: cramps_num ~ total_duration_min * phase + (1 | id)
+##                  npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_cramps        7 4586.4 4624.6 -2286.2    4572.4                     
+## model_cramps_int   10 4587.3 4642.0 -2283.7    4567.3 5.0687  3     0.1668</code></pre>
+<pre class="r"><code># Fatigue
+model_fatigue_int =  lmer(fatigue_num ~ total_duration_min * phase + (1|id), 
+                          data = analysis_data,
+                          REML = FALSE)
+anova(model_fatigue, model_fatigue_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_fatigue: fatigue_num ~ total_duration_min + phase + (1 | id)
+## model_fatigue_int: fatigue_num ~ total_duration_min * phase + (1 | id)
+##                   npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_fatigue        7 7827.5 7869.2 -3906.7    7813.5                     
+## model_fatigue_int   10 7830.0 7889.6 -3905.0    7810.0 3.5026  3     0.3204</code></pre>
+<pre class="r"><code># Stress
+model_stress_int = lmer(stress_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_stress, model_stress_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_stress: stress_num ~ total_duration_min + phase + (1 | id)
+## model_stress_int: stress_num ~ total_duration_min * phase + (1 | id)
+##                  npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_stress        7 8293.4 8335.2 -4139.7    8279.4                     
+## model_stress_int   10 8298.9 8358.6 -4139.5    8278.9 0.4608  3     0.9274</code></pre>
+<pre class="r"><code># Moodswing
+model_mood_int = lmer(moodswing_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_mood, model_mood_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_mood: moodswing_num ~ total_duration_min + phase + (1 | id)
+## model_mood_int: moodswing_num ~ total_duration_min * phase + (1 | id)
+##                npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_mood        7 6184.1 6224.3 -3085.1    6170.1                     
+## model_mood_int   10 6189.0 6246.3 -3084.5    6169.0 1.1674  3     0.7608</code></pre>
+<pre class="r"><code># Sleepissue
+model_sleep_int = lmer(sleepissue_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_sleep, model_sleep_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_sleep: sleepissue_num ~ total_duration_min + phase + (1 | id)
+## model_sleep_int: sleepissue_num ~ total_duration_min * phase + (1 | id)
+##                 npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_sleep        7 7205.4 7246.6 -3595.7    7191.4                     
+## model_sleep_int   10 7210.8 7269.7 -3595.4    7190.8 0.6565  3     0.8834</code></pre>
+<pre class="r"><code># bloating
+model_bloating_int = lmer(bloating_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_bloating, model_bloating_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_bloating: bloating_num ~ total_duration_min + phase + (1 | id)
+## model_bloating_int: bloating_num ~ total_duration_min * phase + (1 | id)
+##                    npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_bloating        7 5626.1 5666.1 -2806.1    5612.1                     
+## model_bloating_int   10 5630.4 5687.5 -2805.2    5610.4 1.6852  3     0.6402</code></pre>
+<pre class="r"><code># appetite
+model_appetite_int = lmer(appetite_num ~ total_duration_min * phase + (1|id), 
+                         data = analysis_data,
+                         REML = FALSE)
+anova(model_appetite, model_appetite_int)</code></pre>
+<pre><code>## Data: analysis_data
+## Models:
+## model_appetite: appetite_num ~ total_duration_min + phase + (1 | id)
+## model_appetite_int: appetite_num ~ total_duration_min * phase + (1 | id)
+##                    npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
+## model_appetite        7 6302.0 6344.4 -3144.0    6288.0                     
+## model_appetite_int   10 6306.5 6367.2 -3143.3    6286.5 1.4539  3      0.693</code></pre>
+</div>
 </div>
 </div>
 
@@ -661,6 +1149,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

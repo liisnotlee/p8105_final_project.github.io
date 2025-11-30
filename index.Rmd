@@ -2,8 +2,6 @@
 title: "Lifestyle Factors and Menstrual Cycle"
 ---
 
-
-# Lifestyle Factors and Menstrual Cycle
-
 ## Data Science I Fall 2025 Final Project
 
+![Image Source Credit: Alexander Sergienko](img/bg.jpg)

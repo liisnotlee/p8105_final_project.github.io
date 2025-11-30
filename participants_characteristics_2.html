@@ -32,6 +32,7 @@
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -220,6 +221,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -252,7 +256,9 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown-header">Report</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -264,8 +270,12 @@ $(document).ready(function () {
     <li>
       <a href="hormone.html">Hormone</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -284,6 +294,14 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Participants Characteristics</h1>
@@ -293,28 +311,12 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(patchwork)
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
 library(ggsci)
 library(dplyr)
-library(janitor)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;janitor&#39;
-## 
-## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     chisq.test, fisher.test</code></pre>
-<pre class="r"><code>library(gt)</code></pre>
+library(janitor)
+library(gt)</code></pre>
 <p>Set plot theme</p>
 <pre class="r"><code>theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
 options(
@@ -355,7 +357,7 @@ both 2022 and 2024, keep the latest one as enrollment year</li>
   ) |&gt;
   ungroup()</code></pre>
 <pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
 ## 
@@ -403,7 +405,7 @@ data</h3>
 <pre class="r"><code>hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
   janitor::clean_names() </code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -436,7 +438,7 @@ data including BMI)</h3>
 subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche
@@ -596,23 +598,23 @@ cols_align(align = &quot;right&quot;,
     columns = value) 
 
 summary_table_gt</code></pre>
-<div id="zmtmfxvoss" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#zmtmfxvoss table {
+<div id="dbbgplrpev" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dbbgplrpev table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#zmtmfxvoss thead, #zmtmfxvoss tbody, #zmtmfxvoss tfoot, #zmtmfxvoss tr, #zmtmfxvoss td, #zmtmfxvoss th {
+#dbbgplrpev thead, #dbbgplrpev tbody, #dbbgplrpev tfoot, #dbbgplrpev tr, #dbbgplrpev td, #dbbgplrpev th {
   border-style: none;
 }
 
-#zmtmfxvoss p {
+#dbbgplrpev p {
   margin: 0;
   padding: 0;
 }
 
-#zmtmfxvoss .gt_table {
+#dbbgplrpev .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -638,12 +640,12 @@ summary_table_gt</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_caption {
+#dbbgplrpev .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#zmtmfxvoss .gt_title {
+#dbbgplrpev .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -655,7 +657,7 @@ summary_table_gt</code></pre>
   border-bottom-width: 0;
 }
 
-#zmtmfxvoss .gt_subtitle {
+#dbbgplrpev .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -667,7 +669,7 @@ summary_table_gt</code></pre>
   border-top-width: 0;
 }
 
-#zmtmfxvoss .gt_heading {
+#dbbgplrpev .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -679,13 +681,13 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_bottom_border {
+#dbbgplrpev .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_col_headings {
+#dbbgplrpev .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -700,7 +702,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_col_heading {
+#dbbgplrpev .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -720,7 +722,7 @@ summary_table_gt</code></pre>
   overflow-x: hidden;
 }
 
-#zmtmfxvoss .gt_column_spanner_outer {
+#dbbgplrpev .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -732,15 +734,15 @@ summary_table_gt</code></pre>
   padding-right: 4px;
 }
 
-#zmtmfxvoss .gt_column_spanner_outer:first-child {
+#dbbgplrpev .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zmtmfxvoss .gt_column_spanner_outer:last-child {
+#dbbgplrpev .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zmtmfxvoss .gt_column_spanner {
+#dbbgplrpev .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -752,11 +754,11 @@ summary_table_gt</code></pre>
   width: 100%;
 }
 
-#zmtmfxvoss .gt_spanner_row {
+#dbbgplrpev .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#zmtmfxvoss .gt_group_heading {
+#dbbgplrpev .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -782,7 +784,7 @@ summary_table_gt</code></pre>
   text-align: left;
 }
 
-#zmtmfxvoss .gt_empty_group_heading {
+#dbbgplrpev .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -797,15 +799,15 @@ summary_table_gt</code></pre>
   vertical-align: middle;
 }
 
-#zmtmfxvoss .gt_from_md > :first-child {
+#dbbgplrpev .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zmtmfxvoss .gt_from_md > :last-child {
+#dbbgplrpev .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zmtmfxvoss .gt_row {
+#dbbgplrpev .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -824,7 +826,7 @@ summary_table_gt</code></pre>
   overflow-x: hidden;
 }
 
-#zmtmfxvoss .gt_stub {
+#dbbgplrpev .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -837,7 +839,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#zmtmfxvoss .gt_stub_row_group {
+#dbbgplrpev .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -851,15 +853,15 @@ summary_table_gt</code></pre>
   vertical-align: top;
 }
 
-#zmtmfxvoss .gt_row_group_first td {
+#dbbgplrpev .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#zmtmfxvoss .gt_row_group_first th {
+#dbbgplrpev .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#zmtmfxvoss .gt_summary_row {
+#dbbgplrpev .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -869,16 +871,16 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#zmtmfxvoss .gt_first_summary_row {
+#dbbgplrpev .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_first_summary_row.thick {
+#dbbgplrpev .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#zmtmfxvoss .gt_last_summary_row {
+#dbbgplrpev .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -888,7 +890,7 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_grand_summary_row {
+#dbbgplrpev .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -898,7 +900,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#zmtmfxvoss .gt_first_grand_summary_row {
+#dbbgplrpev .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -908,7 +910,7 @@ summary_table_gt</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_last_grand_summary_row_top {
+#dbbgplrpev .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -918,11 +920,11 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_striped {
+#dbbgplrpev .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zmtmfxvoss .gt_table_body {
+#dbbgplrpev .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -931,7 +933,7 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_footnotes {
+#dbbgplrpev .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -945,7 +947,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_footnote {
+#dbbgplrpev .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -954,7 +956,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#zmtmfxvoss .gt_sourcenotes {
+#dbbgplrpev .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -968,7 +970,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#zmtmfxvoss .gt_sourcenote {
+#dbbgplrpev .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -976,72 +978,72 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#zmtmfxvoss .gt_left {
+#dbbgplrpev .gt_left {
   text-align: left;
 }
 
-#zmtmfxvoss .gt_center {
+#dbbgplrpev .gt_center {
   text-align: center;
 }
 
-#zmtmfxvoss .gt_right {
+#dbbgplrpev .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zmtmfxvoss .gt_font_normal {
+#dbbgplrpev .gt_font_normal {
   font-weight: normal;
 }
 
-#zmtmfxvoss .gt_font_bold {
+#dbbgplrpev .gt_font_bold {
   font-weight: bold;
 }
 
-#zmtmfxvoss .gt_font_italic {
+#dbbgplrpev .gt_font_italic {
   font-style: italic;
 }
 
-#zmtmfxvoss .gt_super {
+#dbbgplrpev .gt_super {
   font-size: 65%;
 }
 
-#zmtmfxvoss .gt_footnote_marks {
+#dbbgplrpev .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#zmtmfxvoss .gt_asterisk {
+#dbbgplrpev .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#zmtmfxvoss .gt_indent_1 {
+#dbbgplrpev .gt_indent_1 {
   text-indent: 5px;
 }
 
-#zmtmfxvoss .gt_indent_2 {
+#dbbgplrpev .gt_indent_2 {
   text-indent: 10px;
 }
 
-#zmtmfxvoss .gt_indent_3 {
+#dbbgplrpev .gt_indent_3 {
   text-indent: 15px;
 }
 
-#zmtmfxvoss .gt_indent_4 {
+#dbbgplrpev .gt_indent_4 {
   text-indent: 20px;
 }
 
-#zmtmfxvoss .gt_indent_5 {
+#dbbgplrpev .gt_indent_5 {
   text-indent: 25px;
 }
 
-#zmtmfxvoss .katex-display {
+#dbbgplrpev .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#zmtmfxvoss div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#dbbgplrpev div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1112,7 +1114,6 @@ summary_table_gt</code></pre>
 <td headers="subgroup" class="gt_row gt_left">Prefer not to say</td>
 <td headers="value" class="gt_row gt_right">3 (7.1%)</td></tr>
   </tbody>
-  
   
 </table>
 </div>
@@ -1227,18 +1228,6 @@ summary_table_gt</code></pre>
     legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="participants_characteristics_2_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<pre class="r"><code>education_health_lit = ggplot(demographic_data, aes(x = education_ranked, fill = self_report_menstrual_health_literacy)) +
-  geom_bar(position = &quot;fill&quot;) + 
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = &quot;Self-Reported Menstrual Health Literacy by Education Level&quot;,
-    x = &quot;Education Level&quot;,
-    y = &quot;Percentage&quot;,
-    fill = &quot;Menstrual Health Literacy&quot;) +
-  theme_minimal(base_size = 14)
-
-education_health_lit</code></pre>
-<p><img src="participants_characteristics_2_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
 </div>
 <div id="age-distribution" class="section level3">
 <h3>Age distribution</h3>
@@ -1319,17 +1308,6 @@ age_boxplots &lt;- age_boxplot_all + age_boxplot_by_study</code></pre>
     legend.position = &quot;none&quot;
   )</code></pre>
 <p><img src="participants_characteristics_2_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<pre class="r"><code>menarche_plot = ggplot(demographic_data, aes(x = &quot;&quot;, y = age_of_first_menarche)) +
-  geom_boxplot(fill = &quot;cornflowerblue&quot;) +
-  labs(title = &quot;Age of Menarche&quot;,
-    y = &quot;Age (years)&quot;,
-    x = &quot;&quot;) +
-  theme_minimal(base_size = 14) +
-  theme(axis.text.x = element_blank(),
-    axis.ticks.x = element_blank())
-
-menarche_plot</code></pre>
-<p><img src="participants_characteristics_2_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
 <p>Findings: most common age of 1st menarche is at 12 y.o.</p>
 </div>
 <div id="anthropometrics" class="section level2">
@@ -1552,6 +1530,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

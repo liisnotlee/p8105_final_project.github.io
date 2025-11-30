@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Data</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-solid fa-spa"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
+<li class="dropdown-header">Report</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Lifestyle Factors Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="hormone.html">Hormone</a>
+    </li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown-header">Meet the Team</li>
+<li>
+  <a>
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Data</h1>
+
+</div>
+
+
+<div id="data-sources" class="section level1">
+<h1>Data Sources</h1>
+<p>We utilized the inclusive, multimodal, longitudinal, and
+de-identified <a
+href="https://physionet.org/content/mcphases/1.0.0/">mcPHASES</a>
+(menstrual cycle Physiological, Hormonal, and Self-Reported Events and
+Symptoms) dataset for menstrual health tracking with wearable
+devices.</p>
+<p>Data was collected from 42 menstruating young adults in Canada over
+two 3-month intervals (one in 2022, and the other in 2024). Participants
+wore Fitbit Sense smartwatches to measure physiological signals, and
+Mira Plus Starter Kits to track their hormone levels. Participants also
+self-reported daily symptom experiences like cramps, sleep quality, and
+stress levels via a smartphone diary app.</p>
+<p>The original dataset contains 23 structured tables organized by
+signal category. For this project, we focused on the lifestyle factors
+such as exercise, sleep, and stress, and menstrual cycle symptoms. The
+datasets we used are the following:</p>
+<ul>
+<li>Demographics:
+<ul>
+<li><code>subject_info.csv</code>: static information such as age,
+education, and age at menarche</li>
+<li><code>height_and_weight.csv</code>: participant’s baselien height
+and weight</li>
+</ul></li>
+<li>Hormone and Symptoms:
+<ul>
+<li><code>hormones_and_selfreport.csv</code>：self-reported daily data
+including symptoms (e.g., cramps, mood, menstrual flow) and manually
+entered hormone levels (LH, E3G, PdG)</li>
+</ul></li>
+<li>Lifestyle Factors:
+<ul>
+<li><code>stress_score.csv</code></li>
+<li><code>sleep.csv</code>: sleep stages, time in bed</li>
+<li><code>sleep_score.csv</code></li>
+</ul></li>
+</ul>
+</div>
+<div id="data-cleaning-process" class="section level1">
+<h1>Data Cleaning Process</h1>
+<p>Load necessary libraries</p>
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
+library(ggsci)</code></pre>
+<div id="subject_info---subject-relevant-data" class="section level2">
+<h2><code>subject_info</code> - Subject-Relevant Data</h2>
+<p><em>Overview:</em></p>
+<p>The <code>subject_info</code> dataframe contains participants
+demographics data from <code>subject_info.csv</code> and
+<code>height_and_weight.csv</code>, as well as participants study
+enrollment year (this piece of information is from
+<code>hormones_and_selfreport.csv</code>).</p>
+<p>It contains a total of 62 observations of 19 variables. Some key
+variables are the following:</p>
+<ul>
+<li><code>id</code>: participant’s unique identifier</li>
+<li>Age relevant variables: <code>birth_year</code> and
+<code>age_of_first_menarche</code></li>
+<li>Height and weight related variables: <code>avg_height</code>,
+<code>avg_weight</code>, <code>bmi</code></li>
+<li>Study enrollment related information: <code>study</code> (flag of
+which study the participant enrolled in, <code>1</code>=2022,
+<code>2</code>=2024, <code>3</code>=both), <code>year</code> (the year
+of study)</li>
+<li>Categorical variables like <code>ethnicity</code>,
+<code>education</code>,
+<code>self_report_menstrual_health_literacy</code>, etc.</li>
+</ul>
+<p><em>Steps:</em></p>
+<ol style="list-style-type: decimal">
+<li>Cleaned up data from <code>height_and_weight.csv</code> into a
+dataframe called <code>ht_wt</code> which contains 42 observations of 7
+variables.
+<ol style="list-style-type: decimal">
+<li>Some participants were enrolled in both 2022 and 2024, so they had
+baseline records of height and weight for both years (like
+<code>height_2022</code> and <code>height_2024</code>); hence, we took
+the averages and added two columns as <code>avg_height</code> and
+<code>avg_weight</code>.</li>
+<li>Checked data completeness. <strong>Noted a lot of missing values for
+baseline height and weight, which might cause incomplete/biased data
+representation for participant characteristics summary. Noted that only
+24 participants have at least one record of weight and
+height.</strong></li>
+</ol></li>
+</ol>
+<pre class="r"><code>ht_wt = read_csv(&quot;data/height_and_weight.csv&quot;)|&gt; 
+  janitor::clean_names() |&gt; 
+  # calculate mean height/weight
+  rowwise() |&gt;
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
+  ) |&gt;
+  ungroup()</code></pre>
+<pre class="r"><code># at least contain one ht and wt
+ht_wt |&gt;
+  count(!is.na(avg_height) &amp; !is.na(avg_weight))|&gt; 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">!is.na(avg_height) &amp; !is.na(avg_weight)</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">FALSE</td>
+<td align="right">18</td>
+</tr>
+<tr class="even">
+<td align="left">TRUE</td>
+<td align="right">24</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>ht_wt |&gt;
+  summarise(
+    missing_ht = sum(is.na(avg_height)),
+    missing_wt = sum(is.na(avg_weight)),
+    missing_both = sum(is.na(avg_weight) &amp; is.na(avg_height))
+  ) |&gt; 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">missing_ht</th>
+<th align="right">missing_wt</th>
+<th align="right">missing_both</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">12</td>
+<td align="right">11</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" style="list-style-type: decimal">
+<li>Extracted participants study enrollment information from
+<code>hormones_and_selfreport.csv</code> and created a
+<code>study_flag</code> dataframe to represent the study year(s)
+participants were enrolled in (<code>0</code>=No, <code>1</code>=Yes).
+The <code>study_flag</code> dataframe only contains 3 variables:
+<code>id</code>, <code>study_2022</code> and
+<code>study_2024</code>.</li>
+</ol>
+<pre class="r"><code># import csv file
+hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() 
+# extract study_flag
+study_flag &lt;- hormones_and_selfreport  |&gt; 
+  distinct(id, study_interval) |&gt; 
+  mutate(flag = 1,
+         study_interval = paste0(&quot;study_&quot;, study_interval)) |&gt; 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0  
+  )</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Merged <code>ht_wt</code> and <code>study_flag</code> with
+<code>subject_info</code> from <code>subject-info.csv</code> by
+participant’s <code>id</code>.
+<ol style="list-style-type: decimal">
+<li>Used <code>pivot_long</code> for height, weight and study year
+variables (<code>1</code>=2022 only, <code>2</code>=2024 only,
+<code>3</code>=both 2022 and 2024). <strong>Noted that participcants in
+2024 were a subset of participants in 2022. In other words, there was no
+new participants in study 2024.</strong> Because we used
+<code>pivot_long</code>, now if a participant was enrolled in both
+years, she will have 2 rows representing each year.</li>
+<li>Ensured all variables are in the correct type (e.g. numerics for
+age, height, weight, etc.)</li>
+<li>Calculated age based on enrollment study year.</li>
+<li>Calculated BMI for partcipants with both weight and height
+records.</li>
+</ol></li>
+</ol>
+<pre class="r"><code># read in subject-info.csv
+subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
+  janitor::clean_names()</code></pre>
+<pre><code>## Rows: 42 Columns: 8
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
+## dbl (3): id, birth_year, age_of_first_menarche
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>subject_info &lt;- subject_info_raw  |&gt; 
+  # merging
+  left_join(ht_wt, by = &quot;id&quot;) |&gt; 
+  left_join(study_flag, by = &quot;id&quot;) |&gt;
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 &amp; study_2024 == 1 ~ 3L,  # both 2022 &amp; 2024
+      study_2022 == 1 &amp; study_2024 == 0 ~ 1L,  
+      study_2024 == 1 &amp; study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |&gt; 
+  # pivot_long for wt &amp; ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(&quot;.value&quot;, &quot;year&quot;), 
+    names_sep = &quot;_&quot;                 
+  ) |&gt; 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |&gt; 
+  # keep only the relevant study year
+  filter(
+    (study == 1 &amp; year == 2022) |
+    (study == 2 &amp; year == 2024) |
+    (study == 3)
+  ) |&gt; 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |&gt; 
+  # get a mean age for each id
+  group_by(id) |&gt; 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |&gt; 
+  ungroup() |&gt; 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

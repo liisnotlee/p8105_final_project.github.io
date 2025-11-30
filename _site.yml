@@ -5,7 +5,7 @@ navbar:
     - icon: fa-solid fa-spa
       href: index.html
     - text: "Data"
-      href: 
+      href: data.html
     - text: "Report"
       href: 
     - text: "Lifestyle Factors Analyses"
@@ -13,9 +13,9 @@ navbar:
       - text: "Hormone"
         href: hormone.html
       - text: "Exercise"
-        href:
+        href: exercise_hormone.html
       - text: "Sleep & Stress"
-        href:
+        href: sleep_stress_khue.html
   right:
     - text: "Meet the Team"
       href: 
@@ -24,3 +24,4 @@ navbar:
 output:
   html_document:
     theme: readable
+    code_folding: show
