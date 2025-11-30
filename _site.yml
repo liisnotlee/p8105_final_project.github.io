@@ -27,3 +27,5 @@ output:
   html_document:
     theme: readable
     code_folding: show
+    toc: true
+    toc_float: true

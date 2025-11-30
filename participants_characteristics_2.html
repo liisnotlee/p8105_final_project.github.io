@@ -31,6 +31,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
@@ -227,6 +230,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -234,6 +300,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -605,23 +681,23 @@ cols_align(align = &quot;right&quot;,
     columns = value) 
 
 summary_table_gt</code></pre>
-<div id="hcrclxedtb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#hcrclxedtb table {
+<div id="trhjvjjmhj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#trhjvjjmhj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hcrclxedtb thead, #hcrclxedtb tbody, #hcrclxedtb tfoot, #hcrclxedtb tr, #hcrclxedtb td, #hcrclxedtb th {
+#trhjvjjmhj thead, #trhjvjjmhj tbody, #trhjvjjmhj tfoot, #trhjvjjmhj tr, #trhjvjjmhj td, #trhjvjjmhj th {
   border-style: none;
 }
 
-#hcrclxedtb p {
+#trhjvjjmhj p {
   margin: 0;
   padding: 0;
 }
 
-#hcrclxedtb .gt_table {
+#trhjvjjmhj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -647,12 +723,12 @@ summary_table_gt</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_caption {
+#trhjvjjmhj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hcrclxedtb .gt_title {
+#trhjvjjmhj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -664,7 +740,7 @@ summary_table_gt</code></pre>
   border-bottom-width: 0;
 }
 
-#hcrclxedtb .gt_subtitle {
+#trhjvjjmhj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -676,7 +752,7 @@ summary_table_gt</code></pre>
   border-top-width: 0;
 }
 
-#hcrclxedtb .gt_heading {
+#trhjvjjmhj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -688,13 +764,13 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_bottom_border {
+#trhjvjjmhj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_col_headings {
+#trhjvjjmhj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -709,7 +785,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_col_heading {
+#trhjvjjmhj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -729,7 +805,7 @@ summary_table_gt</code></pre>
   overflow-x: hidden;
 }
 
-#hcrclxedtb .gt_column_spanner_outer {
+#trhjvjjmhj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -741,15 +817,15 @@ summary_table_gt</code></pre>
   padding-right: 4px;
 }
 
-#hcrclxedtb .gt_column_spanner_outer:first-child {
+#trhjvjjmhj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hcrclxedtb .gt_column_spanner_outer:last-child {
+#trhjvjjmhj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hcrclxedtb .gt_column_spanner {
+#trhjvjjmhj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -761,11 +837,11 @@ summary_table_gt</code></pre>
   width: 100%;
 }
 
-#hcrclxedtb .gt_spanner_row {
+#trhjvjjmhj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hcrclxedtb .gt_group_heading {
+#trhjvjjmhj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -791,7 +867,7 @@ summary_table_gt</code></pre>
   text-align: left;
 }
 
-#hcrclxedtb .gt_empty_group_heading {
+#trhjvjjmhj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -806,15 +882,15 @@ summary_table_gt</code></pre>
   vertical-align: middle;
 }
 
-#hcrclxedtb .gt_from_md > :first-child {
+#trhjvjjmhj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hcrclxedtb .gt_from_md > :last-child {
+#trhjvjjmhj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hcrclxedtb .gt_row {
+#trhjvjjmhj .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -833,7 +909,7 @@ summary_table_gt</code></pre>
   overflow-x: hidden;
 }
 
-#hcrclxedtb .gt_stub {
+#trhjvjjmhj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -846,7 +922,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#hcrclxedtb .gt_stub_row_group {
+#trhjvjjmhj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -860,15 +936,15 @@ summary_table_gt</code></pre>
   vertical-align: top;
 }
 
-#hcrclxedtb .gt_row_group_first td {
+#trhjvjjmhj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hcrclxedtb .gt_row_group_first th {
+#trhjvjjmhj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hcrclxedtb .gt_summary_row {
+#trhjvjjmhj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -878,16 +954,16 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#hcrclxedtb .gt_first_summary_row {
+#trhjvjjmhj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_first_summary_row.thick {
+#trhjvjjmhj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hcrclxedtb .gt_last_summary_row {
+#trhjvjjmhj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -897,7 +973,7 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_grand_summary_row {
+#trhjvjjmhj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -907,7 +983,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#hcrclxedtb .gt_first_grand_summary_row {
+#trhjvjjmhj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -917,7 +993,7 @@ summary_table_gt</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_last_grand_summary_row_top {
+#trhjvjjmhj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -927,11 +1003,11 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_striped {
+#trhjvjjmhj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hcrclxedtb .gt_table_body {
+#trhjvjjmhj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -940,7 +1016,7 @@ summary_table_gt</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_footnotes {
+#trhjvjjmhj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -954,7 +1030,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_footnote {
+#trhjvjjmhj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -963,7 +1039,7 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#hcrclxedtb .gt_sourcenotes {
+#trhjvjjmhj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -977,7 +1053,7 @@ summary_table_gt</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#hcrclxedtb .gt_sourcenote {
+#trhjvjjmhj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -985,72 +1061,72 @@ summary_table_gt</code></pre>
   padding-right: 5px;
 }
 
-#hcrclxedtb .gt_left {
+#trhjvjjmhj .gt_left {
   text-align: left;
 }
 
-#hcrclxedtb .gt_center {
+#trhjvjjmhj .gt_center {
   text-align: center;
 }
 
-#hcrclxedtb .gt_right {
+#trhjvjjmhj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hcrclxedtb .gt_font_normal {
+#trhjvjjmhj .gt_font_normal {
   font-weight: normal;
 }
 
-#hcrclxedtb .gt_font_bold {
+#trhjvjjmhj .gt_font_bold {
   font-weight: bold;
 }
 
-#hcrclxedtb .gt_font_italic {
+#trhjvjjmhj .gt_font_italic {
   font-style: italic;
 }
 
-#hcrclxedtb .gt_super {
+#trhjvjjmhj .gt_super {
   font-size: 65%;
 }
 
-#hcrclxedtb .gt_footnote_marks {
+#trhjvjjmhj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hcrclxedtb .gt_asterisk {
+#trhjvjjmhj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hcrclxedtb .gt_indent_1 {
+#trhjvjjmhj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hcrclxedtb .gt_indent_2 {
+#trhjvjjmhj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hcrclxedtb .gt_indent_3 {
+#trhjvjjmhj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hcrclxedtb .gt_indent_4 {
+#trhjvjjmhj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hcrclxedtb .gt_indent_5 {
+#trhjvjjmhj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#hcrclxedtb .katex-display {
+#trhjvjjmhj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#hcrclxedtb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#trhjvjjmhj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1506,6 +1582,8 @@ bmi_boxplots &lt;- bmi_all + bmi_by_study</code></pre>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -1543,6 +1621,35 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
