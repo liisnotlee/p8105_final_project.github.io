@@ -255,9 +255,11 @@ $(document).ready(function () {
   </a>
 </li>
 <li>
+  <a href="report.html">Report</a>
+</li>
+<li>
   <a href="data.html">Data</a>
 </li>
-<li class="dropdown-header">Report</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Lifestyle Factors Analyses
@@ -266,19 +268,21 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone</a>
-    </li>
-    <li>
-      <a href="exercise_hormone.html">Exercise</a>
+      <a href="hormone.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown-header">Meet the Team</li>
+        <li>
+  <a href="about.html">Meet the Team</a>
+</li>
 <li>
   <a>
     <span class="fa fa-github fa-lg"></span>
@@ -341,11 +345,16 @@ entered hormone levels (LH, E3G, PdG)</li>
 </ul></li>
 <li>Lifestyle Factors:
 <ul>
-<li><code>stress_score.csv</code></li>
+<li><code>stress_score.csv</code> [TODO]</li>
 <li><code>sleep.csv</code>: sleep stages, time in bed</li>
 <li><code>sleep_score.csv</code></li>
 </ul></li>
 </ul>
+<p>In total, we have 4 dataframes: <code>subject_info</code>
+(demographics data), <code>hormone_symptoms</code> (hormone and symtoms
+data), <code>sleep_stress</code> (sleep and stress related data), and
+<code>exercise</code> (exercise related data). For different analyses,
+we merged these dataframes by participant <code>id</code> as needed.</p>
 </div>
 <div id="data-cleaning-process" class="section level1">
 <h1>Data Cleaning Process</h1>
@@ -494,7 +503,7 @@ records.</li>
 subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche
@@ -545,6 +554,84 @@ subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt;
   # get BMI
   mutate(
     bmi = weight_yr / ( (height_yr / 100)^2 )
+  )</code></pre>
+</div>
+<div id="hormone_symptoms---hormone-self-reported-data"
+class="section level2">
+<h2><code>hormone_symptoms</code> - Hormone &amp; Self-reported
+Data</h2>
+<p><em>Overview:</em></p>
+<p><em>Steps:</em></p>
+<ol style="list-style-type: decimal">
+<li>Factor variables,</li>
+<li>Convert categorical variable values to discrete numeric intensity
+scores (integer) (e.g. <code>moodswing</code> and
+<code>fatigue</code>)</li>
+</ol>
+<pre class="r"><code>hormone_symptoms &lt;- 
+  read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() |&gt; 
+  # factor varialbes
+  mutate(
+    phase = factor(phase, levels = c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)),
+    fatigue = factor(fatigue, 
+                     levels = c(&quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Very High&quot;, &quot;Not at all&quot;)),
+    moodswing = factor(moodswing,
+                       levels = c(&quot;Very Low/Little&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;,&quot;Very High&quot;,&quot;Not at all&quot;)),
+    flow_volume = factor(flow_volume, 
+                         levels = c(&quot;Not at all&quot;, &quot;Spotting / Very Light&quot;,&quot;Light&quot;,&quot;Moderate&quot;, &quot;Somewhat Heavy&quot;,&quot;Heavy&quot;, &quot;Very Heavy&quot;)),
+    flow_color = factor(flow_color,
+                        levels = c(&quot;Not at all&quot;, &quot;Pink&quot;,&quot;Bright Red&quot;, &quot;Dark Brown / Dark Red&quot;, &quot;Grey&quot;, &quot;Black&quot;,&quot;Other&quot;)),
+    appetite = factor(appetite,
+                      levels = c(&quot;Very Low&quot;,&quot;Low&quot;,  &quot;Moderate&quot;, &quot;High&quot;, &quot;Very High&quot;))
+  ) |&gt; 
+  # convert categorical variable values to numeric intensity scores
+  mutate(
+    moodswing_num = case_when(
+      moodswing == &quot;Not at all&quot; ~0,
+      moodswing == &quot;Very Low/Little&quot; ~ 1,
+      moodswing == &quot;Low&quot; ~ 2,
+      moodswing == &quot;Moderate&quot; ~ 3,
+      moodswing == &quot;High&quot; ~ 4,
+      moodswing == &quot;Very High&quot; ~ 5,
+      TRUE ~ NA_real_
+    ),
+    fatigue_num = case_when(
+      fatigue == &quot;Not at all&quot; ~0,
+      fatigue == &quot;Low&quot; ~ 1,
+      fatigue == &quot;Moderate&quot; ~ 2,
+      fatigue == &quot;High&quot; ~ 3,
+      fatigue == &quot;Very High&quot; ~ 4,
+      TRUE ~ NA_real_
+    ),
+    flow_volume_num = case_when(
+      flow_volume == &quot;Not at all&quot; ~ 0,
+      flow_volume == &quot;Spotting / Very Light&quot; ~ 1,
+      flow_volume == &quot;Light&quot; ~ 2,
+      flow_volume == &quot;Moderate&quot; ~ 3,
+      flow_volume == &quot;Somewhat Heavy&quot; ~ 4,
+      flow_volume == &quot;Heavy&quot; ~ 5,
+      flow_volume == &quot;Very Heavy&quot; ~ 6,
+      TRUE ~ NA_real_
+    ),
+    flow_color_num = case_when(
+      flow_color == &quot;Not at all&quot; ~ 0,
+      flow_color == &quot;Pink&quot; ~ 1,
+      flow_color == &quot;Bright Red&quot; ~ 2,
+      flow_color == &quot;Dark Brown / Dark Red&quot; ~ 3,
+      flow_color == &quot;Grey&quot; ~ 4,
+      flow_color == &quot;Black&quot; ~ 5,
+      flow_color == &quot;Other&quot; ~ 6,
+      TRUE ~ NA_real_
+    ),
+    appetite_num = case_when(
+      appetite == &quot;Very Low&quot; ~ 0,
+      appetite == &quot;Low&quot; ~ 1,
+      appetite == &quot;Moderate&quot; ~ 2,
+      appetite == &quot;High&quot; ~ 3,
+      appetite == &quot;Very High&quot; ~ 4,
+      TRUE ~ NA_real_
+    )
   )</code></pre>
 </div>
 </div>
