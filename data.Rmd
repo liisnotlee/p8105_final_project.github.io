@@ -231,3 +231,68 @@ hormone_symptoms <-
   )
 
 ```
+
+
+## `sleep_stress` - Sleep and Stress Data
+*Overview:*
+
+*Steps:*
+
+1. Loaded original data from csv files.
+2. and inner joined the sleep and stress scores by `id`, `study_interval`, `day_in_study`.
+3. Checked data completeness of sleep score and stress score.
+
+```{r}
+# load raw data from csv files
+sleep_score_raw = read_csv("data/sleep_score.csv") |>
+  janitor::clean_names()
+sleep_raw       = read_csv("data/sleep.csv") |>
+  janitor::clean_names()
+stress_score_raw = read_csv("data/stress_score.csv") |>
+  janitor::clean_names()
+
+# combine the sleep and stress score
+sleep_score = sleep_score_raw |>
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes)
+
+sleep = sleep_raw|>
+  select(id,study_interval, sleep_start_day_in_study, timeinbed) |>
+  mutate(day_in_study = sleep_start_day_in_study) |>
+  select(-sleep_start_day_in_study)
+
+stress_score = stress_score_raw |>
+  filter(calculation_failed == "FALSE")|>
+  select(id, study_interval, day_in_study, stress_score)|>
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+# inner join
+sleep_stress = inner_join(sleep_score, stress_score, join_by("id", "study_interval", "day_in_study"))
+ # cleaning exercise from Anu
+exercise_clean = exercise |>
+  distinct()|>
+  select(id, study_interval, start_day_in_study, 
+         activityname, calories, duration, activeduration, 
+         averageheartrate, steps, elevationgain)
+
+# Aggregate to daily level
+exercise_daily = exercise_clean %>%
+  group_by(id, study_interval, start_day_in_study) %>%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = max(averageheartrate, na.rm = TRUE),
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  rename(day_in_study = start_day_in_study)
+exercise_daily1 = exercise_daily |>
+  select(id, day_in_study, total_active_min, study_interval)
+# check of na values
+sum(is.na(sleep_stress$overall_score))
+sum(is.na(sleep_stress$stress_score))
+```
+

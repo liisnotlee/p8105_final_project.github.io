@@ -2,6 +2,29 @@
 title: "Report"
 ---
 
+```{r, include=FALSE}
+# Load packages 
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(mgcv)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(lme4)
+library(lmerTest)
+
+# Set plot theme
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
+)
+```
+
 # Motivation
 
 # Related Work
