@@ -71,7 +71,8 @@ fatigue and moodswing
 
 ```{r, include=FALSE}
 # Remove NA phases AND NA moodswing/fatigue values
-my_int_clean <- my_int |>
+my_int_clean=
+  my_int |>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue))
 
 ```
@@ -232,7 +233,7 @@ other_interest =
   )   
 
 phase_order = c("Menstrual", "Follicular", "Fertility", "Luteal")
-colSums(is.na(my_i[, c("flow_volume", "flow_color", "appetite")]))
+colSums(is.na(other_interest[, c("flow_volume", "flow_color", "appetite")]))
   
 ```
 
@@ -290,8 +291,8 @@ ggplot(my_i_plot, aes(x = phase, y = flow_volume_num)) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun = mean, geom = "line", aes(group = 1), color = "red", size = 1) +
   scale_y_continuous(
-    breaks = 1:length(levels(my_i$flow_volume)),
-    labels = levels(my_i$flow_volume)
+    breaks = 1:length(levels(other_interest$flow_volume)),
+    labels = levels(other_interest$flow_volume)
   ) +
   labs(title = "Flow Volume Across Menstrual Cycle Phases",
        y = "Flow Volume",
@@ -305,8 +306,8 @@ ggplot(my_i_plot, aes(x = phase, y = flow_color_num)) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun = mean, geom = "line", aes(group = 1), color = "red", size = 1) +
   scale_y_continuous(
-    breaks = 1:length(levels(my_i$flow_color)),
-    labels = levels(my_i$flow_color)
+    breaks = 1:length(levels(other_interest$flow_color)),
+    labels = levels(other_interest$flow_color)
   ) +
   labs(title = "Flow Color Across Menstrual Cycle Phases",
        y = "Flow Color",
@@ -320,8 +321,8 @@ ggplot(my_i_plot, aes(x = phase, y = appetite_num)) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "red") +
   stat_summary(fun = mean, geom = "line", aes(group = 1), color = "red", size = 1) +
   scale_y_continuous(
-    breaks = 1:length(levels(my_i$appetite)),
-    labels = levels(my_i$appetite)
+    breaks = 1:length(levels(other_interest$appetite)),
+    labels = levels(other_interest$appetite)
   ) +
   labs(title = "Appetite Across Menstrual Cycle Phases",
        y = "Appetite",
@@ -477,17 +478,17 @@ library(ordinal)
 
 # Flow Volume
 clmm_flowvol=
-  clmm(flow_volume ~ phase + (1 | id), data = my_i, Hess = TRUE)
+  clmm(flow_volume ~ phase + (1 | id), data = other_interest, Hess = TRUE)
 summary(clmm_flowvol)
 
 # Flow Color
 clmm_flowcolor =
-  clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRUE)
+  clmm(flow_color ~ phase + (1 | id), data =other_interest, Hess = TRUE)
 summary(clmm_flowcolor)
 
 # Appetite
 clmm_app=
-  clmm(appetite ~ phase + (1 | id), data = my_i, Hess = TRUE)
+  clmm(appetite ~ phase + (1 | id), data = other_interest, Hess = TRUE)
 summary(clmm_app)
 
 ```
@@ -581,9 +582,10 @@ Cluster 3 (Baseline–Low Symptom Group) exhibited moderate hormone levels (LH =
 These clusters closely align with known biological states of the menstrual cycle, corresponding to menstrual symptomatic states, ovulatory high-hormone states, and baseline low-symptom states.
 
 
-
-
-
-
 Overall final results: 
 Flow volume and flow color exhibited the strongest phase-locking across the menstrual cycle, while appetite showed a robust, individual-specific increase restricted to the Luteal phase, with substantial between-person variability dominating overall appetite levels.
+
+
+
+
+
