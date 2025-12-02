@@ -33,7 +33,7 @@ phase_order <- c("Menstrual", "Follicular", "Fertility", "Luteal")
 
 
 first, explore relationship between LH and estrogen
-```{r}
+```{r, echo = FALSE}
 my_int_avg= 
   my_int|>
   group_by(phase)|>
@@ -82,7 +82,7 @@ my_int_clean=
 
 #so i aim to change the catogorical value (low, moderate, high) to 1,2,3, and so on. i want to sum and avrage. to show a typical cahnge of fatigue and mood in four phases. 
 
-```{r}
+```{r, include=FALSE}
 # Convert moodswing and fatigue to numeric intensity scores
 my_int_numeric <- my_int_clean %>%
   mutate(
@@ -122,7 +122,7 @@ symptom_means
 
 
 
-```{r}
+```{r, echo = FALSE}
 # Mood swing single line plot
 ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
   geom_line(color = "purple", size = 1.5, alpha = 0.7) +
@@ -142,7 +142,7 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
-```{r}
+```{r, echo = FALSE}
 # Fatigue single line plot
 ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
   geom_line(color = "darkorange", size = 1.5, alpha = 0.7) +
@@ -164,7 +164,7 @@ ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
 ```
 
 violin graphs for moodswing
-```{r}
+```{r, echo = FALSE}
 ggplot(my_int_numeric, aes(x = phase, y = moodswing_num)) +
   geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
@@ -177,7 +177,7 @@ ggplot(my_int_numeric, aes(x = phase, y = moodswing_num)) +
   theme_minimal()
 ```
 violin for fatigue
-```{r}
+```{r, echo = FALSE}
 ggplot(my_int_numeric, aes(x = phase, y = fatigue_num)) +
   geom_violin(trim = TRUE, fill = "orange", alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
@@ -196,7 +196,7 @@ Both mood swing and fatigue showed clear phase-dependent variation. After conver
 # approach: longtidual changes
 
 
-```{r}
+```{r, echo = FALSE}
 library(lme4)
 
 
@@ -216,7 +216,7 @@ To account for repeated measurements within individuals, linear mixed-effects mo
 
 reletionship between hormone and flow color, flow volume, and appetite
 
-```{r}
+```{r, include=FALSE}
 other_interest = 
   hormone |>
   select(id, phase, lh, estrogen, flow_color, flow_volume, appetite) |>
@@ -237,7 +237,7 @@ colSums(is.na(other_interest[, c("flow_volume", "flow_color", "appetite")]))
   
 ```
 
-```{r}
+```{r, include=FALSE}
 # Flow volume frequencies by phase
 table_flow_vol=
   other_interest|>
@@ -270,7 +270,7 @@ table_appetite
 
 
 Overall scatter plot for three variables:
-```{r}
+```{r, echo = FALSE}
 
 my_i_plot=
   other_interest|>
@@ -331,7 +331,7 @@ ggplot(my_i_plot, aes(x = phase, y = appetite_num)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r}
+```{r, include=FALSE}
 
 #give them order to do the avereage graph
 my_i_num =
@@ -372,7 +372,7 @@ my_i_num =
   )
 ```
 
-```{r}
+```{r, echo = FALSE}
 #graphing
 phase_order =
   c("Menstrual", "Follicular", "Fertility", "Luteal")
@@ -431,7 +431,7 @@ ggplot(my_i_avg, aes(x = phase, y = avg_appetite, group = 1)) +
 
 ```
 add violin data:
-```{r}
+```{r, echo = FALSE}
 ggplot(my_i_num, aes(x = phase, y = flow_volume_num)) +
   geom_violin(fill = "skyblue", alpha = 0.5, trim = FALSE)
   labs(
@@ -442,7 +442,7 @@ ggplot(my_i_num, aes(x = phase, y = flow_volume_num)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-```{r}
+```{r, echo = FALSE}
 ggplot(my_i_num, aes(x = phase, y = flow_color_num)) +
   geom_violin(fill = "darkseagreen", alpha = 0.5, trim = FALSE) +
   labs(
@@ -453,7 +453,7 @@ ggplot(my_i_num, aes(x = phase, y = flow_color_num)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-```{r}
+```{r, echo = FALSE}
 ggplot(my_i_num, aes(x = phase, y = appetite_num)) +
   geom_violin(fill = "plum", alpha = 0.5, trim = FALSE) +
   labs(
@@ -473,7 +473,7 @@ ggplot(my_i_num, aes(x = phase, y = appetite_num)) +
 
 
 To account for within-subject repeated measures and get phase-specific effects, we can fit CLMM models:
-```{r}
+```{r, echo = FALSE}
 library(ordinal)
 
 # Flow Volume
@@ -511,7 +511,7 @@ Flow color is the most phase-sensitive outcome in your entire dataset, tightly a
 Only the Luteal phase showed a statistically significant increase in appetite relative to the Follicular phase, This estimate is on the log-odds scale, meaning that the odds of reporting higher appetite categories increase substantially in the Luteal phase within the same individuals. Appetite did not differ significantly in the fertility and menstrual phase. This confirms that appetite elevation is a Luteal-specific physiological effect, not a general cycle-wide fluctuation.
 
 Clustering:
-```{r}
+```{r, echo = FALSE}
 cluster_df =
   my_int_numeric |>
   group_by(id, phase) |>
