@@ -147,33 +147,29 @@ subject_info <- subject_info_raw  |>
   # get BMI
   mutate(
     bmi = weight_yr / ( (height_yr / 100)^2 )
-  )
-```
-
-### `demographic_data` - simplified demographic data only for table summary
-```{r}
-demographic_data = subject_info_raw %>%
+  ) |>
+  #this factors variables and also creates "gender abrv" and "education abrv", which are simplified versions of these variables for cleaner tables and figures 
   mutate(
     education = str_trim(education),
-    education_ranked = case_when(
+    education_abrv = case_when(
       education == "High school degree or equivalent (e.g. GED)" ~ "High School",
       education == "Some university/ post-secondary, no degree" ~ "Some College",
       education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
       education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
       TRUE ~ "Other"),
-    education_ranked = factor(
-      education_ranked,
+    education_abrv = factor(
+      education_abrv,
       levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
       ordered = TRUE),
      self_report_menstrual_health_literacy = factor(
       self_report_menstrual_health_literacy,
       levels = c("Non-existant", "Low", "Medium", "High"),
       ordered = TRUE),
-    gender = case_when(
+    gender_abrv = case_when(
       gender %in% c("Gender Fluid", "Non-binary") ~ "Gender Fluid or Non-binary", 
       gender %in% c("Prefer not to say", "Other") ~ "Prefer not to say or Other", 
       gender == "Woman" ~ "Woman"),
-      gender = factor(gender, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
+      gender_abrv = factor(gender_abrv, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
       sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say")))
 ```
 
@@ -181,19 +177,27 @@ demographic_data = subject_info_raw %>%
 
 ### Summary Table 
 ```{r}
-#This is setup to make a clean table with simplified variables and percent count
-#Age
-age_row = demographic_data %>%
-  summarise(variable = "Age at First Period",
+#This is setup to make a clean table with simplified variables, count, percent count, except for menarche which is mean and (range)
+#Menarche
+age_row = subject_info %>%
+  summarise(variable = "Age at Menarche",
     subgroup = "",
-    value = sprintf(
-      "%.1f (%d–%d)",
+    value = sprintf("%.1f (%d–%d)",
       mean(age_of_first_menarche, na.rm = TRUE),
       min(age_of_first_menarche, na.rm = TRUE),
       max(age_of_first_menarche, na.rm = TRUE)))
 
+#bmi
+bmi_row = subject_info %>%
+  summarise(variable = "BMI",
+    subgroup = "",
+    value = sprintf("%.1f (%.1f-%.1f)",
+      mean(bmi, na.rm = TRUE),
+      min(bmi, na.rm = TRUE),
+      max(bmi, na.rm = TRUE)))
+
 #Race
-ethnicity_rows = demographic_data %>%
+ethnicity_rows = subject_info %>%
   count(ethnicity) %>%
   mutate(variable = "Ethnicity",
     subgroup = ethnicity,
@@ -201,15 +205,15 @@ ethnicity_rows = demographic_data %>%
   select(variable, subgroup, value)
 
 #Gender
-gender_rows = demographic_data %>%
-  count(gender) %>%
+gender_rows = subject_info %>%
+  count(gender_abrv) %>%
   mutate(variable = "Gender",
-    subgroup = gender,
+    subgroup = gender_abrv,
     value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
   select(variable, subgroup, value)
 
 #Sexually Active 
-sex_rows = demographic_data %>%
+sex_rows = subject_info %>%
   count(sexually_active) %>%
   mutate(variable = "Sexually Active",
     subgroup = sexually_active,
@@ -217,16 +221,17 @@ sex_rows = demographic_data %>%
   select(variable, subgroup, value)
 
 #Education 
-education_rows = demographic_data %>%
-  count(education_ranked) %>%
+education_rows = subject_info %>%
+  count(education_abrv) %>%
   mutate(variable = "Education", 
-         subgroup = education_ranked,
+         subgroup = education_abrv,
          value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
   select(variable, subgroup, value)
 
 #Combined
 summary_table = bind_rows(
   age_row,
+  bmi_row,
   ethnicity_rows,
   gender_rows,
   education_rows,
@@ -241,7 +246,7 @@ summary_table_gt = summary_table_clean %>%
   gt() %>%
   cols_label(variable = "",
     subgroup = "",
-    value = "Mean (Range) or Count (%)") %>%
+    value = "Mean (Max-Min) or Count (%)") %>%
   tab_options(table.font.size = px(14),
     data_row.padding = px(6)) %>%
   tab_style(style = cell_text(weight = "bold"),
@@ -361,6 +366,17 @@ subject_info |>
     legend.position = "none"
   )
 
+education_health_lit = ggplot(subject_info, aes(x = education_abrv, fill = self_report_menstrual_health_literacy)) +
+  geom_bar(position = "fill") + 
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Self-Reported Menstrual Health Literacy by Education Level",
+    x = "Education Level",
+    y = "Percentage",
+    fill = "Menstrual Health Literacy") +
+  theme_minimal(base_size = 14)
+
+education_health_lit
 ```
 
 
@@ -443,6 +459,17 @@ subject_info |>
     axis.title = element_text(size = 12),
     legend.position = "none"
   )
+
+menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
+  geom_boxplot(fill = "cornflowerblue") +
+  labs(title = "Age of Menarche",
+    y = "Age (years)",
+    x = "") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+
+menarche_plot
 ```
 
 Findings: most common age of 1st menarche is at 12 y.o.
