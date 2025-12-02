@@ -239,10 +239,264 @@ hormone_symptoms <-
 ```
 
 # EDA
+This part of the data analysis explores how the menstrual cycle connects to other parts of health and daily life. We will look at the possible links between the cycle and different body signals—like hormones, changes in flow, or symptoms such as tiredness, mood swings, and appetite. We will also check if lifestyle habits, including exercise, sleep, and stress, are related to these monthly patterns. The goal is to see a clearer picture of how all these factors work together.
+
+
+Age and ethnicity distribution table
+```{r}
+
+```
+#decription+add title to the table
+
+
+Self-Reported Menstrual Health Literacy by Education Level
+```{r}
+education_health_lit = ggplot(demographic_data, aes(x = education_ranked, fill = self_report_menstrual_health_literacy)) +
+  geom_bar(position = "fill") +  # "fill" makes it proportional
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Self-Reported Menstrual Health Literacy by Education Level",
+    x = "Education Level",
+    y = "Percentage",
+    fill = "Menstrual Health Literacy"
+  ) +
+  theme_minimal(base_size = 14)
+
+education_health_lit
+```
+#description
+
+Hormones Levels (estrogen and luteinizing hormone) Across Menstrual Cycle Phases
+```{r, echo = FALSE}
+my_int_avg= 
+  my_int|>
+  group_by(phase)|>
+  summarise(
+    estrogen_mean = mean(estrogen, na.rm = TRUE),
+    lh_mean = mean(lh, na.rm = TRUE)
+  )|>
+  mutate(phase = factor(phase, levels = phase_order))|>
+  filter(!is.na(phase))
+
+# Plot the summarized data
+ggplot(my_int_avg, aes(x = phase)) +
+  geom_line(aes(y = estrogen_mean, color = "Estrogen", group = 1), size = 1) +
+  geom_line(aes(y = lh_mean, color = "LH", group = 1), size = 1) +
+  geom_point(aes(y = estrogen_mean, color = "Estrogen"), size = 3) +
+  geom_point(aes(y = lh_mean, color = "LH"),size= 3) +
+  labs(
+    title = "Average Estrogen and LH Levels Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Hormone Level",
+    color = "Hormone"
+  ) +
+  scale_color_manual(values = c("Estrogen" = "red", "LH" = "blue")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+Average hormone profiles varied systematically across menstrual cycle phases. Estrogen exhibited a clear surge during the Fertility (ovulatory) phase, while LH showed a small peak at the same phase, consistent with the known physiological LH surge that triggers ovulation. Both hormones were relatively low during the Menstrual phase and increased through the Follicular phase before peaking in Fertility, then declining during the Luteal phase. These patterns confirm that the hormonal data capture biologically meaningful endocrine rhythms across the cycle.
+
+Average Mood Swing Intensity Across Menstrual Cycle Phases
+```{r, echo = FALSE}
+# Mood swing single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
+  geom_line(color = "purple", size = 1.5, alpha = 0.7) +
+  geom_point(color = "purple", size = 3) +
+  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = "bold") +
+  labs(
+    title = "Average Mood Swing Intensity Across Menstrual Cycle Phases",
+    subtitle = "Higher values indicate more severe mood swings (Scale: 1-4)",
+    x = "Menstrual Cycle Phase",
+    y = "Average Mood Swing Intensity"
+  ) +
+  ylim(0, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+```
+This plot showed a clear, phase-dependent pattern in mood swings, with average intensity highest during the menstrual phase and lowest in the Fertility phase.
+
+Discusion: Biologically, this aligns with the sharp decline in estrogen and progesterone levels that occurs just before and during menstruation. These hormonal shifts can directly affect neurotransmitter systems in the brain, particularly serotonin, which plays a key role in mood regulation. The relative consistency in mood swing ratings across the other three phases—follicular, ovulatory, and luteal—reflects more stable hormonal environments during these times, where estrogen and progesterone levels are either rising or maintained at a high plateau. Thus, the cyclical pattern visualized in the data is a direct reflection of the underlying endocrine rhythm.
+
+Distribution of Mood Swing Intensity Across Phases
+```{r}
+ggplot(my_int_numeric, aes(x = phase, y = moodswing_num)) +
+  geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
+  geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
+  scale_y_continuous(limits = c(0,5), breaks = 0:5) +
+  labs(
+    title = "Distribution of Mood Swing Intensity Across Phases",
+    x = "Phase",
+    y = "Mood Swing (0–5)"
+  ) +
+  theme_minimal()
+```
+This violin plot highlighted substantial individual differences in symptom experience for moodswing. However, they consistently showed a right-skewed distribution during the Menstrual phase, confirming a higher symptom burden for most individuals in this phase.
+
+Average Fatigue Intensity Across Menstrual Cycle Phases
+```{r, echo = FALSE}
+# Fatigue single line plot
+ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
+  geom_line(color = "darkorange", size = 1.5, alpha = 0.7) +
+  geom_point(color = "darkorange", size = 3) +
+  geom_text(aes(label = round(avg_fatigue, 2)), vjust = -1, size = 4, fontface = "bold") +
+  labs(
+    title = "Average Fatigue Intensity Across Menstrual Cycle Phases",
+    subtitle = "Higher values indicate more severe fatigue (Scale: 1-4)",
+    x = "Menstrual Cycle Phase",
+    y = "Average Fatigue Intensity"
+  ) +
+  ylim(0, 4) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+```
+This plot showed a clear, phase-dependent pattern in fatigue, with average intensity highest during the menstrual phase and lowest in the Fertility phase.
+
+Distribution of Fatigue Intensity Across Phases
+```{r}
+ggplot(my_int_numeric, aes(x = phase, y = fatigue_num)) +
+  geom_violin(trim = TRUE, fill = "orange", alpha = 0.5) +
+  geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
+  scale_y_continuous(limits = c(0,4), breaks = 0:4) +
+  labs(
+    title = "Distribution of Fatigue Intensity Across Phases",
+    x = "Phase",
+    y = "Fatigue (0–4)"
+  ) +
+  theme_minimal()
+```
+This violin plot for fatigue highlights the substantial individual differences in how this symptom is experienced across the cycle.
+Discussion: Biologically, this variability can be attributed to factors such as individual sensitivity to hormonal fluctuations, genetic predispositions, underlying health conditions, and differing baseline stress or energy levels. The consistent right skewness observed in the distribution of fatigue scores across all four menstrual phases is a particularly telling statistical pattern. This indicates that while the majority of individuals report lower fatigue intensity, there is a consistent subset—visible as the extended "tail" of the distribution to the right—who experience disproportionately high levels of fatigue in every phase. This persistent skew suggests that for these individuals, fatigue may be a more chronic or severe issue, potentially influenced by factors beyond the cyclical hormonal changes, such as sleep disorders, nutritional status, or other persistent health challenges, underscoring that menstrual cycle phase is just one component in a complex individual experience of fatigue.
+
+Average Flow Volume Across Menstrual Cycle Phases 
+```{r, echo = FALSE}
+ggplot(my_i_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
+  geom_line(color = "blue", size = 1.5) +
+  geom_point(color = "red", size = 3) +
+  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
+  scale_y_continuous(limits = c(0,6), breaks = 0:6, labels = flow_volume_levels) +
+  labs(title = "Average Flow Volume Across Menstrual Cycle Phases",
+       x = "Phase", y = "Flow Volume") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The graph illustrates a dramatic, expected concentration of menstrual flow volume within the Menstrual phase. The average flow volume is overwhelmingly high during menstruation (2.36) compared to the near-zero averages in the Follicular (0.29), Fertility/Ovulatory (0.09), and Luteal (0.06) phases. This visualizes the fundamental fact that substantial bleeding is confined almost entirely to the menstrual period itself, with only minimal spotting possible during other cycle stages.
+
+Discussion: This pattern is a direct reflection of the uterine lining's lifecycle, governed by reproductive hormones. During the Follicular, Ovulatory, and Luteal phases, the hormones estrogen and progesterone work to build up and maintain a thick, nutrient-rich endometrial lining to support a potential pregnancy. Bleeding does not occur during this time of maintenance. The Menstrual phase is triggered by a sharp drop in progesterone and estrogen levels at the end of the cycle if pregnancy does not occur. This hormonal withdrawal causes the blood vessels in the thickened lining to constrict and the tissue to break down and detach, resulting in the menstrual flow (measured as volume) observed in the data. Thus, the graph captures the essential, cyclical process of endometrial buildup and shedding.
+```{r, echo = FALSE}
+ggplot(my_i_num, aes(x = phase, y = flow_volume_num)) +
+  geom_violin(fill = "skyblue", alpha = 0.5, trim = FALSE)
+  labs(
+    title = "Distribution of Flow Volume Across Phases",
+    x = "Phase", y = "Flow Volume (0–6)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+There are clear differences across menstrual cycle phases. Likely patterns: heavier flow in the Menstrual phase, lighter in Follicular.
+
+
+Distribution of Flow Color Across Phases
+```{r}
+ggplot(my_i_num, aes(x = phase, y = flow_color_num)) +
+  geom_violin(fill = "darkseagreen", alpha = 0.5, trim = FALSE) +
+  labs(
+    title = "Distribution of Flow Color Across Phases",
+    x = "Phase", y = "Flow Color (0–6)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+There are clear differences across menstrual cycle phases. Likely patterns: darker color in the Menstrual phase, spotting in luteal, fertility, and follicular phase. 
+
+Clustering
+```{r, echo = FALSE}
+cluster_df =
+  my_int_numeric |>
+  group_by(id, phase) |>
+  summarise(
+    lh = mean(lh, na.rm = TRUE),
+    estrogen = mean(estrogen, na.rm = TRUE),
+    moodswing_num = mean(moodswing_num, na.rm = TRUE),
+    fatigue_num = mean(fatigue_num, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  left_join(
+    my_i_num |>
+      group_by(id, phase) |>
+      summarise(
+        appetite_num = mean(appetite_num, na.rm = TRUE),
+        flow_volume_num = mean(flow_volume_num, na.rm = TRUE),
+        .groups = "drop"
+      ),
+    by = c("id", "phase")
+  )
+cluster_df =
+  cluster_df |>
+  mutate(
+    lh = as.numeric(lh),
+    estrogen = as.numeric(estrogen)
+  )
+cluster_scaled =
+  cluster_df |>
+  select(-id, -phase) |>
+  scale()
+set.seed(123)
+k3 =
+  kmeans(
+    cluster_scaled,
+    centers = 3,
+    nstart = 25
+  )
+
+cluster_df =
+  cluster_df |>
+  mutate(cluster = factor(k3$cluster))
+ggplot(cluster_df, aes(x = estrogen, y = lh, color = cluster)) +
+  geom_point(size = 2, alpha = 0.7) +
+  labs(
+    title = "Hormone–Symptom Clusters",
+    x = "Estrogen",
+    y = "LH",
+    color = "Cluster"
+  ) +
+  theme_minimal()
+cluster_summary =
+  cluster_df |>
+  group_by(cluster) |>
+  summarise(across(c(lh, estrogen, moodswing_num, fatigue_num, appetite_num, flow_volume_num), mean))
+
+cluster_summary
+```
+Unsupervised k-means clustering applied to six standardized features (LH, estrogen, mood swing, fatigue, appetite, and flow volume) identified three distinct physiological–symptom phenotypes:
+Cluster 1 (Menstrual–High Symptom–High Flow Group) was characterized by low hormones (LH = 3.82, estrogen = 101.00), the highest mood swing (1.85) and fatigue (2.08), and markedly elevated flow volume (2.45).
+Cluster 2 (Ovulatory–High Hormone–High Appetite Group) showed extremely high hormones (LH = 11.47, estrogen = 256.48), the highest appetite (2.14), low mood swing (1.45) and fatigue (1.93), and minimal flow (0.21).
+
+Cluster 3 (Baseline–Low Symptom Group) exhibited moderate hormone levels (LH = 4.58, estrogen = 119.21), the lowest mood swing (1.47) and fatigue (1.82), stable appetite (1.83), and minimal flow (0.15).
+These clusters closely align with known biological states of the menstrual cycle, corresponding to menstrual symptomatic states, ovulatory high-hormone states, and baseline low-symptom states.
+
+Overall final results: 
+Flow volume and flow color exhibited the strongest phase-locking across the menstrual cycle, while appetite showed a robust, individual-specific increase restricted to the Luteal phase, with substantial between-person variability dominating overall appetite levels.
 
 
 
+Exercise:
 
+Sleep:
+
+Stress:
 # Modelling
 
 # Discussion
