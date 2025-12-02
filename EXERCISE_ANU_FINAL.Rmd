@@ -6,20 +6,19 @@ output: html_document
 ---
 
 # Libraries required
-```{r}
+```{r, message = FALSE}
 library(tidyverse)
 library(knitr)
-
-
-
 ```
 
-
 # Data import and cleaning
-```{r}
+This analysis combines exercise tracking data with hormone and self-reported symptom data to examine relationships between physical activity and menstrual cycle phases. The exercise data was first cleaned by removing duplicate entries and selecting relevant variables including exercise duration, active time, and heart rate. Individual exercise sessions were then aggregated to the daily level, with duration variables converted from milliseconds to minutes. Daily summaries include total exercise duration, total active minutes, average heart rate, and number of exercise sessions per day. The hormone and self-reported symptom data was cleaned by converting all Likert scale responses (ranging from "Very Low/Little" to "Very High") to numeric values from 1 to 5 for quantitative analysis. Menstrual cycle phases were ordered chronologically (Menstrual, Follicular, Fertility, Luteal) as an ordered factor variable to ensure proper sequencing during analyses.
+
+```{r, message = FALSE, warning = FALSE}
 # Read data
 exercise = read_csv("./data/exercise.csv")
 hormones = read_csv("./data/hormones_and_selfreport.csv")
+
 
 # Clean and de-duplicate exercise data
 exercise_clean = exercise %>%
@@ -55,13 +54,12 @@ hormones_clean = hormones %>%
     foodcravings_num = recode(foodcravings, !!!likert_to_num),
     indigestion_num = recode(indigestion, !!!likert_to_num),
     bloating_num = recode(bloating, !!!likert_to_num),
-    appetite_num = recode(appetite, !!!likert_to_num)
-  )
+    appetite_num = recode(appetite, !!!likert_to_num),
     
     # Order phase factor
     phase = factor(phase, 
                    levels = c("Menstrual", "Follicular", "Fertility", "Luteal"))
-  )
+    )
 
 # Merge datasets
 merged_data = hormones_clean %>%
