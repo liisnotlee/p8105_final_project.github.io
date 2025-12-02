@@ -1,0 +1,298 @@
+---
+title: "Data"
+---
+
+# Data Sources
+
+We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
+
+Data was collected from 42 menstruating young adults in Canada over two 3-month intervals (one in 2022, and the other in 2024). Participants wore Fitbit Sense smartwatches to measure physiological signals, and Mira Plus Starter Kits to track their hormone levels. Participants also self-reported daily symptom experiences like cramps, sleep quality, and stress levels via a smartphone diary app.
+
+The original dataset contains 23 structured tables organized by signal category. For this project, we focused on the lifestyle factors such as exercise, sleep, and stress, and menstrual cycle symptoms. The datasets we used are the following:
+
+-   Demographics:
+    -   `subject_info.csv`: static information such as age, education, and age at menarche
+    -   `height_and_weight.csv`: participant's baselien height and weight
+-   Hormone and Symptoms:
+    -   `hormones_and_selfreport.csv`：self-reported daily data including symptoms (e.g., cramps, mood, menstrual flow) and manually entered hormone levels (LH, E3G, PdG)
+-   Lifestyle Factors:
+    -   `stress_score.csv` [TODO]
+    -   `sleep.csv`: sleep stages, time in bed
+    -   `sleep_score.csv`
+
+In total, we have 4 dataframes: `subject_info` (demographics data), `hormone_symptoms` (hormone and symtoms data), `sleep_stress` (sleep and stress related data), and `exercise` (exercise related data). For different analyses, we merged these dataframes by participant `id` as needed.
+
+# Data Cleaning Process
+
+Load necessary libraries
+
+```{r load-lib, message=FALSE}
+library(tidyverse)
+library(patchwork)
+library(ggsci)
+```
+
+## `subject_info` - Subject-Relevant Data
+
+*Overview:*
+
+The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
+
+It contains a total of 62 observations of 19 variables. Some key variables are the following:
+
+- `id`: participant's unique identifier 
+- Age relevant variables: `birth_year` and `age_of_first_menarche` 
+- Height and weight related variables: `avg_height`, `avg_weight`, `bmi` 
+- Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study) 
+- Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
+
+*Steps:*
+
+1.  Cleaned up data from `height_and_weight.csv` into a dataframe called `ht_wt` which contains 42 observations of 7 variables.
+    1.  Some participants were enrolled in both 2022 and 2024, so they had baseline records of height and weight for both years (like `height_2022` and `height_2024`); hence, we took the averages and added two columns as `avg_height` and `avg_weight`.
+    2.  Checked data completeness. **Noted a lot of missing values for baseline height and weight, which might cause incomplete/biased data representation for participant characteristics summary. Noted that only 24 participants have at least one record of weight and height.**
+
+```{r ht-and-wt, message=FALSE}
+ht_wt = read_csv("data/height_and_weight.csv")|> 
+  janitor::clean_names() |> 
+  # calculate mean height/weight
+  rowwise() |>
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
+  ) |>
+  ungroup()
+```
+
+```{r missing-value-ht-wt}
+# at least contain one ht and wt
+ht_wt |>
+  count(!is.na(avg_height) & !is.na(avg_weight))|> 
+  knitr::kable()
+
+ht_wt |>
+  summarise(
+    missing_ht = sum(is.na(avg_height)),
+    missing_wt = sum(is.na(avg_weight)),
+    missing_both = sum(is.na(avg_weight) & is.na(avg_height))
+  ) |> 
+  knitr::kable()
+```
+
+2.  Extracted participants study enrollment information from `hormones_and_selfreport.csv` and created a `study_flag` dataframe to represent the study year(s) participants were enrolled in (`0`=No, `1`=Yes). The `study_flag` dataframe only contains 3 variables: `id`, `study_2022` and `study_2024`.
+
+```{r, message=FALSE}
+# import csv file
+hormones_and_selfreport = read_csv("data/hormones_and_selfreport.csv") |> 
+  janitor::clean_names() 
+# extract study_flag
+study_flag <- hormones_and_selfreport  |> 
+  distinct(id, study_interval) |> 
+  mutate(flag = 1,
+         study_interval = paste0("study_", study_interval)) |> 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0  
+  )
+```
+
+3.  Merged `ht_wt` and `study_flag` with `subject_info` from `subject-info.csv` by participant's `id`.
+    1.  Used `pivot_long` for height, weight and study year variables (`1`=2022 only, `2`=2024 only, `3`=both 2022 and 2024). **Noted that participcants in 2024 were a subset of participants in 2022. In other words, there was no new participants in study 2024.** Because we used `pivot_long`, now if a participant was enrolled in both years, she will have 2 rows representing each year.
+    2.  Ensured all variables are in the correct type (e.g. numerics for age, height, weight, etc.)
+    3.  Calculated age based on enrollment study year.
+    4.  Calculated BMI for partcipants with both weight and height records.
+
+```{r}
+# read in subject-info.csv
+subject_info_raw = read_csv("data/subject-info.csv") |> 
+  janitor::clean_names()
+
+subject_info <- subject_info_raw  |> 
+  # merging
+  left_join(ht_wt, by = "id") |> 
+  left_join(study_flag, by = "id") |>
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 & study_2024 == 1 ~ 3L,  # both 2022 & 2024
+      study_2022 == 1 & study_2024 == 0 ~ 1L,  
+      study_2024 == 1 & study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |> 
+  # pivot_long for wt & ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(".value", "year"), 
+    names_sep = "_"                 
+  ) |> 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |> 
+  # keep only the relevant study year
+  filter(
+    (study == 1 & year == 2022) |
+    (study == 2 & year == 2024) |
+    (study == 3)
+  ) |> 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |> 
+  # get a mean age for each id
+  group_by(id) |> 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |> 
+  ungroup() |> 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )
+```
+
+
+## `hormone_symptoms` - Hormone & Self-reported Data
+*Overview:*
+
+*Steps:*
+
+1. Factor variables, 
+2. Convert categorical variable values to discrete numeric intensity scores (integer) (e.g. `moodswing` and `fatigue`)
+```{r, message = FALSE}
+hormone_symptoms <- 
+  read_csv("data/hormones_and_selfreport.csv") |> 
+  janitor::clean_names() |> 
+  # factor varialbes
+  mutate(
+    phase = factor(phase, levels = c("Menstrual", "Follicular", "Fertility", "Luteal")),
+    fatigue = factor(fatigue, 
+                     levels = c("Low", "Moderate", "High", "Very High", "Not at all")),
+    moodswing = factor(moodswing,
+                       levels = c("Very Low/Little", "Low", "Moderate", "High","Very High","Not at all")),
+    flow_volume = factor(flow_volume, 
+                         levels = c("Not at all", "Spotting / Very Light","Light","Moderate", "Somewhat Heavy","Heavy", "Very Heavy")),
+    flow_color = factor(flow_color,
+                        levels = c("Not at all", "Pink","Bright Red", "Dark Brown / Dark Red", "Grey", "Black","Other")),
+    appetite = factor(appetite,
+                      levels = c("Very Low","Low",  "Moderate", "High", "Very High"))
+  ) |> 
+  # convert categorical variable values to numeric intensity scores
+  mutate(
+    moodswing_num = case_when(
+      moodswing == "Not at all" ~0,
+      moodswing == "Very Low/Little" ~ 1,
+      moodswing == "Low" ~ 2,
+      moodswing == "Moderate" ~ 3,
+      moodswing == "High" ~ 4,
+      moodswing == "Very High" ~ 5,
+      TRUE ~ NA_real_
+    ),
+    fatigue_num = case_when(
+      fatigue == "Not at all" ~0,
+      fatigue == "Low" ~ 1,
+      fatigue == "Moderate" ~ 2,
+      fatigue == "High" ~ 3,
+      fatigue == "Very High" ~ 4,
+      TRUE ~ NA_real_
+    ),
+    flow_volume_num = case_when(
+      flow_volume == "Not at all" ~ 0,
+      flow_volume == "Spotting / Very Light" ~ 1,
+      flow_volume == "Light" ~ 2,
+      flow_volume == "Moderate" ~ 3,
+      flow_volume == "Somewhat Heavy" ~ 4,
+      flow_volume == "Heavy" ~ 5,
+      flow_volume == "Very Heavy" ~ 6,
+      TRUE ~ NA_real_
+    ),
+    flow_color_num = case_when(
+      flow_color == "Not at all" ~ 0,
+      flow_color == "Pink" ~ 1,
+      flow_color == "Bright Red" ~ 2,
+      flow_color == "Dark Brown / Dark Red" ~ 3,
+      flow_color == "Grey" ~ 4,
+      flow_color == "Black" ~ 5,
+      flow_color == "Other" ~ 6,
+      TRUE ~ NA_real_
+    ),
+    appetite_num = case_when(
+      appetite == "Very Low" ~ 0,
+      appetite == "Low" ~ 1,
+      appetite == "Moderate" ~ 2,
+      appetite == "High" ~ 3,
+      appetite == "Very High" ~ 4,
+      TRUE ~ NA_real_
+    )
+  )
+
+```
+
+
+## `sleep_stress` - Sleep and Stress Data
+*Overview:*
+
+*Steps:*
+
+1. Loaded original data from csv files.
+2. and inner joined the sleep and stress scores by `id`, `study_interval`, `day_in_study`.
+3. Checked data completeness of sleep score and stress score.
+
+```{r}
+# load raw data from csv files
+sleep_score_raw = read_csv("data/sleep_score.csv") |>
+  janitor::clean_names()
+sleep_raw       = read_csv("data/sleep.csv") |>
+  janitor::clean_names()
+stress_score_raw = read_csv("data/stress_score.csv") |>
+  janitor::clean_names()
+
+# combine the sleep and stress score
+sleep_score = sleep_score_raw |>
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes)
+
+sleep = sleep_raw|>
+  select(id,study_interval, sleep_start_day_in_study, timeinbed) |>
+  mutate(day_in_study = sleep_start_day_in_study) |>
+  select(-sleep_start_day_in_study)
+
+stress_score = stress_score_raw |>
+  filter(calculation_failed == "FALSE")|>
+  select(id, study_interval, day_in_study, stress_score)|>
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+# inner join
+sleep_stress = inner_join(sleep_score, stress_score, join_by("id", "study_interval", "day_in_study"))
+ # cleaning exercise from Anu
+exercise_clean = exercise |>
+  distinct()|>
+  select(id, study_interval, start_day_in_study, 
+         activityname, calories, duration, activeduration, 
+         averageheartrate, steps, elevationgain)
+
+# Aggregate to daily level
+exercise_daily = exercise_clean %>%
+  group_by(id, study_interval, start_day_in_study) %>%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = max(averageheartrate, na.rm = TRUE),
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  rename(day_in_study = start_day_in_study)
+exercise_daily1 = exercise_daily |>
+  select(id, day_in_study, total_active_min, study_interval)
+# check of na values
+sum(is.na(sleep_stress$overall_score))
+sum(is.na(sleep_stress$stress_score))
+```
+

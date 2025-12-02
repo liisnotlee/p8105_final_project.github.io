@@ -31,7 +31,11 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -220,7 +224,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -230,6 +300,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -252,8 +332,12 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
-<li class="dropdown-header">Report</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Lifestyle Factors Analyses
@@ -262,15 +346,24 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone</a>
+      <a href="hormone.html">Hormone &amp; Symptoms</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
   </ul>
+</li>
+<li>
+  <a href="p8105_final_project_proposal.html">Proposal</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown-header">Meet the Team</li>
+        <li>
+  <a href="about.html">Meet the Team</a>
+</li>
 <li>
   <a>
     <span class="fa fa-github fa-lg"></span>
@@ -284,6 +377,14 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Participants Characteristics</h1>
@@ -293,18 +394,8 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(patchwork)
+<pre class="r"><code>library(tidyverse)
+library(patchwork)
 library(ggsci)</code></pre>
 <p>Set plot theme</p>
 <pre class="r"><code>theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
@@ -346,7 +437,7 @@ both 2022 and 2024, keep the latest one as enrollment year</li>
   ) |&gt;
   ungroup()</code></pre>
 <pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
 ## 
@@ -394,7 +485,7 @@ data</h3>
 <pre class="r"><code>hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
   janitor::clean_names() </code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -424,7 +515,7 @@ data</h3>
 subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche
@@ -865,6 +956,8 @@ bmi_boxplots &lt;- bmi_all + bmi_by_study</code></pre>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -896,7 +989,41 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

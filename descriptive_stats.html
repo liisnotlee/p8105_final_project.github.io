@@ -9,11 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Muying Li" />
 
-<meta name="date" content="2025-11-18" />
+<meta name="date" content="2025-11-15" />
 
-<title>descriptive_stats</title>
+<title>Demographic Data</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -31,7 +30,11 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
@@ -220,7 +223,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -230,6 +299,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -252,8 +331,12 @@ $(document).ready(function () {
      
   </a>
 </li>
-<li class="dropdown-header">Data</li>
-<li class="dropdown-header">Report</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Lifestyle Factors Analyses
@@ -262,15 +345,24 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone</a>
+      <a href="hormone.html">Hormone &amp; Symptoms</a>
     </li>
-    <li class="dropdown-header">Exercise</li>
-    <li class="dropdown-header">Sleep &amp; Stress</li>
+    <li>
+      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_hormone.html">Exercise</a>
+    </li>
   </ul>
+</li>
+<li>
+  <a href="p8105_final_project_proposal.html">Proposal</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown-header">Meet the Team</li>
+        <li>
+  <a href="about.html">Meet the Team</a>
+</li>
 <li>
   <a>
     <span class="fa fa-github fa-lg"></span>
@@ -284,265 +376,668 @@ $(document).ready(function () {
 
 <div id="header">
 
-
-
-<h1 class="title toc-ignore">descriptive_stats</h1>
-<h4 class="author">Muying Li</h4>
-<h4 class="date">2025-11-18</h4>
-
-</div>
-
-
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(patchwork)
-library(ggsci)</code></pre>
-<p>Set plot theme</p>
-<pre class="r"><code>theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
-options(
-  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
-  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = &quot;Pastel2&quot;),
-
-  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
-  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
-)</code></pre>
-<div id="data-preparation" class="section level1">
-<h1>Data Preparation</h1>
-<div id="ht_wt---subject-height-and-weight" class="section level3">
-<h3><code>ht_wt</code> - Subject height and weight</h3>
-<ul>
-<li><code>id</code></li>
-<li><code>height</code>: mean height</li>
-<li><code>weight</code>: mean weight</li>
-<li><code>enrollment_year</code>: some participants were enrolled in
-both 2022 and 2024, keep the latest one as enrollment year</li>
-<li><code>height_2022</code></li>
-<li><code>height_2024</code></li>
-<li><code>weight_2022</code></li>
-<li><code>weight_2024</code></li>
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
 </ul>
-<p>Process:</p>
-<ol style="list-style-type: decimal">
-<li>Take the mean for subjects who have multiple heights and weights
-(both in 2022 and 2024), take the mean.</li>
-<li>Note missing data</li>
-</ol>
-<pre class="r"><code>ht_wt = read_csv(&quot;data/height_and_weight.csv&quot;)|&gt; 
-  janitor::clean_names() |&gt; 
-  # calculate mean height/weight
-  rowwise() |&gt;
-  mutate(
-    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
-    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
-  ) |&gt;
-  ungroup()</code></pre>
-<pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>Count how many missing values:</p>
-<pre class="r"><code>ht_wt |&gt;
-  summarise(
-    missing_ht = sum(is.na(avg_height)),
-    missing_wt = sum(is.na(avg_weight)),
-    missing_both = sum(is.na(avg_weight) &amp; is.na(avg_height))
-  )</code></pre>
-<pre><code>## # A tibble: 1 × 3
-##   missing_ht missing_wt missing_both
-##        &lt;int&gt;      &lt;int&gt;        &lt;int&gt;
-## 1         17         12           11</code></pre>
-<pre class="r"><code>ht_wt |&gt;
-  filter(is.na(avg_height) | is.na(avg_weight))</code></pre>
-<pre><code>## # A tibble: 18 × 7
-##       id height_2022 weight_2022 height_2024 weight_2024 avg_height avg_weight
-##    &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
-##  1     1          NA        NA            NA        NA          NaN      NaN  
-##  2     2          NA        NA            NA        NA          NaN      NaN  
-##  3     6          NA        NA            NA        NA          NaN      NaN  
-##  4     8          NA        NA            NA        NA          NaN      NaN  
-##  5    11          NA        NA            NA        NA          NaN      NaN  
-##  6    13          NA        58.9          NA        NA          NaN       58.9
-##  7    16          NA        57.3          NA        NA          NaN       57.3
-##  8    20          NA        NA            NA        NA          NaN      NaN  
-##  9    22          NA        53            NA        NA          NaN       53  
-## 10    23          NA        NA            NA        NA          NaN      NaN  
-## 11    27          NA        NA            NA        NA          NaN      NaN  
-## 12    29          NA        NA            NA        NA          NaN      NaN  
-## 13    39          NA        55.5          NA        NA          NaN       55.5
-## 14    40         164        NA            NA        NA          164      NaN  
-## 15    44          NA        55            NA        NA          NaN       55  
-## 16    45          NA        NA            NA        NA          NaN      NaN  
-## 17    47          NA        NA            NA        54.9        NaN       54.9
-## 18    49          NA        NA            NA        NA          NaN      NaN</code></pre>
 </div>
-<div id="hormones_and_selfreport---hormone-and-self-reported-data"
-class="section level3">
-<h3><code>hormones_and_selfreport</code> - hormone and self-reported
-data</h3>
-<pre class="r"><code>hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
-  janitor::clean_names() </code></pre>
-<pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
-## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
-## lgl  (1): is_weekend
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>Get participants study enrollment info:</p>
-<ul>
-<li><code>id</code></li>
-<li><code>study_2022</code>: whether enrolled in 2022 (1=Yes, 0=No)</li>
-<li><code>study_2024</code>: whether enrolled in 2024 (1=Yes, 0=No)</li>
-</ul>
-<pre class="r"><code>study_flag &lt;- hormones_and_selfreport  |&gt; 
-  distinct(id, study_interval) |&gt; 
-  mutate(flag = 1,
-         study_interval = paste0(&quot;study_&quot;, study_interval)) |&gt; 
-  pivot_wider(
-    names_from = study_interval,
-    values_from = flag,
-    values_fill = 0  
-  )</code></pre>
-</div>
-<div id="subject_info---subject-information" class="section level3">
-<h3><code>subject_info</code> - subject information</h3>
-<pre class="r"><code># read in csv
-subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
-  janitor::clean_names()</code></pre>
-<pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
-## dbl (3): id, birth_year, age_of_first_menarche
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>Process: 1. merge with <code>ht_wt</code> and <code>study_flag</code>
-2. <code>pivot_long</code> for ht, wt, and study (1=2022, 2=2024,
-3=2025) 3. calculate age based on enrollment study year</p>
-<pre class="r"><code>subject_info &lt;- subject_info_raw  |&gt; 
-  # merging
-  left_join(ht_wt, by = &quot;id&quot;) |&gt; 
-  left_join(study_flag, by = &quot;id&quot;) |&gt;
-  # add a study_flag
-  mutate(
-    study = case_when(
-      study_2022 == 1 &amp; study_2024 == 1 ~ 3L,  # both 2022 &amp; 2024
-      study_2022 == 1 &amp; study_2024 == 0 ~ 1L,  
-      study_2024 == 1 &amp; study_2022 == 0 ~ 2L,  
-      TRUE ~ NA_integer_
-    )
-  ) |&gt; 
-  # pivot_long for wt &amp; ht
-  pivot_longer(
-    cols = c(weight_2022, weight_2024, height_2022, height_2024),
-    names_to  = c(&quot;.value&quot;, &quot;year&quot;), 
-    names_sep = &quot;_&quot;                 
-  ) |&gt; 
-  rename(
-    weight_yr = weight,
-    height_yr = height
-  ) |&gt; 
-  # keep only the relevant study year
-  filter(
-    (study == 1 &amp; year == 2022) |
-    (study == 2 &amp; year == 2024) |
-    (study == 3)
-  ) |&gt; 
-  # calculate age
-  mutate(
-    year = as.numeric(year),
-    birth_year = as.numeric(birth_year),
-    age = year - birth_year
-  ) |&gt; 
-  # get a mean age for each id
-  group_by(id) |&gt; 
-  mutate(
-    mean_age = mean(age, na.rm = TRUE)
-  ) |&gt; 
-  ungroup()</code></pre>
-</div>
-</div>
-<div id="visualization" class="section level1">
-<h1>Visualization</h1>
-<div id="age-distribution" class="section level3">
-<h3>Age distribution</h3>
-<ul>
-<li>View mean age in total (2022 &amp; 2024)</li>
-<li>View age by study (2022, 2024)</li>
-</ul>
-<pre class="r"><code>overall_n &lt;- subject_info |&gt; 
-  distinct(id) |&gt; 
-  count(name = &quot;n&quot;)
 
-age_boxplot_all &lt;- subject_info |&gt; 
-  ggplot(aes(x=&quot;All participants&quot;, y = mean_age)) +
-  geom_boxplot(fill = &quot;#bcbddc&quot;)+
-  geom_text(
-    data = overall_n,
-    aes(
-      x = &quot;All participants&quot;, 
-      y = max(subject_info$age, na.rm = TRUE) + 3,
-      label = paste0(&quot;n = &quot;, n)
-    )
-  ) +
-  labs(
-    x = NULL,
-    y = &quot;Mean age (years)&quot;,
-    title = &quot;Mean age of all participants&quot;
-  ) +
-  ylim(10, NA) +
-  theme(
-    axis.text.x = element_text(size = 10),
-    plot.title  = element_text(hjust = 0.5)
-  )
 
-count_df &lt;- subject_info |&gt; 
-  distinct(id, year) |&gt; 
-  count(year, name=&quot;n&quot;)
 
-age_boxplot_by_study &lt;- subject_info |&gt; 
-  ggplot(aes(x = factor(year), y = age, fill = factor(year))) +
-  geom_boxplot() +
-  geom_text(
-    data = count_df,
-    aes(x = factor(year), y = max(subject_info$age, na.rm = TRUE) + 1, 
-        label = paste0(&quot;n = &quot;, n)),
-    size = 4
-  ) +
-  labs(
-    x = &quot;Year&quot;,
+<h1 class="title toc-ignore">Demographic Data</h1>
+<h4 class="date">2025-11-15</h4>
+
+</div>
+
+
+<pre class="r"><code>library(tidyverse)
+library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(dplyr)
+library(gt)
+library(stringr)</code></pre>
+<pre class="r"><code>demographic_data &lt;- read.csv(&quot;data/subject-info.csv&quot;, header = TRUE) %&gt;%
+  clean_names() %&gt;%
+  mutate(
+    education = str_trim(education),
+    education_ranked = case_when(
+      education == &quot;High school degree or equivalent (e.g. GED)&quot; ~ &quot;High School&quot;,
+      education == &quot;Some university/ post-secondary, no degree&quot; ~ &quot;Some College&quot;,
+      education == &quot;Bachelor&#39;s degree (e.g. BA, BS)&quot; ~ &quot;Bachelors&quot;,
+      education %in% c(&quot;Master&#39;s degree (e.g. MA, MS, MEd)&quot;, &quot;Doctorate or professional degree&quot;) ~ &quot;Graduate Degree or Higher&quot;,
+      TRUE ~ &quot;Other&quot;),
+    education_ranked = factor(
+      education_ranked,
+      levels = c(&quot;High School&quot;, &quot;Some College&quot;, &quot;Bachelors&quot;, &quot;Graduate Degree or Higher&quot;, &quot;Other&quot;),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c(&quot;Non-existant&quot;, &quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;),
+      ordered = TRUE))
+ 
+#Making plots and Tables 
+#Table of Mean Age at first period (Range), Race Count (%), Gender (%), Sexually Active (%)
+#Age
+age_row = demographic_data %&gt;%
+  summarise(variable = &quot;Age at First Period&quot;,
+    subgroup = &quot;&quot;,
+    value = sprintf(
+      &quot;%.1f (%d–%d)&quot;,
+      mean(age_of_first_menarche, na.rm = TRUE),
+      min(age_of_first_menarche, na.rm = TRUE),
+      max(age_of_first_menarche, na.rm = TRUE)))
+
+#Race
+ethnicity_rows = demographic_data %&gt;%
+  count(ethnicity) %&gt;%
+  mutate(variable = &quot;Ethnicity&quot;,
+    subgroup = ethnicity,
+    value = sprintf(&quot;%d (%.1f%%)&quot;, n, 100 * n / sum(n))) %&gt;%
+  select(variable, subgroup, value)
+
+#Gender
+gender_rows = demographic_data %&gt;%
+  count(gender) %&gt;%
+  mutate(variable = &quot;Gender&quot;,
+    subgroup = gender,
+    value = sprintf(&quot;%d (%.1f%%)&quot;, n, 100 * n / sum(n))) %&gt;%
+  select(variable, subgroup, value)
+
+#Sexually Active 
+sex_rows = demographic_data %&gt;%
+  count(sexually_active) %&gt;%
+  mutate(variable = &quot;Sexually Active&quot;,
+    subgroup = sexually_active,
+    value = sprintf(&quot;%d (%.1f%%)&quot;, n, 100 * n / sum(n))) %&gt;%
+  select(variable, subgroup, value)
+
+#Education 
+education_rows = demographic_data %&gt;%
+  count(education_ranked) %&gt;%
+  mutate(variable = &quot;Education&quot;, 
+         subgroup = education_ranked,
+         value = sprintf(&quot;%d (%.1f%%)&quot;, n, 100 * n / sum(n))) %&gt;%
+  select(variable, subgroup, value)
+
+#Combined
+summary_table = bind_rows(
+  age_row,
+  ethnicity_rows,
+  gender_rows,
+  education_rows,
+  sex_rows)
+
+#GT table
+summary_table_gt = summary_table %&gt;%
+  gt() %&gt;%
+  cols_label(variable = &quot;&quot;,
+    subgroup = &quot;&quot;,
+    value = &quot;Value&quot;) %&gt;%
+  tab_options(table.font.size = px(14),
+    data_row.padding = px(6)) %&gt;%
+  tab_style(style = cell_text(weight = &quot;bold&quot;),
+    locations = cells_body(columns = variable))
+summary_table_gt</code></pre>
+<div id="ecgbbycbxx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ecgbbycbxx table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ecgbbycbxx thead, #ecgbbycbxx tbody, #ecgbbycbxx tfoot, #ecgbbycbxx tr, #ecgbbycbxx td, #ecgbbycbxx th {
+  border-style: none;
+}
+
+#ecgbbycbxx p {
+  margin: 0;
+  padding: 0;
+}
+
+#ecgbbycbxx .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ecgbbycbxx .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ecgbbycbxx .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ecgbbycbxx .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ecgbbycbxx .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ecgbbycbxx .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ecgbbycbxx .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ecgbbycbxx .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ecgbbycbxx .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ecgbbycbxx .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ecgbbycbxx .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ecgbbycbxx .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ecgbbycbxx .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ecgbbycbxx .gt_row {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ecgbbycbxx .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ecgbbycbxx .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ecgbbycbxx .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ecgbbycbxx .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ecgbbycbxx .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ecgbbycbxx .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ecgbbycbxx .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ecgbbycbxx .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ecgbbycbxx .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ecgbbycbxx .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ecgbbycbxx .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ecgbbycbxx .gt_left {
+  text-align: left;
+}
+
+#ecgbbycbxx .gt_center {
+  text-align: center;
+}
+
+#ecgbbycbxx .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ecgbbycbxx .gt_font_normal {
+  font-weight: normal;
+}
+
+#ecgbbycbxx .gt_font_bold {
+  font-weight: bold;
+}
+
+#ecgbbycbxx .gt_font_italic {
+  font-style: italic;
+}
+
+#ecgbbycbxx .gt_super {
+  font-size: 65%;
+}
+
+#ecgbbycbxx .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ecgbbycbxx .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ecgbbycbxx .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ecgbbycbxx .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ecgbbycbxx .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ecgbbycbxx .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ecgbbycbxx .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ecgbbycbxx .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ecgbbycbxx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="variable"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="subgroup"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="value">Value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Age at First Period</td>
+<td headers="subgroup" class="gt_row gt_left"></td>
+<td headers="value" class="gt_row gt_left">11.9 (10–15)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">African</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">Caribbean</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">East Asian</td>
+<td headers="value" class="gt_row gt_left">14 (33.3%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">Latina</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">Middle Eastern</td>
+<td headers="value" class="gt_row gt_left">5 (11.9%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">South Asian</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">Southeast Asian</td>
+<td headers="value" class="gt_row gt_left">10 (23.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">White</td>
+<td headers="value" class="gt_row gt_left">9 (21.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Gender Fluid</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Non-binary</td>
+<td headers="value" class="gt_row gt_left">2 (4.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Other</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Prefer not to say</td>
+<td headers="value" class="gt_row gt_left">1 (2.4%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Woman</td>
+<td headers="value" class="gt_row gt_left">37 (88.1%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Education</td>
+<td headers="subgroup" class="gt_row gt_left">High School</td>
+<td headers="value" class="gt_row gt_left">6 (14.3%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Education</td>
+<td headers="subgroup" class="gt_row gt_left">Some College</td>
+<td headers="value" class="gt_row gt_left">21 (50.0%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Education</td>
+<td headers="subgroup" class="gt_row gt_left">Bachelors</td>
+<td headers="value" class="gt_row gt_left">10 (23.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Education</td>
+<td headers="subgroup" class="gt_row gt_left">Graduate Degree or Higher</td>
+<td headers="value" class="gt_row gt_left">5 (11.9%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Sexually Active</td>
+<td headers="subgroup" class="gt_row gt_left">No</td>
+<td headers="value" class="gt_row gt_left">24 (57.1%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Sexually Active</td>
+<td headers="subgroup" class="gt_row gt_left">Prefer not to say</td>
+<td headers="value" class="gt_row gt_left">3 (7.1%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Sexually Active</td>
+<td headers="subgroup" class="gt_row gt_left">Yes</td>
+<td headers="value" class="gt_row gt_left">15 (35.7%)</td></tr>
+  </tbody>
+  
+</table>
+</div>
+<pre class="r"><code>#Boxplot - age at menarche
+menarche_plot = ggplot(demographic_data, aes(x = &quot;&quot;, y = age_of_first_menarche)) +
+  geom_boxplot(fill = &quot;skyblue&quot;) +
+  labs(title = &quot;Age of Menarche&quot;,
     y = &quot;Age (years)&quot;,
-    fill = &quot;Year&quot;,
-    title = &quot;Age Distribution by Study Year&quot;
+    x = &quot;&quot;) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+
+#Education and self report menstrual health literacy 
+education_health_lit = ggplot(demographic_data, aes(x = education_ranked, fill = self_report_menstrual_health_literacy)) +
+  geom_bar(position = &quot;fill&quot;) +  # &quot;fill&quot; makes it proportional
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = &quot;Self-Reported Menstrual Health Literacy by Education Level&quot;,
+    x = &quot;Education Level&quot;,
+    y = &quot;Percentage&quot;,
+    fill = &quot;Menstrual Health Literacy&quot;
   ) +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    legend.position = &quot;none&quot; 
-  )
+  theme_minimal(base_size = 14)
 
-age_boxplots &lt;- age_boxplot_all + age_boxplot_by_study</code></pre>
-<pre class="r"><code>age_boxplots</code></pre>
-<p><img src="descriptive_stats_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+education_health_lit</code></pre>
+<p><img src="descriptive_stats_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+
+
+
 </div>
 </div>
-
-
-
 
 </div>
 
@@ -574,7 +1069,41 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

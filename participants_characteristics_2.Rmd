@@ -1,0 +1,642 @@
+---
+title: "Participants Characteristics"
+author: "Muying Li"
+date: "2025-11-18"
+output: html_document
+---
+
+```{r load-lib, results='hide'}
+library(tidyverse)
+library(patchwork)
+library(ggsci)
+library(dplyr)
+library(janitor)
+library(gt)
+```
+
+Set plot theme
+```{r}
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
+)
+```
+
+# Data Preparation
+
+### `ht_wt` - Subject height and weight 
+- `id`
+- `height`: mean height
+- `weight`: mean weight
+- `enrollment_year`: some participants were enrolled in both 2022 and 2024, keep the latest one as enrollment year
+- `height_2022`
+- `height_2024`
+- `weight_2022`
+- `weight_2024`
+
+Process:
+
+1. Take the mean for subjects who have multiple heights and weights (both in 2022 and 2024), take the mean.
+2. Note missing data
+```{r ht-and-wt}
+ht_wt = read_csv("data/height_and_weight.csv")|> 
+  janitor::clean_names() |> 
+  # calculate mean height/weight
+  rowwise() |>
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
+  ) |>
+  ungroup()
+```
+
+Count how many missing values:
+```{r missing-value-ht-wt}
+ht_wt |>
+  summarise(
+    missing_ht = sum(is.na(avg_height)),
+    missing_wt = sum(is.na(avg_weight)),
+    missing_both = sum(is.na(avg_weight) & is.na(avg_height))
+  )
+
+ht_wt |>
+  filter(is.na(avg_height) | is.na(avg_weight))
+```
+
+### `hormones_and_selfreport` - hormone and self-reported data
+```{r}
+hormones_and_selfreport = read_csv("data/hormones_and_selfreport.csv") |> 
+  janitor::clean_names() 
+```
+
+Get participants study enrollment info:
+
+- `id`
+- `study_2022`: whether enrolled in 2022 (1=Yes, 0=No)
+- `study_2024`: whether enrolled in 2024 (1=Yes, 0=No)
+```{r}
+study_flag <- hormones_and_selfreport  |> 
+  distinct(id, study_interval) |> 
+  mutate(flag = 1,
+         study_interval = paste0("study_", study_interval)) |> 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0  
+  )
+```
+
+### `subject_info` - subject information (all demographic data including BMI)
+```{r}
+# read in csv
+subject_info_raw = read_csv("data/subject-info.csv") |> 
+  janitor::clean_names()
+```
+
+Process:
+1. merge with `ht_wt` and `study_flag`
+2. `pivot_long` for ht, wt, and study (1=2022, 2=2024, 3=2025)
+3. calculate age based on enrollment study year
+4. calculate BMI
+```{r}
+subject_info <- subject_info_raw  |> 
+  # merging
+  left_join(ht_wt, by = "id") |> 
+  left_join(study_flag, by = "id") |>
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 & study_2024 == 1 ~ 3L,  # both 2022 & 2024
+      study_2022 == 1 & study_2024 == 0 ~ 1L,  
+      study_2024 == 1 & study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |> 
+  # pivot_long for wt & ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(".value", "year"), 
+    names_sep = "_"                 
+  ) |> 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |> 
+  # keep only the relevant study year
+  filter(
+    (study == 1 & year == 2022) |
+    (study == 2 & year == 2024) |
+    (study == 3)
+  ) |> 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |> 
+  # get a mean age for each id
+  group_by(id) |> 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |> 
+  ungroup() |> 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )
+```
+
+### `demographic_data` - simplified demographic data only for table summary
+```{r}
+demographic_data = subject_info_raw %>%
+  mutate(
+    education = str_trim(education),
+    education_ranked = case_when(
+      education == "High school degree or equivalent (e.g. GED)" ~ "High School",
+      education == "Some university/ post-secondary, no degree" ~ "Some College",
+      education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
+      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
+      TRUE ~ "Other"),
+    education_ranked = factor(
+      education_ranked,
+      levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c("Non-existant", "Low", "Medium", "High"),
+      ordered = TRUE),
+    gender = case_when(
+      gender %in% c("Gender Fluid", "Non-binary") ~ "Gender Fluid or Non-binary", 
+      gender %in% c("Prefer not to say", "Other") ~ "Prefer not to say or Other", 
+      gender == "Woman" ~ "Woman"),
+      gender = factor(gender, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
+      sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say")))
+```
+
+# Report Summary
+
+### Summary Table 
+```{r}
+#This is setup to make a clean table with simplified variables and percent count
+#Age
+age_row = demographic_data %>%
+  summarise(variable = "Age at First Period",
+    subgroup = "",
+    value = sprintf(
+      "%.1f (%d–%d)",
+      mean(age_of_first_menarche, na.rm = TRUE),
+      min(age_of_first_menarche, na.rm = TRUE),
+      max(age_of_first_menarche, na.rm = TRUE)))
+
+#Race
+ethnicity_rows = demographic_data %>%
+  count(ethnicity) %>%
+  mutate(variable = "Ethnicity",
+    subgroup = ethnicity,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Gender
+gender_rows = demographic_data %>%
+  count(gender) %>%
+  mutate(variable = "Gender",
+    subgroup = gender,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Sexually Active 
+sex_rows = demographic_data %>%
+  count(sexually_active) %>%
+  mutate(variable = "Sexually Active",
+    subgroup = sexually_active,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Education 
+education_rows = demographic_data %>%
+  count(education_ranked) %>%
+  mutate(variable = "Education", 
+         subgroup = education_ranked,
+         value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Combined
+summary_table = bind_rows(
+  age_row,
+  ethnicity_rows,
+  gender_rows,
+  education_rows,
+  sex_rows)
+
+summary_table_clean <- summary_table %>%
+  group_by(variable) %>%
+  mutate(variable = ifelse(row_number() == 1, variable, "")) %>%
+  ungroup()
+
+summary_table_gt = summary_table_clean %>%
+  gt() %>%
+  cols_label(variable = "",
+    subgroup = "",
+    value = "Mean (Range) or Count (%)") %>%
+  tab_options(table.font.size = px(14),
+    data_row.padding = px(6)) %>%
+  tab_style(style = cell_text(weight = "bold"),
+    locations = cells_body(columns = variable)) %>%
+cols_align(align = "right",
+    columns = value) 
+
+summary_table_gt
+```
+# Visualization
+### Gender
+```{r}
+subject_info |> 
+  # factor gender
+  mutate(
+    gender = factor(
+      gender,
+      levels=c("Woman","Non-binary","Gender Fluid","Other","Prefer not to say")
+    )
+  ) |> 
+  ggplot(aes(gender, fill=gender)) + 
+  geom_bar() +
+  labs(
+    title = "Gender Distribution",
+    x = "Gender Category",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+    )
+```
+
+### Ethnicity
+```{r}
+ggplot(subject_info, aes(fct_infreq(ethnicity), ,fill=fct_infreq(ethnicity))) + 
+  geom_bar()+
+  labs(
+    title = "Ethnicity Distribution",
+    x = "Ethnicity",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+    )
+```
+
+### Education 
+```{r}
+subject_info |>  
+  # factor education level
+  mutate(
+    education = factor(
+      education,
+      levels=c("High school degree or equivalent (e.g. GED)","Some university/ post-secondary, no degree","Bachelor's degree (e.g. BA, BS)"    ,"Master's degree (e.g. MA, MS, MEd)","Doctorate or professional degree")
+    )
+  ) |> 
+  ggplot(aes(education, fill=education)) + 
+  geom_bar() +
+  coord_flip()+
+  labs(
+    title = "Education Level Distribution",
+    x = "Education Level",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+    )
+
+```
+
+### Sexually active
+```{r}
+subject_info |> 
+  mutate(sexually_active = fct_inorder(sexually_active)) |> 
+  ggplot(aes(x = sexually_active, fill = sexually_active)) +
+  geom_bar() +
+  labs(
+    title = "Sexual Activity Status",
+    x = "Sexually Active",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+    )
+```
+
+### Menstrual health literacy
+
+ordered by level
+```{r}
+subject_info |> 
+  filter(!is.na(self_report_menstrual_health_literacy)) |> 
+  count(self_report_menstrual_health_literacy) |> 
+  mutate(
+    prop = n / sum(n),
+    mhl = factor(
+      self_report_menstrual_health_literacy,
+      levels = c("Non-existent", "Low", "Medium", "High", "Expert")
+    )  
+  ) |> 
+  ggplot(aes(x = mhl,
+             y = n,
+             fill = mhl)) +
+  geom_col() +
+  coord_flip() +   # horizontal for readability
+  labs(
+    title = "Self-Reported Menstrual Health Literacy",
+    x = "Menstrual Health Literacy Level",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none"
+  )
+
+```
+
+
+### Age distribution
+
+- View mean age in total (2022 & 2024)
+- View age by study (2022, 2024)
+```{r age-distribution-boxplot}
+overall_n <- subject_info |> 
+  distinct(id) |> 
+  count(name = "n")
+
+age_boxplot_all <- subject_info |> 
+  ggplot(aes(x="All participants", y = mean_age)) +
+  geom_boxplot(fill = "#bcbddc")+
+  geom_text(
+    data = overall_n,
+    aes(
+      x = "All participants", 
+      y = max(subject_info$age, na.rm = TRUE) + 3,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Mean age (years)",
+    title = "Mean age of all participants"
+  ) +
+  ylim(15, NA) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    plot.title  = element_text(hjust = 0.5)
+  )
+
+count_df <- subject_info |> 
+  distinct(id, year) |> 
+  count(year, name="n")
+
+age_boxplot_by_study <- subject_info |> 
+  ggplot(aes(x = factor(year), y = age, fill = factor(year))) +
+  geom_boxplot() +
+  geom_text(
+    data = count_df,
+    aes(x = factor(year), y = max(subject_info$age, na.rm = TRUE) + 1, 
+        label = paste0("n = ", n)),
+    size = 4
+  ) +
+  labs(
+    x = "Year",
+    y = "Age (years)",
+    fill = "Year",
+    title = "Age Distribution by Study Year"
+  ) +
+  ylim(15, NA) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+  )
+
+age_boxplots <- age_boxplot_all + age_boxplot_by_study
+```
+```{r}
+age_boxplots
+```
+
+### Age of first menarche
+```{r}
+subject_info |> 
+  distinct(id, .keep_all = TRUE) |> 
+  filter(!is.na(age_of_first_menarche)) |> 
+  ggplot(aes(x = age_of_first_menarche, fill = factor(age_of_first_menarche))) +
+  geom_bar() +
+  labs(
+    title = "Distribution of Age at First Menarche",
+    x = "Age at First Menarche (years)",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14),
+    axis.title = element_text(size = 12),
+    legend.position = "none"
+  )
+```
+
+Findings: most common age of 1st menarche is at 12 y.o.
+
+## Anthropometrics
+### Weight, Height, BMI distribution
+
+- boxplot for weight (all (mean)vs. by study)
+```{r}
+overall_weight_n <- subject_info |> 
+  filter(!is.na(weight_yr)) |> 
+  summarize(n = n())
+
+weight_all <- subject_info |> 
+  filter(!is.na(weight_yr)) |> 
+  ggplot(aes(x = "All participants", y = weight_yr)) +
+  geom_boxplot(fill = "#bcbddc") +
+  geom_text(
+    data = overall_weight_n,
+    aes(
+      x = "All participants",
+      y = 135, 
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Weight (kg)",
+    title = "Overall Mean Weight Distribution"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+
+weight_year_n <- subject_info |> 
+  filter(!is.na(weight_yr)) |> 
+  count(year, name = "n")
+
+weight_by_study <- subject_info |> 
+  filter(!is.na(weight_yr)) |> 
+  ggplot(aes(x = factor(year), y = weight_yr, fill = factor(year))) +
+  geom_boxplot() +
+  geom_text(
+    data = weight_year_n,
+    aes(
+      x = factor(year),
+      y = 135,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "Weight (kg)",
+    fill = "Year",
+    title = "Weight Distribution by Study Year"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+  )
+
+weight_boxplots <- weight_all + weight_by_study
+```
+
+```{r}
+weight_boxplots
+```
+
+<span style="color: red;">Note an extreme weight value, need to exclude for the future weight-related analyses</span>
+
+- boxplot for height (all (mean)vs. by study)
+```{r}
+overall_height_n <- subject_info |> 
+  filter(!is.na(height_yr)) |> 
+  summarize(n = n())
+
+height_all <- subject_info |> 
+  filter(!is.na(height_yr)) |> 
+  ggplot(aes(x = "All participants", y = height_yr)) +
+  geom_boxplot(fill = "#bcbddc") +
+  geom_text(
+    data = overall_height_n,
+    aes(
+      x = "All participants",
+      y = 190, 
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Height (cm)",
+    title = "Overall Mean Height Distribution"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+
+height_year_n <- subject_info |> 
+  filter(!is.na(height_yr)) |> 
+  count(year, name = "n")
+
+height_by_study <- subject_info |> 
+  filter(!is.na(height_yr)) |> 
+  ggplot(aes(x = factor(year), y = height_yr, fill = factor(year))) +
+  geom_boxplot() +
+  geom_text(
+    data = height_year_n,
+    aes(
+      x = factor(year),
+      y = 190,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "Height (cm)",
+    fill = "Year",
+    title = "Height Distribution by Study Year"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+  )
+
+height_boxplots <- height_all + height_by_study
+```
+
+```{r}
+height_boxplots
+```
+
+No outlier noticed.
+
+- boxplot for BMI
+```{r bmi-boxplot}
+overall_bmi_n <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  summarize(n = n())
+
+bmi_all <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  ggplot(aes(x = "All participants", y = bmi)) +
+  geom_boxplot(fill = "#bcbddc") +
+  geom_text(
+    data = overall_bmi_n,
+    aes(
+      x = "All participants",
+      y = 45, 
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "BMI (kg/m^2)",
+    title = "Overall Mean BMI Distribution"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+bmi_study_n <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  count(year, name = "n")
+
+bmi_by_study <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  ggplot(aes(x = factor(year), y = bmi, fill = factor(year))) +
+  geom_boxplot() +
+  geom_text(
+    data = bmi_study_n,
+    aes(
+      x = factor(year),
+      y = 45,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "BMI (kg/m^2)",
+    fill = "Year",
+    title = "BMI Distribution by Study Year"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+  )
+
+bmi_boxplots <- bmi_all + bmi_by_study
+```
+
+```{r}
+bmi_boxplots
+```
+
+

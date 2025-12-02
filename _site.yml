@@ -4,23 +4,28 @@ navbar:
   left: 
     - icon: fa-solid fa-spa
       href: index.html
-    - text: "Data"
-      href: 
     - text: "Report"
-      href: 
+      href: report.html
+    - text: "Data"
+      href: data.html
     - text: "Lifestyle Factors Analyses"
       menu:
-      - text: "Hormone"
+      - text: "Hormone & Symptoms"
         href: hormone.html
-      - text: "Exercise"
-        href:
       - text: "Sleep & Stress"
-        href:
+        href: sleep_stress_khue.html
+      - text: "Exercise"
+        href: exercise_hormone.html
+    - text: "Proposal"
+      href: p8105_final_project_proposal.html
   right:
     - text: "Meet the Team"
-      href: 
+      href: about.html
     - icon: fa-github fa-lg
       href: 
 output:
   html_document:
     theme: readable
+    code_folding: show
+    toc: true
+    toc_float: true

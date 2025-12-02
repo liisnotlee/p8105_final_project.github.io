@@ -3,7 +3,6 @@ title: "P8105 FINAL PROJECT PROPOSAL"
 date: "2025-11-07"
 output: github_document
 ---
-
 ## Group members
 Muying Li (ml5218), Yue Zhao (yz5290), Khue Nguyen (nnk2114), Anu Singh (as7923), Emily Brynn Weaver (ebw2145)
 
@@ -33,7 +32,8 @@ The [mcPHASES dataset](https://physionet.org/content/mcphases/1.0.0/) contains m
 - `hormones_and_selfreport.csv`
 - `height_and_weight.csv`
 - `subject_info.csv`
-- `stress_score.csv sleep.csv`
+- `stress_score.csv`
+- `sleep.csv`
 - `sleep_score.csv`
 
 

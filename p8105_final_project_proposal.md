@@ -45,7 +45,8 @@ contains 23 structured tables. We will focus on:
 - `hormones_and_selfreport.csv`
 - `height_and_weight.csv`
 - `subject_info.csv`
-- `stress_score.csv sleep.csv`
+- `stress_score.csv`
+- `sleep.csv`
 - `sleep_score.csv`
 
 ## Planned analyses / visualizations
