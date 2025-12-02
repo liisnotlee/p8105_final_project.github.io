@@ -1,0 +1,144 @@
+---
+title: "model"
+output: html_document
+date: "2025-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Loading packages
+```{r}
+library(tidyverse)
+library(janitor)
+library(broom)
+```
+#Pulling datasets needed
+```{r} 
+hormones_raw = read_csv("./data/hormones_and_selfreport.csv") %>%
+  clean_names()
+
+subject_info_raw = read_csv("data/subject-info.csv") %>%
+  janitor::clean_names()
+
+ht_wt_raw = read_csv("data/height_and_weight.csv")%>%
+  janitor::clean_names() %>%
+  rowwise() %>%
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)) %>%
+  ungroup() %>%
+   mutate(
+    bmi = avg_height / ( (avg_weight / 100)^2 ))
+```
+
+#Cleaning data similar to other reports, pulled directly for consistency  
+```{r}
+study_flag <- hormones_raw  |> 
+  distinct(id, study_interval) |> 
+  mutate(flag = 1,
+         study_interval = paste0("study_", study_interval)) |> 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0)
+
+subject_info <- subject_info_raw  |> 
+  # merging
+  left_join(ht_wt_raw, by = "id") |> 
+  left_join(study_flag, by = "id") |>
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 & study_2024 == 1 ~ 3L,  # both 2022 & 2024
+      study_2022 == 1 & study_2024 == 0 ~ 1L,  
+      study_2024 == 1 & study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |> 
+  # pivot_long for wt & ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(".value", "year"), 
+    names_sep = "_"                 
+  ) |> 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |> 
+  # keep only the relevant study year
+  filter(
+    (study == 1 & year == 2022) |
+    (study == 2 & year == 2024) |
+    (study == 3)
+  ) |> 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |> 
+  # get a mean age for each id
+  group_by(id) |> 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |> 
+  ungroup() |> 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )
+```
+
+#Setting up for linear model 
+```{r} 
+demographic_data = subject_info_raw %>%
+  select(id, age_of_first_menarche)
+
+hormones_data = hormones_raw %>%
+  select(c(id, phase, lh, estrogen, appetite, exerciselevel, headaches, cramps, sorebreasts, fatigue, sleepissue, moodswing, stress, foodcravings, indigestion, bloating)) %>%
+  mutate(menstruation = factor(if_else(phase == "Menstrual", 1, 0),
+                          levels = c(0, 1),
+                          labels = c("No", "Yes")))
+
+likert_to_num = c("Not at all" = 0, "Very Low" = 1, "Little" = 1, "Very Low/Little" = 1, "Low" = 2, "Moderate" = 3, "High" = 4, "Very High" = 5)
+
+hormones_clean = hormones_data %>%
+  mutate(stress_num = recode(stress, !!!likert_to_num),
+    fatigue_num = recode(fatigue, !!!likert_to_num),
+    cramps_num = recode(cramps, !!!likert_to_num),
+    sleepissue_num = recode(sleepissue, !!!likert_to_num),
+    exerciselevel_num = recode(exerciselevel, !!!likert_to_num),
+    appetite_num = recode(appetite, !!!likert_to_num),
+    bloating_num = recode(bloating, !!!likert_to_num),
+    moodswing_num = recode(moodswing, !!!likert_to_num),
+    headache_num = recode(headaches, !!!likert_to_num),
+    foodcrave_num = recode(foodcravings, !!!likert_to_num),
+    indigestion_num = recode(indigestion, !!!likert_to_num),
+    sorebreasts_num = recode(sorebreasts, !!!likert_to_num))
+
+ht_wt_data = subject_info %>%
+  select(c(id, avg_height, avg_weight, bmi))
+
+merged_df = demographic_data %>%
+  left_join(hormones_clean, by = "id") %>%
+  left_join(ht_wt_data, by = "id")
+```
+
+#Running model 
+```{r}
+symptom_model = glm(
+  menstruation ~ stress_num + fatigue_num + cramps_num + sleepissue_num + exerciselevel_num + appetite_num + bloating_num + moodswing_num + headache_num + foodcrave_num + indigestion_num + sorebreasts_num, 
+  data = merged_df,
+  family = binomial())
+
+summary(symptom_model)
+tidy(symptom_model)
+
+physiology_model = glm(menstruation ~ estrogen + lh, 
+                       data = merged_df, 
+                       family=binomial())
+
+summary(physiology_model)
+tidy(physiology_model)
+```
