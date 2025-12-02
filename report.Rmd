@@ -35,7 +35,11 @@ Half of the world's population has experineced or will experience menstruation; 
 # Related Work
 
 # Questions
-
+1. What are background characteristics of people who participated in this study?
+2. How does the menstrual cycle and hormones affect sleep and stress?
+3. How does exercise and caloric consumption affect menstrual symptoms and hormonal levels? 
+4. How do hormonal levels affect menstrual symptoms? 
+5. What is the significance of menstruation on self-reported symptoms of participants in this study? 
 
 # Data
 ## Data Sources
