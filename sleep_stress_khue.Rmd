@@ -13,6 +13,9 @@ library(tidyr)
 library(patchwork)
 library(lme4)
 library(lmerTest)
+library(rstatix)
+library(ggpubr)
+library(FSA) # for Dunn test
 
 set.seed(1)
 #library(readxl)
@@ -46,8 +49,8 @@ exercise = read_csv("data/exercise.csv") |>
 ```
 
 
-View the sleep time for different participants in each study interval
-```{r}
+**View the sleep time for different participants in each study interval**
+```{r, message=FALSE}
 # plot the mean timein bed in hour
 sleep |>
   group_by(id, study_interval)|>
@@ -64,7 +67,7 @@ The average sleep time for each person is different each study interval and vari
 
 Combine the sleep and stress score
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # join two data sets, using inner join
 sleep_score1 = sleep_score |>
   select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes)
@@ -105,13 +108,13 @@ exercise_daily = exercise_clean %>%
 exercise_daily1 = exercise_daily |>
   select(id, day_in_study, total_active_min, study_interval)
 # check of na values
-sum(is.na(sleep_stress$overall_score))
-sum(is.na(sleep_stress$stress_score))
+#sum(is.na(sleep_stress$overall_score))
+#sum(is.na(sleep_stress$stress_score))
 ```
 
 Showing the sleep score and stress score changes 
 
-```{r, warning=FALSE}
+```{r, include = FALSE, warning=FALSE, message=FALSE}
 # graphs to show the score across ids
 sleep_stress|>
   group_by(id) |> 
@@ -121,6 +124,8 @@ sleep_stress|>
     .groups = "drop"
   ) |>
   ggplot(aes(x = id, mean_sleep_score)) +
+  geom_point(aes(y = mean_sleep_score, color = "mean_sleep_score"), alpha = 0.5) +
+  geom_point(aes(y = mean_stress_score, color = "mean_stress_score"), alpha = 0.5)+
   geom_smooth(aes(y = mean_sleep_score, color = "mean_sleep_score"), se= FALSE )+
   geom_smooth(aes(y = mean_stress_score, color = "mean_stress_score"), se = FALSE) 
 
@@ -148,7 +153,7 @@ sleep_stress_hormone =
   inner_join(sleep_stress,hormone1, join_by(id, day_in_study))
 ```
 
-Now explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
+We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
 The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
 
 
@@ -219,36 +224,88 @@ plot_2  =
 plot_1+ plot_2
 ```
 
-Variation of sleep score across menstrual cycle phases
+**Variation of sleep score across menstrual cycle phases**
+
+We used Kruskal Wallis test to check the differences of the sleep score between different menstrual phases. The post-hoc Dunn Test resulted showed the statistically significant differences in sleep score between Follicular and Fertility, Fertility and menstrual and Luteal and Menstrual. There is no significant differences in sleep score between Fertility vs Luteal or Follicular vs Luteal and Follicular vs Menstrual.
 
 ```{r}
+kruskal.test(overall_score ~ phase, data = sleep_stress_hormone)
+dunnTest(overall_score ~ phase, data = sleep_stress_hormone, method = "bh")
+
+# Dunn test results formatted for ggplot
+stat_test <- sleep_stress_hormone %>%
+  dunn_test(overall_score ~ phase, p.adjust.method = "BH") %>%
+  mutate(
+    p.adj = round(p.adj, 3),                # format to 3 digits
+    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
+  ) %>%
+  add_xy_position(x = "phase")
+
 sleep_stress_hormone |>
-  ggplot(aes(x = phase, y = overall_score, fill = phase))+
-  geom_violin(alpha = 0.5)+
-  geom_boxplot(width = 0.2)+
-      labs(
+  mutate(phase = factor(phase, levels = phase_order)
+         )|>
+  ggplot(aes(x = phase, y = overall_score, fill = phase)) +
+  geom_violin(alpha = 0.5, trim = FALSE) +
+  geom_boxplot(width = 0.15, outlier.size = 0.8) +
+  stat_pvalue_manual(
+    stat_test,
+    label = "p.adj",
+    tip.length = 0.01,
+    hide.ns = TRUE      # hides non-significant comparisons
+  ) +
+  labs(
     title = "Sleep Score Across Menstrual Cycle Phases",
     x = "Menstrual Cycle Phase",
-    y = "score"
+    y = "Sleep Score"
   ) +
-    theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
 ```
 
+**Variation of stress score across menstrual cycle phases**
+Similarly we used Kruskal Wallis and post-hoc Dunn Test to check the significant differences of stress score across menstrual phases. The resuls showed that there are statistically significant differences for stress score across menstrual phases. 
 
-Variation of stress score across menstrual cycle phases
+
 ```{r}
+kruskal.test(stress_score ~ phase, data = sleep_stress_hormone)
+dunnTest(stress_score ~ phase, data = sleep_stress_hormone, method = "bh")
+
+# Dunn test results formatted for ggplot
+stat_test2 <- sleep_stress_hormone %>%
+  dunn_test(stress_score ~ phase, p.adjust.method = "BH") %>%
+  mutate(
+    p.adj = round(p.adj, 3),                # format to 3 digits
+    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
+  ) %>%
+  add_xy_position(x = "phase")
+
 sleep_stress_hormone |>
-  ggplot(aes(x = phase, y = stress_score, fill = phase))+
-  geom_violin(alpha = 0.5)+
-  geom_boxplot(width = 0.2)+
-      labs(
-    title = "Stress Score Across Menstrual Cycle Phases",
-    x = "Menstrual Cycle Phase",
-    y = "score"
+  mutate(phase = factor(phase, levels = phase_order)
+         )|>
+  ggplot(aes(x = phase, y = stress_score, fill = phase)) +
+  geom_violin(alpha = 0.5, trim = FALSE) +
+  geom_boxplot(width = 0.15, outlier.size = 0.8) +
+  stat_pvalue_manual(
+    stat_test2,
+    label = "p.adj",
+    tip.length = 0.01,
+    hide.ns = TRUE      # hides non-significant comparisons
   ) +
-    theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  labs(
+    title = "Sleep Score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Sleep Score"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
 ```
 
 
