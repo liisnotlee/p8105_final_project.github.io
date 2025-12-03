@@ -40,11 +40,11 @@ The `subject_info` dataframe contains participants demographics data from `subje
 
 It contains a total of 62 observations of 19 variables. Some key variables are the following:
 
-- `id`: participant's unique identifier 
-- Age relevant variables: `birth_year` and `age_of_first_menarche` 
-- Height and weight related variables: `avg_height`, `avg_weight`, `bmi` 
-- Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study) 
-- Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
+-   `id`: participant's unique identifier
+-   Age relevant variables: `birth_year` and `age_of_first_menarche`
+-   Height and weight related variables: `avg_height`, `avg_weight`, `bmi`
+-   Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study)
+-   Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
 
 *Steps:*
 
@@ -152,95 +152,52 @@ subject_info <- subject_info_raw  |>
   # get BMI
   mutate(
     bmi = weight_yr / ( (height_yr / 100)^2 )
-  )
+  )|>
+  #this factors variables and also creates "gender abrv" and "education abrv", which are simplified versions of these variables for cleaner tables and figures 
+  mutate(
+    education = str_trim(education),
+    education_abrv = case_when(
+      education == "High school degree or equivalent (e.g. GED)" ~ "High School",
+      education == "Some university/ post-secondary, no degree" ~ "Some College",
+      education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
+      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
+      TRUE ~ "Other"),
+    education_abrv = factor(
+      education_abrv,
+      levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c("Non-existant", "Low", "Medium", "High"),
+      ordered = TRUE),
+    gender_abrv = case_when(
+      gender %in% c("Gender Fluid", "Non-binary") ~ "Gender Fluid or Non-binary", 
+      gender %in% c("Prefer not to say", "Other") ~ "Prefer not to say or Other", 
+      gender == "Woman" ~ "Woman"),
+      gender_abrv = factor(gender_abrv, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
+      sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say")))
 ```
-
 
 ## `hormone_symptoms` - Hormone & Self-reported Data
+
 *Overview:*
 
 *Steps:*
 
-1. Factor variables, 
-2. Convert categorical variable values to discrete numeric intensity scores (integer) (e.g. `moodswing` and `fatigue`)
-```{r, message = FALSE}
-hormone_symptoms <- 
-  read_csv("data/hormones_and_selfreport.csv") |> 
-  janitor::clean_names() |> 
-  # factor varialbes
-  mutate(
-    phase = factor(phase, levels = c("Menstrual", "Follicular", "Fertility", "Luteal")),
-    fatigue = factor(fatigue, 
-                     levels = c("Low", "Moderate", "High", "Very High", "Not at all")),
-    moodswing = factor(moodswing,
-                       levels = c("Very Low/Little", "Low", "Moderate", "High","Very High","Not at all")),
-    flow_volume = factor(flow_volume, 
-                         levels = c("Not at all", "Spotting / Very Light","Light","Moderate", "Somewhat Heavy","Heavy", "Very Heavy")),
-    flow_color = factor(flow_color,
-                        levels = c("Not at all", "Pink","Bright Red", "Dark Brown / Dark Red", "Grey", "Black","Other")),
-    appetite = factor(appetite,
-                      levels = c("Very Low","Low",  "Moderate", "High", "Very High"))
-  ) |> 
-  # convert categorical variable values to numeric intensity scores
-  mutate(
-    moodswing_num = case_when(
-      moodswing == "Not at all" ~0,
-      moodswing == "Very Low/Little" ~ 1,
-      moodswing == "Low" ~ 2,
-      moodswing == "Moderate" ~ 3,
-      moodswing == "High" ~ 4,
-      moodswing == "Very High" ~ 5,
-      TRUE ~ NA_real_
-    ),
-    fatigue_num = case_when(
-      fatigue == "Not at all" ~0,
-      fatigue == "Low" ~ 1,
-      fatigue == "Moderate" ~ 2,
-      fatigue == "High" ~ 3,
-      fatigue == "Very High" ~ 4,
-      TRUE ~ NA_real_
-    ),
-    flow_volume_num = case_when(
-      flow_volume == "Not at all" ~ 0,
-      flow_volume == "Spotting / Very Light" ~ 1,
-      flow_volume == "Light" ~ 2,
-      flow_volume == "Moderate" ~ 3,
-      flow_volume == "Somewhat Heavy" ~ 4,
-      flow_volume == "Heavy" ~ 5,
-      flow_volume == "Very Heavy" ~ 6,
-      TRUE ~ NA_real_
-    ),
-    flow_color_num = case_when(
-      flow_color == "Not at all" ~ 0,
-      flow_color == "Pink" ~ 1,
-      flow_color == "Bright Red" ~ 2,
-      flow_color == "Dark Brown / Dark Red" ~ 3,
-      flow_color == "Grey" ~ 4,
-      flow_color == "Black" ~ 5,
-      flow_color == "Other" ~ 6,
-      TRUE ~ NA_real_
-    ),
-    appetite_num = case_when(
-      appetite == "Very Low" ~ 0,
-      appetite == "Low" ~ 1,
-      appetite == "Moderate" ~ 2,
-      appetite == "High" ~ 3,
-      appetite == "Very High" ~ 4,
-      TRUE ~ NA_real_
-    )
-  )
-
-```
-
+1.  Factor variables,
+2.  Convert categorical variable values to discrete numeric intensity scores (integer) (e.g. `moodswing` and `fatigue`)
 
 ## `sleep_stress` - Sleep and Stress Data
+
 *Overview:*
 
 *Steps:*
 
-1. Loaded original data from csv files.
-2. and inner joined the sleep and stress scores by `id`, `study_interval`, `day_in_study`.
-3. Checked data completeness of sleep score and stress score.
+1.  Loaded original data from csv files.
+2.  and inner joined the sleep and stress scores by `id`, `study_interval`, `day_in_study`. -\>
+3.  Checked data completeness of sleep score and stress score.
+
+// line 390
 
 ```{r}
 # load raw data from csv files
@@ -264,6 +221,7 @@ stress_score = stress_score_raw |>
   filter(calculation_failed == "FALSE")|>
   select(id, study_interval, day_in_study, stress_score)|>
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
 # inner join
 sleep_stress = inner_join(sleep_score, stress_score, join_by("id", "study_interval", "day_in_study"))
  # cleaning exercise from Anu
@@ -295,4 +253,3 @@ exercise_daily1 = exercise_daily |>
 sum(is.na(sleep_stress$overall_score))
 sum(is.na(sleep_stress$stress_score))
 ```
-

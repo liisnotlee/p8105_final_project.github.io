@@ -1,5 +1,7 @@
 ---
 title: "Report"
+html_document:
+    code_folding: hide
 ---
 
 ```{r, include=FALSE}
@@ -13,6 +15,7 @@ library(tidyr)
 library(patchwork)
 library(lme4)
 library(lmerTest)
+library(ggsci)
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -34,8 +37,6 @@ Half of the world's population has experineced or will experience menstruation; 
 
 
 # Data
-
-## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
 
@@ -65,13 +66,6 @@ In total, we have 4 dataframes:
 For different analyses, we merged the dataframes above by participant `id` as needed.
 
 ------------------------------------------------------------------------
-
-```{r load-lib, include=FALSE}
-# Load necessary libraries
-library(tidyverse)
-library(patchwork)
-library(ggsci)
-```
 
 ### `subject_info` - Subject-Relevant Data
 
@@ -162,7 +156,46 @@ subject_info <- subject_info_raw  |>
   # get BMI
   mutate(
     bmi = weight_yr / ( (height_yr / 100)^2 )
+  )|>
+  # convert NaN to NA
+  mutate(
+    # 使用 across() 批量处理 avg_wt 和 avg_ht
+    across(c(avg_weight, avg_height), 
+           ~ if_else(is.nan(.), NA_real_, .))
+  ) |> 
+  #this factors variables and also creates "gender abrv" and "education abrv", which are simplified versions of these variables for cleaner tables and figures 
+  mutate(
+    education = str_trim(education),
+    education_abrv = case_when(
+      education == "High school degree or equivalent (e.g. GED)" ~ "High School",
+      education == "Some university/ post-secondary, no degree" ~ "Some College",
+      education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
+      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
+      TRUE ~ "Other"),
+    education_abrv = factor(
+      education_abrv,
+      levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c("Non-existant", "Low", "Medium", "High"),
+      ordered = TRUE),
+    gender_abrv = case_when(
+      gender %in% c("Gender Fluid", "Non-binary") ~ "Gender Fluid or Non-binary", 
+      gender %in% c("Prefer not to say", "Other") ~ "Prefer not to say or Other", 
+      gender == "Woman" ~ "Woman"),
+      gender_abrv = factor(gender_abrv, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
+      sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say"))) |> 
+  # only need 1 study_interval flag to indicate the study year
+  mutate(study_interval = year) |> 
+  select(-study_2022, -study_2024, -year, -study) |> 
+  # rearrange the column order
+  select(
+    id,     
+    study_interval,     
+    everything()
   )
+  
 ```
 
 ### `hormone_symptoms` - Hormone & Self-reported Data
@@ -170,335 +203,221 @@ subject_info <- subject_info_raw  |>
 [TODO] add overview
 
 ```{r, include=FALSE}
-hormone_symptoms <- 
+# read in raw csv file
+hormone_symptoms_raw <- 
   read_csv("data/hormones_and_selfreport.csv") |> 
-  janitor::clean_names() |> 
-  # factor varialbes
+  janitor::clean_names() 
+
+# factor string values
+likert_level_factor = c("not at all", "very low/little", "low", "moderate", "high", "very high")
+likert_levels_no_verylowlittle = c("not at all", "very low", "low", "moderate", "high", "very high")
+# likert_scale for numeric score conversion
+likert_6_levels = c("not at all" = 0, "very low/little" = 1, "very low" = 1, "low" = 2, "moderate" = 3, "high" = 4, "very high" = 5)
+
+
+hormone_symptoms <- hormone_symptoms_raw
+  # convert all to lower case string for standardization
+  mutate(across(flow_volume:bloating, 
+                ~ ifelse(!is.na(.) & !grepl("^\\d+$", .), tolower(.), .))) |> 
+  mutate(across(c(phase), ~ ifelse(!is.na(.) & !grepl("^\\d+$", .), tolower(.), .))) |> 
+  # factor variables
   mutate(
-    phase = factor(phase, levels = c("Menstrual", "Follicular", "Fertility", "Luteal")),
-    fatigue = factor(fatigue, 
-                     levels = c("Low", "Moderate", "High", "Very High", "Not at all")),
-    moodswing = factor(moodswing,
-                       levels = c("Very Low/Little", "Low", "Moderate", "High","Very High","Not at all")),
+    phase = factor(phase, levels = c("menstrual", "follicular", "fertility", "luteal")),
     flow_volume = factor(flow_volume, 
-                         levels = c("Not at all", "Spotting / Very Light","Light","Moderate", "Somewhat Heavy","Heavy", "Very Heavy")),
+                         levels = c("not at all", "spotting / very light","light","moderate", "somewhat heavy","heavy", "very heavy")),
     flow_color = factor(flow_color,
-                        levels = c("Not at all", "Pink","Bright Red", "Dark Brown / Dark Red", "Grey", "Black","Other")),
-    appetite = factor(appetite,
-                      levels = c("Very Low","Low",  "Moderate", "High", "Very High"))
+                        levels = c("not at all", "pink","bright red", "dark brown / dark red", "grey", "black","other")),
   ) |> 
+  # factor character values
+  mutate(across(
+    .cols = c(sleepissue, headaches, stress, cramps, foodcravings, indigestion, bloating, moodswing, sorebreasts, fatigue),  
+    .fns = ~ factor(., levels = likert_level_factor),  
+    .names = "{.col}"  
+  )) |> 
+  mutate(across(
+    .cols = c(appetite, exerciselevel),
+    .fns = ~ factor(., levels = likert_levels_no_verylowlittle), 
+    .names = "{.col}"  
+  )) |> 
   # convert categorical variable values to numeric intensity scores
+  mutate(across(
+    .cols = appetite:bloating,
+    .fns = ~ recode(., !!!likert_6_levels),
+    .names = "{.col}_score"
+  )) |> 
+  # special conversion for flow
   mutate(
-    moodswing_num = case_when(
-      moodswing == "Not at all" ~0,
-      moodswing == "Very Low/Little" ~ 1,
-      moodswing == "Low" ~ 2,
-      moodswing == "Moderate" ~ 3,
-      moodswing == "High" ~ 4,
-      moodswing == "Very High" ~ 5,
+    flow_volume_score = case_when(
+      flow_volume == "not at all" ~ 0,
+      flow_volume == "spotting / very light" ~ 1,
+      flow_volume == "light" ~ 2,
+      flow_volume == "moderate" ~ 3,
+      flow_volume == "somewhat heavy" ~ 4,
+      flow_volume == "heavy" ~ 5,
+      flow_volume == "very heavy" ~ 6,
       TRUE ~ NA_real_
     ),
-    fatigue_num = case_when(
-      fatigue == "Not at all" ~0,
-      fatigue == "Low" ~ 1,
-      fatigue == "Moderate" ~ 2,
-      fatigue == "High" ~ 3,
-      fatigue == "Very High" ~ 4,
-      TRUE ~ NA_real_
-    ),
-    flow_volume_num = case_when(
-      flow_volume == "Not at all" ~ 0,
-      flow_volume == "Spotting / Very Light" ~ 1,
-      flow_volume == "Light" ~ 2,
-      flow_volume == "Moderate" ~ 3,
-      flow_volume == "Somewhat Heavy" ~ 4,
-      flow_volume == "Heavy" ~ 5,
-      flow_volume == "Very Heavy" ~ 6,
-      TRUE ~ NA_real_
-    ),
-    flow_color_num = case_when(
-      flow_color == "Not at all" ~ 0,
-      flow_color == "Pink" ~ 1,
-      flow_color == "Bright Red" ~ 2,
-      flow_color == "Dark Brown / Dark Red" ~ 3,
-      flow_color == "Grey" ~ 4,
-      flow_color == "Black" ~ 5,
-      flow_color == "Other" ~ 6,
-      TRUE ~ NA_real_
-    ),
-    appetite_num = case_when(
-      appetite == "Very Low" ~ 0,
-      appetite == "Low" ~ 1,
-      appetite == "Moderate" ~ 2,
-      appetite == "High" ~ 3,
-      appetite == "Very High" ~ 4,
+    flow_color_score = case_when(
+      flow_color == "not at all" ~ 0,
+      flow_color == "pink" ~ 1,
+      flow_color == "bright red" ~ 2,
+      flow_color == "dark brown / dark red" ~ 3,
+      flow_color == "grey" ~ 4,
+      flow_color == "black" ~ 5,
+      flow_color == "other" ~ 6,
       TRUE ~ NA_real_
     )
   )
 
+
+hormone_symptoms |> 
+  filter(is.na(phase))
 ```
+
+### `exercise`
+
+```{r, include = FALSE}
+# Read data
+exercise_raw <- read_csv("data/exercise.csv") |> 
+  janitor::clean_names() 
+
+exercise_daily <- exercise_raw |> 
+  distinct() |> 
+#  select(id, study_interval, start_day_in_study, activityname, duration, activeduration, averageheartrate) |> 
+  # Aggregate to daily level
+  group_by(id, study_interval, start_day_in_study) %>%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = ifelse(all(is.na(averageheartrate)), NA, max(averageheartrate, na.rm = TRUE)),  # Handling -Inf
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = ", "),
+    .groups = "drop"
+  ) |> 
+  rename(day_in_study = start_day_in_study) 
+```
+
+
+### `sleep_stress`
+[TODO] add overview
+
+```{r}
+# load raw data from csv files
+sleep_score_raw <- read_csv("data/sleep_score.csv") |>
+  janitor::clean_names()
+sleep_raw       <- read_csv("data/sleep.csv") |>
+  janitor::clean_names()
+stress_score_raw <- read_csv("data/stress_score.csv") |>
+  janitor::clean_names()
+
+# combine the sleep and stress score
+sleep_score <- sleep_score_raw |>
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes) |> 
+  mutate(sleep_score = overall_score) |> 
+  select(-overall_score) |> 
+  # remove duplicates by keeping the maximum score
+  group_by(id, study_interval, day_in_study) |> 
+  slice_max(order_by = sleep_score, n = 1, with_ties = FALSE) |> 
+  ungroup()
+
+stress_score <- stress_score_raw |>
+  filter(calculation_failed == "FALSE")|>
+  select(id, study_interval, day_in_study, stress_score)|>
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
+
+sleep_stress_score <- full_join(sleep_score, stress_score, by=c("id", "study_interval", "day_in_study"))
+
+# check duplicates >> no duplicates nice
+sleep_stress_score %>%
+  group_by(id, study_interval, day_in_study) %>%
+  filter(n() > 1)
+
+# check of na values
+#sum(is.na(sleep_stress$overall_score))
+#sum(is.na(sleep_stress$stress_score))
+
+# check how many days have both scores
+sleep_stress_score %>%
+  filter(!is.na(stress_score) & !is.na(sleep_score)) |> 
+  nrow()
+
+# NOT GOING TO USE SLEEP DATA FOR NOW
+######################
+sleep <- sleep_raw|>
+  select(id,study_interval, sleep_end_day_in_study, timeinbed) |>
+  # changed to sleep_end_day
+  mutate(day_in_study = sleep_end_day_in_study) |>
+  select(-sleep_end_day_in_study)
+sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))  |> view()
+#sleep %>%
+ # group_by(id, study_interval, day_in_study) %>%
+  #summarise(
+   # total_timeinbed = sum(timeinbed, na.rm = TRUE),
+    #.groups = "drop"  # 去除分组，返回一个没有分组的 data frame
+#  ) |> 
+ # filter(total_timeinbed>2000)
+  
+ # ggplot(aes(x = total_timeinbed)) +
+#  geom_density(fill = "skyblue", alpha = 0.5) +  # 填充颜色为淡蓝色，透明度为0.5
+#  labs(title = "Density Distribution of Total Time in Bed", 
+ #      x = "Total Time in Bed (hours)", 
+  #     y = "Density")
+```
+
+### Merged Dataset
+
+We used `hormone_symptoms` as our anchor dataframe since all of our outcome variables are from `hormone_symptoms`; hence, we used `left_join` on it. In other words, if a person did not have any hormone/symptoms related data on a given day, she would not have any other types of data on that day (e.g. no exercise/stress/sleep) in the merged dataset called `all_daily_data`.
+
+First merged daily exercise data, then merged daily stress and sleep scores. 
+
+```{r, include=FALSE}
+
+all_daily_data <- hormone_symptoms |> 
+  # MERGE exercise & hormone
+  left_join(exercise_daily, by = c("id", "study_interval", "day_in_study")) |>
+  # add flag exercised_flag for easy filtering in the future analyses
+  # only need to keep exercised_flag==1 to have all rows with exercise data
+  mutate(
+    exercised_flag = ifelse(!is.na(n_sessions) & n_sessions > 0, 1, 0)
+    # Replace NA with 0 for days without exercise ## NA might be not wearing the device instead of not exercising, I think it's better to remove them. Converting to 0 might cause very biased (right skewed) data/results
+    #total_duration_min = replace_na(total_duration_min, 0),
+    #total_active_min = replace_na(total_active_min, 0),
+    #n_sessions = replace_na(n_sessions, 0),
+  ) |> 
+  # Remove individuals with no phase
+  # filter(!is.na(phase))
+
+  # MERGE sleep & stress score data
+  # noticed hormone_symptoms df has a stress_score column 
+  # drop it
+  select(-stress_score) |> 
+  left_join(sleep_stress_score, by = c("id", "study_interval", "day_in_study")) |> 
+  # add flag sleep_stress_flag for easy filtering in the future analyses
+  mutate(
+    sleep_stress_flag = ifelse(
+      !is.na(stress_score) & !is.na(sleep_score),1,0
+    )
+  )  
+  # MERGE demographic data
+  # left_join(subject_info, by = c("id", "study_interval")) 
+  
+```
+
 
 # EDA
-This part of the data analysis explores how the menstrual cycle connects to other parts of health and daily life. We will look at the possible links between the cycle and different body signals—like hormones, changes in flow, or symptoms such as tiredness, mood swings, and appetite. We will also check if lifestyle habits, including exercise, sleep, and stress, are related to these monthly patterns. The goal is to see a clearer picture of how all these factors work together.
 
 
-Age and ethnicity distribution table
-```{r}
-
-```
-#decription+add title to the table
-
-
-Self-Reported Menstrual Health Literacy by Education Level
-```{r}
-education_health_lit = ggplot(demographic_data, aes(x = education_ranked, fill = self_report_menstrual_health_literacy)) +
-  geom_bar(position = "fill") +  # "fill" makes it proportional
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = "Self-Reported Menstrual Health Literacy by Education Level",
-    x = "Education Level",
-    y = "Percentage",
-    fill = "Menstrual Health Literacy"
-  ) +
-  theme_minimal(base_size = 14)
-
-education_health_lit
-```
-#description
-
-Hormones Levels (estrogen and luteinizing hormone) Across Menstrual Cycle Phases
-```{r, echo = FALSE}
-my_int_avg= 
-  my_int|>
-  group_by(phase)|>
-  summarise(
-    estrogen_mean = mean(estrogen, na.rm = TRUE),
-    lh_mean = mean(lh, na.rm = TRUE)
-  )|>
-  mutate(phase = factor(phase, levels = phase_order))|>
-  filter(!is.na(phase))
-
-# Plot the summarized data
-ggplot(my_int_avg, aes(x = phase)) +
-  geom_line(aes(y = estrogen_mean, color = "Estrogen", group = 1), size = 1) +
-  geom_line(aes(y = lh_mean, color = "LH", group = 1), size = 1) +
-  geom_point(aes(y = estrogen_mean, color = "Estrogen"), size = 3) +
-  geom_point(aes(y = lh_mean, color = "LH"),size= 3) +
-  labs(
-    title = "Average Estrogen and LH Levels Across Menstrual Cycle Phases",
-    x = "Menstrual Cycle Phase",
-    y = "Hormone Level",
-    color = "Hormone"
-  ) +
-  scale_color_manual(values = c("Estrogen" = "red", "LH" = "blue")) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-Average hormone profiles varied systematically across menstrual cycle phases. Estrogen exhibited a clear surge during the Fertility (ovulatory) phase, while LH showed a small peak at the same phase, consistent with the known physiological LH surge that triggers ovulation. Both hormones were relatively low during the Menstrual phase and increased through the Follicular phase before peaking in Fertility, then declining during the Luteal phase. These patterns confirm that the hormonal data capture biologically meaningful endocrine rhythms across the cycle.
-
-Average Mood Swing Intensity Across Menstrual Cycle Phases
-```{r, echo = FALSE}
-# Mood swing single line plot
-ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
-  geom_line(color = "purple", size = 1.5, alpha = 0.7) +
-  geom_point(color = "purple", size = 3) +
-  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = "bold") +
-  labs(
-    title = "Average Mood Swing Intensity Across Menstrual Cycle Phases",
-    subtitle = "Higher values indicate more severe mood swings (Scale: 1-4)",
-    x = "Menstrual Cycle Phase",
-    y = "Average Mood Swing Intensity"
-  ) +
-  ylim(0, 4) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = "bold"),
-    panel.grid.major = element_line(color = "grey90")
-  )
-
-```
-This plot showed a clear, phase-dependent pattern in mood swings, with average intensity highest during the menstrual phase and lowest in the Fertility phase.
-
-Discusion: Biologically, this aligns with the sharp decline in estrogen and progesterone levels that occurs just before and during menstruation. These hormonal shifts can directly affect neurotransmitter systems in the brain, particularly serotonin, which plays a key role in mood regulation. The relative consistency in mood swing ratings across the other three phases—follicular, ovulatory, and luteal—reflects more stable hormonal environments during these times, where estrogen and progesterone levels are either rising or maintained at a high plateau. Thus, the cyclical pattern visualized in the data is a direct reflection of the underlying endocrine rhythm.
-
-Distribution of Mood Swing Intensity Across Phases
-```{r}
-ggplot(my_int_numeric, aes(x = phase, y = moodswing_num)) +
-  geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
-  geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
-  scale_y_continuous(limits = c(0,5), breaks = 0:5) +
-  labs(
-    title = "Distribution of Mood Swing Intensity Across Phases",
-    x = "Phase",
-    y = "Mood Swing (0–5)"
-  ) +
-  theme_minimal()
-```
-This violin plot highlighted substantial individual differences in symptom experience for moodswing. However, they consistently showed a right-skewed distribution during the Menstrual phase, confirming a higher symptom burden for most individuals in this phase.
-
-Average Fatigue Intensity Across Menstrual Cycle Phases
-```{r, echo = FALSE}
-# Fatigue single line plot
-ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
-  geom_line(color = "darkorange", size = 1.5, alpha = 0.7) +
-  geom_point(color = "darkorange", size = 3) +
-  geom_text(aes(label = round(avg_fatigue, 2)), vjust = -1, size = 4, fontface = "bold") +
-  labs(
-    title = "Average Fatigue Intensity Across Menstrual Cycle Phases",
-    subtitle = "Higher values indicate more severe fatigue (Scale: 1-4)",
-    x = "Menstrual Cycle Phase",
-    y = "Average Fatigue Intensity"
-  ) +
-  ylim(0, 4) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = "bold"),
-    panel.grid.major = element_line(color = "grey90")
-  )
-```
-This plot showed a clear, phase-dependent pattern in fatigue, with average intensity highest during the menstrual phase and lowest in the Fertility phase.
-
-Distribution of Fatigue Intensity Across Phases
-```{r}
-ggplot(my_int_numeric, aes(x = phase, y = fatigue_num)) +
-  geom_violin(trim = TRUE, fill = "orange", alpha = 0.5) +
-  geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
-  scale_y_continuous(limits = c(0,4), breaks = 0:4) +
-  labs(
-    title = "Distribution of Fatigue Intensity Across Phases",
-    x = "Phase",
-    y = "Fatigue (0–4)"
-  ) +
-  theme_minimal()
-```
-This violin plot for fatigue highlights the substantial individual differences in how this symptom is experienced across the cycle.
-Discussion: Biologically, this variability can be attributed to factors such as individual sensitivity to hormonal fluctuations, genetic predispositions, underlying health conditions, and differing baseline stress or energy levels. The consistent right skewness observed in the distribution of fatigue scores across all four menstrual phases is a particularly telling statistical pattern. This indicates that while the majority of individuals report lower fatigue intensity, there is a consistent subset—visible as the extended "tail" of the distribution to the right—who experience disproportionately high levels of fatigue in every phase. This persistent skew suggests that for these individuals, fatigue may be a more chronic or severe issue, potentially influenced by factors beyond the cyclical hormonal changes, such as sleep disorders, nutritional status, or other persistent health challenges, underscoring that menstrual cycle phase is just one component in a complex individual experience of fatigue.
-
-Average Flow Volume Across Menstrual Cycle Phases 
-```{r, echo = FALSE}
-ggplot(my_i_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
-  geom_line(color = "blue", size = 1.5) +
-  geom_point(color = "red", size = 3) +
-  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(0,6), breaks = 0:6, labels = flow_volume_levels) +
-  labs(title = "Average Flow Volume Across Menstrual Cycle Phases",
-       x = "Phase", y = "Flow Volume") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-The graph illustrates a dramatic, expected concentration of menstrual flow volume within the Menstrual phase. The average flow volume is overwhelmingly high during menstruation (2.36) compared to the near-zero averages in the Follicular (0.29), Fertility/Ovulatory (0.09), and Luteal (0.06) phases. This visualizes the fundamental fact that substantial bleeding is confined almost entirely to the menstrual period itself, with only minimal spotting possible during other cycle stages.
-
-Discussion: This pattern is a direct reflection of the uterine lining's lifecycle, governed by reproductive hormones. During the Follicular, Ovulatory, and Luteal phases, the hormones estrogen and progesterone work to build up and maintain a thick, nutrient-rich endometrial lining to support a potential pregnancy. Bleeding does not occur during this time of maintenance. The Menstrual phase is triggered by a sharp drop in progesterone and estrogen levels at the end of the cycle if pregnancy does not occur. This hormonal withdrawal causes the blood vessels in the thickened lining to constrict and the tissue to break down and detach, resulting in the menstrual flow (measured as volume) observed in the data. Thus, the graph captures the essential, cyclical process of endometrial buildup and shedding.
-```{r, echo = FALSE}
-ggplot(my_i_num, aes(x = phase, y = flow_volume_num)) +
-  geom_violin(fill = "skyblue", alpha = 0.5, trim = FALSE)
-  labs(
-    title = "Distribution of Flow Volume Across Phases",
-    x = "Phase", y = "Flow Volume (0–6)"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-There are clear differences across menstrual cycle phases. Likely patterns: heavier flow in the Menstrual phase, lighter in Follicular.
-
-
-Distribution of Flow Color Across Phases
-```{r}
-ggplot(my_i_num, aes(x = phase, y = flow_color_num)) +
-  geom_violin(fill = "darkseagreen", alpha = 0.5, trim = FALSE) +
-  labs(
-    title = "Distribution of Flow Color Across Phases",
-    x = "Phase", y = "Flow Color (0–6)"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-There are clear differences across menstrual cycle phases. Likely patterns: darker color in the Menstrual phase, spotting in luteal, fertility, and follicular phase. 
-
-Clustering
-```{r, echo = FALSE}
-cluster_df =
-  my_int_numeric |>
-  group_by(id, phase) |>
-  summarise(
-    lh = mean(lh, na.rm = TRUE),
-    estrogen = mean(estrogen, na.rm = TRUE),
-    moodswing_num = mean(moodswing_num, na.rm = TRUE),
-    fatigue_num = mean(fatigue_num, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  left_join(
-    my_i_num |>
-      group_by(id, phase) |>
-      summarise(
-        appetite_num = mean(appetite_num, na.rm = TRUE),
-        flow_volume_num = mean(flow_volume_num, na.rm = TRUE),
-        .groups = "drop"
-      ),
-    by = c("id", "phase")
-  )
-cluster_df =
-  cluster_df |>
-  mutate(
-    lh = as.numeric(lh),
-    estrogen = as.numeric(estrogen)
-  )
-cluster_scaled =
-  cluster_df |>
-  select(-id, -phase) |>
-  scale()
-set.seed(123)
-k3 =
-  kmeans(
-    cluster_scaled,
-    centers = 3,
-    nstart = 25
-  )
-
-cluster_df =
-  cluster_df |>
-  mutate(cluster = factor(k3$cluster))
-ggplot(cluster_df, aes(x = estrogen, y = lh, color = cluster)) +
-  geom_point(size = 2, alpha = 0.7) +
-  labs(
-    title = "Hormone–Symptom Clusters",
-    x = "Estrogen",
-    y = "LH",
-    color = "Cluster"
-  ) +
-  theme_minimal()
-cluster_summary =
-  cluster_df |>
-  group_by(cluster) |>
-  summarise(across(c(lh, estrogen, moodswing_num, fatigue_num, appetite_num, flow_volume_num), mean))
-
-cluster_summary
-```
-Unsupervised k-means clustering applied to six standardized features (LH, estrogen, mood swing, fatigue, appetite, and flow volume) identified three distinct physiological–symptom phenotypes:
-Cluster 1 (Menstrual–High Symptom–High Flow Group) was characterized by low hormones (LH = 3.82, estrogen = 101.00), the highest mood swing (1.85) and fatigue (2.08), and markedly elevated flow volume (2.45).
-Cluster 2 (Ovulatory–High Hormone–High Appetite Group) showed extremely high hormones (LH = 11.47, estrogen = 256.48), the highest appetite (2.14), low mood swing (1.45) and fatigue (1.93), and minimal flow (0.21).
-
-Cluster 3 (Baseline–Low Symptom Group) exhibited moderate hormone levels (LH = 4.58, estrogen = 119.21), the lowest mood swing (1.47) and fatigue (1.82), stable appetite (1.83), and minimal flow (0.15).
-These clusters closely align with known biological states of the menstrual cycle, corresponding to menstrual symptomatic states, ovulatory high-hormone states, and baseline low-symptom states.
-
-Overall final results: 
-Flow volume and flow color exhibited the strongest phase-locking across the menstrual cycle, while appetite showed a robust, individual-specific increase restricted to the Luteal phase, with substantial between-person variability dominating overall appetite levels.
-
-
-
-Exercise:
-
-Sleep:
-
-Stress:
 # Modelling
 
 # Discussion
 
+
+
 ## Limitation
+
+
