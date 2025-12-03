@@ -1,0 +1,63 @@
+id,study_interval,birth_year,gender,ethnicity,education,sexually_active,self_report_menstrual_health_literacy,age_of_first_menarche,avg_height,avg_weight,weight_yr,height_yr,age,mean_age,bmi,education_abrv,gender_abrv
+1,2022,1999,Woman,White,"Some university/ post-secondary, no degree",Yes,NA,14,NA,NA,NA,NA,23,23,NA,Some College,Woman
+2,2022,1995,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",Yes,High,13,NA,NA,NA,NA,27,27,NA,Bachelors,Woman
+3,2022,2000,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",No,High,12,167,52,52,167,22,22,18.645344042454013,Bachelors,Woman
+4,2022,2000,Woman,South Asian,Doctorate or professional degree,No,Medium,12,170,78,78,170,22,22,26.989619377162633,Graduate Degree or Higher,Woman
+6,2022,1997,Woman,East Asian,Doctorate or professional degree,Yes,Low,13,NA,NA,NA,NA,25,25,NA,Graduate Degree or Higher,Woman
+7,2022,2001,Gender Fluid,East Asian,"Some university/ post-secondary, no degree",Yes,Medium,10,170,56,56,170,21,21,19.377162629757787,Some College,Gender Fluid or Non-binary
+8,2022,2000,Woman,White,High school degree or equivalent (e.g. GED),Yes,High,10,NA,NA,NA,NA,22,22,NA,High School,Woman
+9,2022,2004,Woman,White,"Some university/ post-secondary, no degree",No,Medium,13,160,52.15,50.8,160,18,19,19.843749999999996,Some College,Woman
+9,2024,2004,Woman,White,"Some university/ post-secondary, no degree",No,Medium,13,160,52.15,53.5,160,20,19,20.898437499999996,Some College,Woman
+10,2022,2002,Other,White,"Some university/ post-secondary, no degree",No,High,11,160.5,60.3,60.3,160,20,21,23.554687499999993,Some College,Prefer not to say or Other
+10,2024,2002,Other,White,"Some university/ post-secondary, no degree",No,High,11,160.5,60.3,NA,161,22,21,NA,Some College,Prefer not to say or Other
+11,2022,2003,Non-binary,East Asian,High school degree or equivalent (e.g. GED),No,Medium,12,NA,NA,NA,NA,19,19,NA,High School,Gender Fluid or Non-binary
+12,2022,1999,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",Yes,Medium,13,165,68,NA,NA,23,24,NA,Bachelors,Woman
+12,2024,1999,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",Yes,Medium,13,165,68,68,165,25,24,24.977043158861342,Bachelors,Woman
+13,2022,2003,Woman,White,"Some university/ post-secondary, no degree",Yes,Medium,12,NA,58.9,58.9,NA,19,20,NA,Some College,Woman
+13,2024,2003,Woman,White,"Some university/ post-secondary, no degree",Yes,Medium,12,NA,58.9,NA,NA,21,20,NA,Some College,Woman
+14,2022,2003,Woman,Southeast Asian,"Some university/ post-secondary, no degree",Yes,Medium,12,162.6,47.7,45.4,162.6,19,20,17.171758433451494,Some College,Woman
+14,2024,2003,Woman,Southeast Asian,"Some university/ post-secondary, no degree",Yes,Medium,12,162.6,47.7,50,NA,21,20,NA,Some College,Woman
+15,2022,2001,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",No,Low,12,150,45,45,150,21,21,20,Bachelors,Woman
+16,2022,1999,Woman,East Asian,Doctorate or professional degree,Prefer not to say,Medium,12,NA,57.3,57.3,NA,23,23,NA,Graduate Degree or Higher,Woman
+18,2022,2004,Prefer not to say,Middle Eastern,"Some university/ post-secondary, no degree",Yes,High,12,172.15,62.5,NA,171.3,18,19,NA,Some College,Prefer not to say or Other
+18,2024,2004,Prefer not to say,Middle Eastern,"Some university/ post-secondary, no degree",Yes,High,12,172.15,62.5,62.5,173,20,19,20.882755855524742,Some College,Prefer not to say or Other
+19,2022,2000,Woman,Southeast Asian,High school degree or equivalent (e.g. GED),Yes,Medium,12,172,58.4,58.4,172,22,22,19.740400216333153,High School,Woman
+20,2022,2001,Woman,Southeast Asian,"Bachelor's degree (e.g. BA, BS)",No,High,10,NA,NA,NA,NA,21,22,NA,Bachelors,Woman
+20,2024,2001,Woman,Southeast Asian,"Bachelor's degree (e.g. BA, BS)",No,High,10,NA,NA,NA,NA,23,22,NA,Bachelors,Woman
+22,2022,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,High,10,NA,53,53,NA,20,21,NA,Some College,Woman
+22,2024,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,High,10,NA,53,NA,NA,22,21,NA,Some College,Woman
+23,2022,2003,Woman,African,"Some university/ post-secondary, no degree",Prefer not to say,Low,12,NA,NA,NA,NA,19,19,NA,Some College,Woman
+24,2022,1993,Woman,Middle Eastern,"Master's degree (e.g. MA, MS, MEd)",No,Medium,12,160,85,85,160,29,29,33.20312499999999,Graduate Degree or Higher,Woman
+26,2022,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,NA,11,168,71.8,62,168,20,21,21.9671201814059,Some College,Woman
+26,2024,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,NA,11,168,71.8,81.6,168,22,21,28.911564625850342,Some College,Woman
+27,2022,1997,Woman,Southeast Asian,"Bachelor's degree (e.g. BA, BS)",Prefer not to say,Medium,12,NA,NA,NA,NA,25,26,NA,Bachelors,Woman
+27,2024,1997,Woman,Southeast Asian,"Bachelor's degree (e.g. BA, BS)",Prefer not to say,Medium,12,NA,NA,NA,NA,27,26,NA,Bachelors,Woman
+29,2022,1998,Woman,White,"Master's degree (e.g. MA, MS, MEd)",Yes,Medium,12,NA,NA,NA,NA,24,24,NA,Graduate Degree or Higher,Woman
+30,2022,2004,Woman,East Asian,"Some university/ post-secondary, no degree",No,High,10,170.1,88.4,NA,NA,18,19,NA,Some College,Woman
+30,2024,2004,Woman,East Asian,"Some university/ post-secondary, no degree",No,High,10,170.1,88.4,88.4,170.1,20,19,30.55228086255587,Some College,Woman
+32,2022,2004,Woman,East Asian,High school degree or equivalent (e.g. GED),No,Medium,13,164,59.7,59.7,164,18,19,22.19660916121357,High School,Woman
+32,2024,2004,Woman,East Asian,High school degree or equivalent (e.g. GED),No,Medium,13,164,59.7,NA,NA,20,19,NA,High School,Woman
+33,2022,2003,Woman,White,"Some university/ post-secondary, no degree",No,Medium,12,164,80.4,80.4,164,19,20,29.892920880428324,Some College,Woman
+33,2024,2003,Woman,White,"Some university/ post-secondary, no degree",No,Medium,12,164,80.4,NA,NA,21,20,NA,Some College,Woman
+34,2022,2001,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,Medium,15,165.1,50,50,165.1,21,21,18.343231952736094,Some College,Woman
+37,2022,2004,Woman,White,"Some university/ post-secondary, no degree",No,Medium,12,160,62,62,160,18,18,24.218749999999996,Some College,Woman
+38,2022,2004,Woman,White,"Bachelor's degree (e.g. BA, BS)",Yes,Medium,11,170,72.5,NA,NA,18,19,NA,Bachelors,Woman
+38,2024,2004,Woman,White,"Bachelor's degree (e.g. BA, BS)",Yes,Medium,11,170,72.5,72.5,170,20,19,25.08650519031142,Bachelors,Woman
+39,2022,2003,Non-binary,Middle Eastern,"Some university/ post-secondary, no degree",No,High,11,NA,55.5,55.5,NA,19,19,NA,Some College,Gender Fluid or Non-binary
+40,2022,2004,Woman,Southeast Asian,High school degree or equivalent (e.g. GED),No,Medium,12,164,NA,NA,164,18,18,NA,High School,Woman
+41,2022,1999,Woman,Latina,"Bachelor's degree (e.g. BA, BS)",No,Medium,13,158,70,70,158,23,24,28.040378144528116,Bachelors,Woman
+41,2024,1999,Woman,Latina,"Bachelor's degree (e.g. BA, BS)",No,Medium,13,158,70,NA,NA,25,24,NA,Bachelors,Woman
+42,2022,2004,Woman,Middle Eastern,"Some university/ post-secondary, no degree",No,High,14,180,127,NA,NA,18,19,NA,Some College,Woman
+42,2024,2004,Woman,Middle Eastern,"Some university/ post-secondary, no degree",No,High,14,180,127,127,180,20,19,39.19753086419753,Some College,Woman
+43,2022,1997,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",No,Low,11,164,47,47,164,25,26,17.474717430101133,Bachelors,Woman
+43,2024,1997,Woman,East Asian,"Bachelor's degree (e.g. BA, BS)",No,Low,11,164,47,NA,NA,27,26,NA,Bachelors,Woman
+44,2022,1999,Woman,Middle Eastern,"Bachelor's degree (e.g. BA, BS)",No,Medium,12,NA,55,55,NA,23,23,NA,Bachelors,Woman
+45,2022,2002,Woman,Caribbean,"Some university/ post-secondary, no degree",No,Medium,11,NA,NA,NA,NA,20,20,NA,Some College,Woman
+46,2022,2004,Woman,Southeast Asian,"Some university/ post-secondary, no degree",No,Medium,12,152.3,53.9,53.9,152.3,18,18,23.23747622901028,Some College,Woman
+47,2022,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",Yes,High,11,NA,54.9,NA,NA,20,21,NA,Some College,Woman
+47,2024,2002,Woman,Southeast Asian,"Some university/ post-secondary, no degree",Yes,High,11,NA,54.9,54.9,NA,22,21,NA,Some College,Woman
+48,2022,2003,Woman,East Asian,"Some university/ post-secondary, no degree",Yes,High,14,153,50.45,52,153,19,20,22.21367849972233,Some College,Woman
+48,2024,2003,Woman,East Asian,"Some university/ post-secondary, no degree",Yes,High,14,153,50.45,48.9,NA,21,20,NA,Some College,Woman
+49,2022,2000,Woman,East Asian,High school degree or equivalent (e.g. GED),Yes,NA,12,NA,NA,NA,NA,22,22,NA,High School,Woman
+50,2022,2004,Woman,East Asian,"Some university/ post-secondary, no degree",No,Medium,11,164.5,58.35,61,164.5,18,19,22.54228989015253,Some College,Woman
+50,2024,2004,Woman,East Asian,"Some university/ post-secondary, no degree",No,Medium,11,164.5,58.35,55.7,NA,20,19,NA,Some College,Woman
