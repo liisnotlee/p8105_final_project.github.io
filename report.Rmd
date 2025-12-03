@@ -345,15 +345,43 @@ sleep_stress_score %>%
 sleep_stress_score %>%
   filter(!is.na(stress_score) & !is.na(sleep_score)) |> 
   nrow()
+```
 
-# NOT GOING TO USE SLEEP DATA FOR NOW
-######################
+
+```{r, include=FALSE}
+# working on sleep data
 sleep <- sleep_raw|>
-  select(id,study_interval, sleep_end_day_in_study, timeinbed) |>
+  select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |>
   # changed to sleep_end_day
   mutate(day_in_study = sleep_end_day_in_study) |>
-  select(-sleep_end_day_in_study)
-sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))  |> view()
+  select(-sleep_end_day_in_study) |> 
+  # only keep main sleep = TRUE as mainsleep: boolean indicating whether this is the main sleep session of the day
+  filter(
+    mainsleep == TRUE
+  ) |> 
+# check duplicates >> all duplicates from 2024
+  group_by(id, study_interval, day_in_study) |>
+  summarise(
+    timeinbed_mean = mean(timeinbed, na.rm = TRUE),
+    mainsleep = first(mainsleep),
+    .groups = "drop" 
+  ) |>
+  ungroup() |> 
+  # no need flag
+  select(-mainsleep)
+
+# check duplicates
+sleep |> 
+  filter(study_interval == 2022) |> 
+  pull(timeinbed) |> 
+  mean(na.rm = TRUE)
+  
+sleep |> count(id, study_interval, day_in_study) |>
+  filter(n > 1)
+
+sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))
+
+
 #sleep %>%
  # group_by(id, study_interval, day_in_study) %>%
   #summarise(
@@ -369,15 +397,18 @@ sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_int
   #     y = "Density")
 ```
 
+
 ### Merged Dataset
 
 We used `hormone_symptoms` as our anchor dataframe since all of our outcome variables are from `hormone_symptoms`; hence, we used `left_join` on it. In other words, if a person did not have any hormone/symptoms related data on a given day, she would not have any other types of data on that day (e.g. no exercise/stress/sleep) in the merged dataset called `all_daily_data`.
 
-First merged daily exercise data, then merged daily stress and sleep scores. 
+So now in this `all_daily_data`, each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
+
+First merged daily exercise data, then merged daily stress and sleep data. 
 
 ```{r, include=FALSE}
 
-all_daily_data <- hormone_symptoms |> 
+all_daily_data2 <- hormone_symptoms |> 
   # MERGE exercise & hormone
   left_join(exercise_daily, by = c("id", "study_interval", "day_in_study")) |>
   # add flag exercised_flag for easy filtering in the future analyses
@@ -387,7 +418,6 @@ all_daily_data <- hormone_symptoms |>
     # Replace NA with 0 for days without exercise ## NA might be not wearing the device instead of not exercising, I think it's better to remove them. Converting to 0 might cause very biased (right skewed) data/results
     #total_duration_min = replace_na(total_duration_min, 0),
     #total_active_min = replace_na(total_active_min, 0),
-    #n_sessions = replace_na(n_sessions, 0),
   ) |> 
   # Remove individuals with no phase
   # filter(!is.na(phase))
@@ -396,7 +426,7 @@ all_daily_data <- hormone_symptoms |>
   # noticed hormone_symptoms df has a stress_score column 
   # drop it
   select(-stress_score) |> 
-  left_join(sleep_stress_score, by = c("id", "study_interval", "day_in_study")) |> 
+  left_join(sleep_stress_daily, by = c("id", "study_interval", "day_in_study")) |> 
   # add flag sleep_stress_flag for easy filtering in the future analyses
   mutate(
     sleep_stress_flag = ifelse(
@@ -416,7 +446,12 @@ all_daily_data <- hormone_symptoms |>
 
 # Discussion
 
+### Data Handling
+- data quality issues - take hormones & self-reported as an example
 
+regardless the most common missing data (due to self-report), 1) integer values in categorical variables; 2) inconsistent likert scale ('very low/little' vs. 'very low') >> give us the tip when we run a study to collect different likert scale data, collect them at the same scale for easy and consistent future data analyses.
+
+- data entry issues - take sleep.csv as an example
 
 ## Limitation
 
