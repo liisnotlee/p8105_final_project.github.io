@@ -392,6 +392,20 @@ div.tocify {
 
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
+<p>Half of the world’s population has experineced or will experience
+menstruation; for many, this physiologic function occurs monthly for
+several decades. For young adults who menstruate, symptoms and regular
+menstration can be a vital health indicator. Abnormal symptoms can
+further suggest reproductive tract abnormalities, such as uterine
+fibroids or endometriosis. However, abnormal symptoms such as heavy
+bleeding or extreme pain can also be attributed to lifestyle
+characteristics. By leveraging a cohort of young adult menstruators, we
+hope to better understand the relationship between physiological
+menstrual characteristics and lifestyle factors such as stress, sleep,
+and exercise. Understanding how day-to-day factors influence menstrual
+health can help individuals who menstruate understand how to better
+manage concerning symptoms or identify when abnormal symptoms could be
+indicative of a more serious health concern.</p>
 </div>
 <div id="related-work" class="section level1">
 <h1>Related Work</h1>
@@ -401,8 +415,6 @@ div.tocify {
 </div>
 <div id="data" class="section level1">
 <h1>Data</h1>
-<div id="data-sources" class="section level2">
-<h2>Data Sources</h2>
 <p>We utilized the inclusive, multimodal, longitudinal, and
 de-identified <a
 href="https://physionet.org/content/mcphases/1.0.0/">mcPHASES</a>
@@ -481,6 +493,28 @@ class="section level3">
 Data</h3>
 <p>[TODO] add overview</p>
 </div>
+<div id="exercise" class="section level3">
+<h3><code>exercise</code></h3>
+</div>
+<div id="sleep_stress" class="section level3">
+<h3><code>sleep_stress</code></h3>
+<p>[TODO] add overview</p>
+</div>
+<div id="merged-dataset" class="section level3">
+<h3>Merged Dataset</h3>
+<p>We used <code>hormone_symptoms</code> as our anchor dataframe since
+all of our outcome variables are from <code>hormone_symptoms</code>;
+hence, we used <code>left_join</code> on it. In other words, if a person
+did not have any hormone/symptoms related data on a given day, she would
+not have any other types of data on that day (e.g. no
+exercise/stress/sleep) in the merged dataset called
+<code>all_daily_data</code>.</p>
+<p>So now in this <code>all_daily_data</code>, each row represents a
+daily data for a person in a specific study year (including sleep score,
+stress score, daily exercise data, hormone and self-reported
+symptoms).</p>
+<p>First merged daily exercise data, then merged daily stress and sleep
+data.</p>
 </div>
 </div>
 <div id="eda" class="section level1">
@@ -491,6 +525,21 @@ Data</h3>
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>
+<div id="data-handling" class="section level3">
+<h3>Data Handling</h3>
+<ul>
+<li>data quality issues - take hormones &amp; self-reported as an
+example</li>
+</ul>
+<p>regardless the most common missing data (due to self-report), 1)
+integer values in categorical variables; 2) inconsistent likert scale
+(‘very low/little’ vs. ‘very low’) &gt;&gt; give us the tip when we run
+a study to collect different likert scale data, collect them at the same
+scale for easy and consistent future data analyses.</p>
+<ul>
+<li>data entry issues - take sleep.csv as an example</li>
+</ul>
+</div>
 <div id="limitation" class="section level2">
 <h2>Limitation</h2>
 </div>

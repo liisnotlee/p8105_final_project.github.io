@@ -159,7 +159,6 @@ subject_info <- subject_info_raw  |>
   )|>
   # convert NaN to NA
   mutate(
-    # 使用 across() 批量处理 avg_wt 和 avg_ht
     across(c(avg_weight, avg_height), 
            ~ if_else(is.nan(.), NA_real_, .))
   ) |> 
@@ -215,7 +214,7 @@ likert_levels_no_verylowlittle = c("not at all", "very low", "low", "moderate", 
 likert_6_levels = c("not at all" = 0, "very low/little" = 1, "very low" = 1, "low" = 2, "moderate" = 3, "high" = 4, "very high" = 5)
 
 
-hormone_symptoms <- hormone_symptoms_raw
+hormone_symptoms <- hormone_symptoms_raw |> 
   # convert all to lower case string for standardization
   mutate(across(flow_volume:bloating, 
                 ~ ifelse(!is.na(.) & !grepl("^\\d+$", .), tolower(.), .))) |> 
@@ -229,11 +228,13 @@ hormone_symptoms <- hormone_symptoms_raw
                         levels = c("not at all", "pink","bright red", "dark brown / dark red", "grey", "black","other")),
   ) |> 
   # factor character values
-  mutate(across(
+  mutate(
+    across(
     .cols = c(sleepissue, headaches, stress, cramps, foodcravings, indigestion, bloating, moodswing, sorebreasts, fatigue),  
     .fns = ~ factor(., levels = likert_level_factor),  
     .names = "{.col}"  
-  )) |> 
+  )
+  ) |> 
   mutate(across(
     .cols = c(appetite, exerciselevel),
     .fns = ~ factor(., levels = likert_levels_no_verylowlittle), 
@@ -270,8 +271,8 @@ hormone_symptoms <- hormone_symptoms_raw
   )
 
 
-hormone_symptoms |> 
-  filter(is.na(phase))
+#hormone_symptoms |> 
+#  filter(is.na(phase))
 ```
 
 ### `exercise`
@@ -305,7 +306,7 @@ exercise_daily <- exercise_raw |>
 ### `sleep_stress`
 [TODO] add overview
 
-```{r}
+```{r, include=FALSE}
 # load raw data from csv files
 sleep_score_raw <- read_csv("data/sleep_score.csv") |>
   janitor::clean_names()
@@ -371,13 +372,13 @@ sleep <- sleep_raw|>
   select(-mainsleep)
 
 # check duplicates
-sleep |> 
-  filter(study_interval == 2022) |> 
-  pull(timeinbed) |> 
-  mean(na.rm = TRUE)
+#sleep |> 
+ # filter(study_interval == 2022) |> 
+#  pull(timeinbed) |> 
+#  mean(na.rm = TRUE)
   
-sleep |> count(id, study_interval, day_in_study) |>
-  filter(n > 1)
+#sleep |> count(id, study_interval, day_in_study) |>
+ # filter(n > 1)
 
 sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))
 
@@ -408,7 +409,7 @@ First merged daily exercise data, then merged daily stress and sleep data.
 
 ```{r, include=FALSE}
 
-all_daily_data2 <- hormone_symptoms |> 
+all_daily_data <- hormone_symptoms |> 
   # MERGE exercise & hormone
   left_join(exercise_daily, by = c("id", "study_interval", "day_in_study")) |>
   # add flag exercised_flag for easy filtering in the future analyses
