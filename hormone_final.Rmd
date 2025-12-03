@@ -72,6 +72,8 @@ EDA: Violin plots show substantial inter-individual variability. Menstrual phase
 Discussion: This distribution suggests that mood swings are most severe during menstruation, likely due to the simultaneous withdrawal of estrogen and progesterone. Luteal phase has moderate symptom expression, consistent with premenstrual hormonal shifts.
 
 
+
+
 Average Mood Swing Across Phases
 
 Topic: Summarize average mood swing intensity across phases to visualize general trends.
@@ -145,6 +147,8 @@ ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
 EDA: Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
 Discussion: Flow volume is biologically highest during menstruation due to active shedding of the endometrium. Luteal phase generally has minimal flow, reflecting the quiescent secretory phase.
+
+
 
 
 Average Flow Volume and Appetite Across Phases
