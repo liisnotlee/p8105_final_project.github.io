@@ -390,6 +390,27 @@ div.tocify {
 </div>
 
 
+<pre class="r"><code># Load packages 
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(mgcv)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(lme4)
+library(lmerTest)
+library(ggsci)
+
+# Set plot theme
+theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = &quot;Pastel2&quot;),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
+)</code></pre>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
 <p>Half of the world’s population has experineced or will experience
@@ -486,12 +507,191 @@ of study)</li>
 <code>education</code>,
 <code>self_report_menstrual_health_literacy</code>, etc.</li>
 </ul>
+<pre class="r"><code>ht_wt = read_csv(&quot;data/height_and_weight.csv&quot;)|&gt; 
+  janitor::clean_names() |&gt; 
+  # calculate mean height/weight
+  rowwise() |&gt;
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
+  ) |&gt;
+  ungroup()</code></pre>
+<pre class="r"><code># import csv file
+hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() 
+# extract study_flag
+study_flag &lt;- hormones_and_selfreport  |&gt; 
+  distinct(id, study_interval) |&gt; 
+  mutate(flag = 1,
+         study_interval = paste0(&quot;study_&quot;, study_interval)) |&gt; 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0  
+  )</code></pre>
+<pre class="r"><code># read in subject-info.csv
+subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
+  janitor::clean_names()
+
+subject_info &lt;- subject_info_raw  |&gt; 
+  # merging
+  left_join(ht_wt, by = &quot;id&quot;) |&gt; 
+  left_join(study_flag, by = &quot;id&quot;) |&gt;
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 &amp; study_2024 == 1 ~ 3L,  # both 2022 &amp; 2024
+      study_2022 == 1 &amp; study_2024 == 0 ~ 1L,  
+      study_2024 == 1 &amp; study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |&gt; 
+  # pivot_long for wt &amp; ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(&quot;.value&quot;, &quot;year&quot;), 
+    names_sep = &quot;_&quot;                 
+  ) |&gt; 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |&gt; 
+  # keep only the relevant study year
+  filter(
+    (study == 1 &amp; year == 2022) |
+    (study == 2 &amp; year == 2024) |
+    (study == 3)
+  ) |&gt; 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |&gt; 
+  # get a mean age for each id
+  group_by(id) |&gt; 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |&gt; 
+  ungroup() |&gt; 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )|&gt;
+  # convert NaN to NA
+  mutate(
+    across(c(avg_weight, avg_height), 
+           ~ if_else(is.nan(.), NA_real_, .))
+  ) |&gt; 
+  #this factors variables and also creates &quot;gender abrv&quot; and &quot;education abrv&quot;, which are simplified versions of these variables for cleaner tables and figures 
+  mutate(
+    education = str_trim(education),
+    education_abrv = case_when(
+      education == &quot;High school degree or equivalent (e.g. GED)&quot; ~ &quot;High School&quot;,
+      education == &quot;Some university/ post-secondary, no degree&quot; ~ &quot;Some College&quot;,
+      education == &quot;Bachelor&#39;s degree (e.g. BA, BS)&quot; ~ &quot;Bachelors&quot;,
+      education %in% c(&quot;Master&#39;s degree (e.g. MA, MS, MEd)&quot;, &quot;Doctorate or professional degree&quot;) ~ &quot;Graduate Degree or Higher&quot;,
+      TRUE ~ &quot;Other&quot;),
+    education_abrv = factor(
+      education_abrv,
+      levels = c(&quot;High School&quot;, &quot;Some College&quot;, &quot;Bachelors&quot;, &quot;Graduate Degree or Higher&quot;, &quot;Other&quot;),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c(&quot;Non-existant&quot;, &quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;),
+      ordered = TRUE),
+    gender_abrv = case_when(
+      gender %in% c(&quot;Gender Fluid&quot;, &quot;Non-binary&quot;) ~ &quot;Gender Fluid or Non-binary&quot;, 
+      gender %in% c(&quot;Prefer not to say&quot;, &quot;Other&quot;) ~ &quot;Prefer not to say or Other&quot;, 
+      gender == &quot;Woman&quot; ~ &quot;Woman&quot;),
+      gender_abrv = factor(gender_abrv, levels = c(&quot;Woman&quot;, &quot;Gender Fluid or Non-binary&quot;, &quot;Prefer not to say or Other&quot;)), 
+      sexually_active = factor(sexually_active, levels = c(&quot;Yes&quot;, &quot;No&quot;, &quot;Prefer not to say&quot;))) |&gt; 
+  # only need 1 study_interval flag to indicate the study year
+  mutate(study_interval = year) |&gt; 
+  select(-study_2022, -study_2024, -year, -study) |&gt; 
+  # rearrange the column order
+  select(
+    id,     
+    study_interval,     
+    everything()
+  )</code></pre>
 </div>
 <div id="hormone_symptoms---hormone-self-reported-data"
 class="section level3">
 <h3><code>hormone_symptoms</code> - Hormone &amp; Self-reported
 Data</h3>
 <p>[TODO] add overview</p>
+<pre class="r"><code># read in raw csv file
+hormone_symptoms_raw &lt;- 
+  read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() 
+
+# factor string values
+likert_level_factor = c(&quot;not at all&quot;, &quot;very low/little&quot;, &quot;low&quot;, &quot;moderate&quot;, &quot;high&quot;, &quot;very high&quot;)
+likert_levels_no_verylowlittle = c(&quot;not at all&quot;, &quot;very low&quot;, &quot;low&quot;, &quot;moderate&quot;, &quot;high&quot;, &quot;very high&quot;)
+# likert_scale for numeric score conversion
+likert_6_levels = c(&quot;not at all&quot; = 0, &quot;very low/little&quot; = 1, &quot;very low&quot; = 1, &quot;low&quot; = 2, &quot;moderate&quot; = 3, &quot;high&quot; = 4, &quot;very high&quot; = 5)
+
+
+hormone_symptoms &lt;- hormone_symptoms_raw |&gt; 
+  # convert all to lower case string for standardization
+  mutate(across(flow_volume:bloating, 
+                ~ ifelse(!is.na(.) &amp; !grepl(&quot;^\\d+$&quot;, .), tolower(.), .))) |&gt; 
+  mutate(across(c(phase), ~ ifelse(!is.na(.) &amp; !grepl(&quot;^\\d+$&quot;, .), tolower(.), .))) |&gt; 
+  # factor variables
+  mutate(
+    phase = factor(phase, levels = c(&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)),
+    flow_volume = factor(flow_volume, 
+                         levels = c(&quot;not at all&quot;, &quot;spotting / very light&quot;,&quot;light&quot;,&quot;moderate&quot;, &quot;somewhat heavy&quot;,&quot;heavy&quot;, &quot;very heavy&quot;)),
+    flow_color = factor(flow_color,
+                        levels = c(&quot;not at all&quot;, &quot;pink&quot;,&quot;bright red&quot;, &quot;dark brown / dark red&quot;, &quot;grey&quot;, &quot;black&quot;,&quot;other&quot;)),
+  ) |&gt; 
+  # factor character values
+  mutate(
+    across(
+    .cols = c(sleepissue, headaches, stress, cramps, foodcravings, indigestion, bloating, moodswing, sorebreasts, fatigue),  
+    .fns = ~ factor(., levels = likert_level_factor),  
+    .names = &quot;{.col}&quot;  
+  )
+  ) |&gt; 
+  mutate(across(
+    .cols = c(appetite, exerciselevel),
+    .fns = ~ factor(., levels = likert_levels_no_verylowlittle), 
+    .names = &quot;{.col}&quot;  
+  )) |&gt; 
+  # convert categorical variable values to numeric intensity scores
+  mutate(across(
+    .cols = appetite:bloating,
+    .fns = ~ recode(., !!!likert_6_levels),
+    .names = &quot;{.col}_score&quot;
+  )) |&gt; 
+  # special conversion for flow
+  mutate(
+    flow_volume_score = case_when(
+      flow_volume == &quot;not at all&quot; ~ 0,
+      flow_volume == &quot;spotting / very light&quot; ~ 1,
+      flow_volume == &quot;light&quot; ~ 2,
+      flow_volume == &quot;moderate&quot; ~ 3,
+      flow_volume == &quot;somewhat heavy&quot; ~ 4,
+      flow_volume == &quot;heavy&quot; ~ 5,
+      flow_volume == &quot;very heavy&quot; ~ 6,
+      TRUE ~ NA_real_
+    ),
+    flow_color_score = case_when(
+      flow_color == &quot;not at all&quot; ~ 0,
+      flow_color == &quot;pink&quot; ~ 1,
+      flow_color == &quot;bright red&quot; ~ 2,
+      flow_color == &quot;dark brown / dark red&quot; ~ 3,
+      flow_color == &quot;grey&quot; ~ 4,
+      flow_color == &quot;black&quot; ~ 5,
+      flow_color == &quot;other&quot; ~ 6,
+      TRUE ~ NA_real_
+    )
+  )
+
+
+#hormone_symptoms |&gt; 
+#  filter(is.na(phase))</code></pre>
 </div>
 <div id="exercise" class="section level3">
 <h3><code>exercise</code></h3>
@@ -499,9 +699,94 @@ Data</h3>
 <div id="sleep_stress" class="section level3">
 <h3><code>sleep_stress</code></h3>
 <p>[TODO] add overview</p>
+<pre class="r"><code># load raw data from csv files
+sleep_score_raw &lt;- read_csv(&quot;data/sleep_score.csv&quot;) |&gt;
+  janitor::clean_names()
+sleep_raw       &lt;- read_csv(&quot;data/sleep.csv&quot;) |&gt;
+  janitor::clean_names()
+stress_score_raw &lt;- read_csv(&quot;data/stress_score.csv&quot;) |&gt;
+  janitor::clean_names()
+
+# combine the sleep and stress score
+sleep_score &lt;- sleep_score_raw |&gt;
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes) |&gt; 
+  mutate(sleep_score = overall_score) |&gt; 
+  select(-overall_score) |&gt; 
+  # remove duplicates by keeping the maximum score
+  group_by(id, study_interval, day_in_study) |&gt; 
+  slice_max(order_by = sleep_score, n = 1, with_ties = FALSE) |&gt; 
+  ungroup()
+
+stress_score &lt;- stress_score_raw |&gt;
+  filter(calculation_failed == &quot;FALSE&quot;)|&gt;
+  select(id, study_interval, day_in_study, stress_score)|&gt;
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
+
+sleep_stress_score &lt;- full_join(sleep_score, stress_score, by=c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;))
+
+# check duplicates &gt;&gt; no duplicates nice
+#sleep_stress_score %&gt;%
+#  group_by(id, study_interval, day_in_study) %&gt;%
+#  filter(n() &gt; 1)
+
+# check of na values
+#sum(is.na(sleep_stress$overall_score))
+#sum(is.na(sleep_stress$stress_score))
+
+# check how many days have both scores
+#sleep_stress_score %&gt;%
+#  filter(!is.na(stress_score) &amp; !is.na(sleep_score)) |&gt; 
+#  nrow()</code></pre>
+<pre class="r"><code># working on sleep data
+sleep &lt;- sleep_raw|&gt;
+  select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |&gt;
+  # changed to sleep_end_day
+  mutate(day_in_study = sleep_end_day_in_study) |&gt;
+  select(-sleep_end_day_in_study) |&gt; 
+  # only keep main sleep = TRUE as mainsleep: boolean indicating whether this is the main sleep session of the day
+  filter(
+    mainsleep == TRUE
+  ) |&gt; 
+# check duplicates &gt;&gt; all duplicates from 2024
+  group_by(id, study_interval, day_in_study) |&gt;
+  summarise(
+    timeinbed_mean = mean(timeinbed, na.rm = TRUE),
+    mainsleep = first(mainsleep),
+    .groups = &quot;drop&quot; 
+  ) |&gt;
+  ungroup() |&gt; 
+  # no need flag
+  select(-mainsleep)
+
+# check duplicates
+#sleep |&gt; 
+ # filter(study_interval == 2022) |&gt; 
+#  pull(timeinbed) |&gt; 
+#  mean(na.rm = TRUE)
+  
+#sleep |&gt; count(id, study_interval, day_in_study) |&gt;
+ # filter(n &gt; 1)
+
+sleep_stress_daily &lt;- full_join(sleep, sleep_stress_score, by=c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;))
+
+
+#sleep %&gt;%
+ # group_by(id, study_interval, day_in_study) %&gt;%
+  #summarise(
+   # total_timeinbed = sum(timeinbed, na.rm = TRUE),
+    #.groups = &quot;drop&quot;  # 去除分组，返回一个没有分组的 data frame
+#  ) |&gt; 
+ # filter(total_timeinbed&gt;2000)
+  
+ # ggplot(aes(x = total_timeinbed)) +
+#  geom_density(fill = &quot;skyblue&quot;, alpha = 0.5) +  # 填充颜色为淡蓝色，透明度为0.5
+#  labs(title = &quot;Density Distribution of Total Time in Bed&quot;, 
+ #      x = &quot;Total Time in Bed (hours)&quot;, 
+  #     y = &quot;Density&quot;)</code></pre>
 </div>
-<div id="merged-dataset" class="section level3">
-<h3>Merged Dataset</h3>
+<div id="all_daily_data---merged-dataset" class="section level3">
+<h3><code>all_daily_data</code> - Merged dataset</h3>
 <p>We used <code>hormone_symptoms</code> as our anchor dataframe since
 all of our outcome variables are from <code>hormone_symptoms</code>;
 hence, we used <code>left_join</code> on it. In other words, if a person
@@ -515,10 +800,38 @@ stress score, daily exercise data, hormone and self-reported
 symptoms).</p>
 <p>First merged daily exercise data, then merged daily stress and sleep
 data.</p>
+<pre class="r"><code>all_daily_data &lt;- hormone_symptoms |&gt; 
+  # MERGE exercise &amp; hormone
+  left_join(exercise_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) |&gt;
+  # add flag exercised_flag for easy filtering in the future analyses
+  # only need to keep exercised_flag==1 to have all rows with exercise data
+  mutate(
+    exercised_flag = ifelse(!is.na(n_sessions) &amp; n_sessions &gt; 0, 1, 0)
+    # Replace NA with 0 for days without exercise ## NA might be not wearing the device instead of not exercising, I think it&#39;s better to remove them. Converting to 0 might cause very biased (right skewed) data/results
+    #total_duration_min = replace_na(total_duration_min, 0),
+    #total_active_min = replace_na(total_active_min, 0),
+  ) |&gt; 
+  # Remove individuals with no phase
+  # filter(!is.na(phase))
+
+  # MERGE sleep &amp; stress score data
+  # noticed hormone_symptoms df has a stress_score column 
+  # drop it
+  select(-stress_score) |&gt; 
+  left_join(sleep_stress_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) |&gt; 
+  # add flag sleep_stress_flag for easy filtering in the future analyses
+  mutate(
+    sleep_stress_flag = ifelse(
+      !is.na(stress_score) &amp; !is.na(sleep_score),1,0
+    )
+  )  
+  # MERGE demographic data
+  # left_join(subject_info, by = c(&quot;id&quot;, &quot;study_interval&quot;)) </code></pre>
 </div>
 </div>
 <div id="eda" class="section level1">
 <h1>EDA</h1>
+<pre class="r"><code># test code-foldings</code></pre>
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
@@ -582,7 +895,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 

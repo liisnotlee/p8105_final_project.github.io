@@ -1,10 +1,11 @@
 ---
 title: "Report"
-html_document:
-    code_folding: hide
+output:
+  html_document:
+    code_folding: hide 
 ---
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # Load packages 
 library(tidyverse)
 library(ggplot2)
@@ -79,7 +80,7 @@ It contains a total of 62 observations of 19 variables. Some key variables are t
 -   Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study)
 -   Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
 
-```{r ht-and-wt, include=FALSE}
+```{r ht-and-wt, message=FALSE}
 ht_wt = read_csv("data/height_and_weight.csv")|> 
   janitor::clean_names() |> 
   # calculate mean height/weight
@@ -91,7 +92,7 @@ ht_wt = read_csv("data/height_and_weight.csv")|>
   ungroup()
 ```
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # import csv file
 hormones_and_selfreport = read_csv("data/hormones_and_selfreport.csv") |> 
   janitor::clean_names() 
@@ -107,7 +108,7 @@ study_flag <- hormones_and_selfreport  |>
   )
 ```
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # read in subject-info.csv
 subject_info_raw = read_csv("data/subject-info.csv") |> 
   janitor::clean_names()
@@ -201,7 +202,7 @@ subject_info <- subject_info_raw  |>
 
 [TODO] add overview
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # read in raw csv file
 hormone_symptoms_raw <- 
   read_csv("data/hormones_and_selfreport.csv") |> 
@@ -306,7 +307,7 @@ exercise_daily <- exercise_raw |>
 ### `sleep_stress`
 [TODO] add overview
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # load raw data from csv files
 sleep_score_raw <- read_csv("data/sleep_score.csv") |>
   janitor::clean_names()
@@ -334,22 +335,22 @@ stress_score <- stress_score_raw |>
 sleep_stress_score <- full_join(sleep_score, stress_score, by=c("id", "study_interval", "day_in_study"))
 
 # check duplicates >> no duplicates nice
-sleep_stress_score %>%
-  group_by(id, study_interval, day_in_study) %>%
-  filter(n() > 1)
+#sleep_stress_score %>%
+#  group_by(id, study_interval, day_in_study) %>%
+#  filter(n() > 1)
 
 # check of na values
 #sum(is.na(sleep_stress$overall_score))
 #sum(is.na(sleep_stress$stress_score))
 
 # check how many days have both scores
-sleep_stress_score %>%
-  filter(!is.na(stress_score) & !is.na(sleep_score)) |> 
-  nrow()
+#sleep_stress_score %>%
+#  filter(!is.na(stress_score) & !is.na(sleep_score)) |> 
+#  nrow()
 ```
 
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 # working on sleep data
 sleep <- sleep_raw|>
   select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |>
@@ -399,7 +400,7 @@ sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_int
 ```
 
 
-### Merged Dataset
+### `all_daily_data` - Merged dataset
 
 We used `hormone_symptoms` as our anchor dataframe since all of our outcome variables are from `hormone_symptoms`; hence, we used `left_join` on it. In other words, if a person did not have any hormone/symptoms related data on a given day, she would not have any other types of data on that day (e.g. no exercise/stress/sleep) in the merged dataset called `all_daily_data`.
 
@@ -407,7 +408,7 @@ So now in this `all_daily_data`, each row represents a daily data for a person i
 
 First merged daily exercise data, then merged daily stress and sleep data. 
 
-```{r, include=FALSE}
+```{r, message=FALSE}
 
 all_daily_data <- hormone_symptoms |> 
   # MERGE exercise & hormone
@@ -441,6 +442,9 @@ all_daily_data <- hormone_symptoms |>
 
 
 # EDA
+```{r}
+# test code-foldings
+```
 
 
 # Modelling
