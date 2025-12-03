@@ -831,7 +831,119 @@ data.</p>
 </div>
 <div id="eda" class="section level1">
 <h1>EDA</h1>
-<pre class="r"><code># test code-foldings</code></pre>
+<p>-hormone</p>
+<p>###LH &amp; Estrogen Across Phases Topic: Examine average estrogen
+and LH levels across menstrual cycle phases to see if hormonal patterns
+match biological expectations</p>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+Estrogen levels are highest in the Fertility (ovulatory) phase, second
+highest in Luteal, and relatively low in Menstrual, gradually rising
+from Follicular to Luteal. LH is much lower than estrogen overall,
+peaking sharply in Fertility and remaining low in the other phases.</p>
+<p>###Mood Swing Distribution Across Phases Topic: Assess whether
+menstrual cycle phases influence mood swing intensity using violin
+plots.</p>
+<pre><code>## Warning: Removed 462 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+Violin plots show substantial inter-individual variability. Menstrual
+phase has the highest mood swing intensity (right-skewed distribution,
+peak around 1.85), while Luteal phase shows lower values with a wider
+base (more individuals with low mood swing).</p>
+<p>###Average Mood Swing Across Phases</p>
+<p>Topic: Summarize average mood swing intensity across phases to
+visualize general trends.
+<img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Average mood swing is highest in Menstrual phase (1.85), lowest in
+Luteal phase (1.41), with intermediate levels in Follicular and
+Fertility phases.</p>
+<p>###Mood Swing &amp; Fatigue Linear Mixed Models</p>
+<p>Topic: Test whether mood swing and fatigue differ by menstrual phase,
+accounting for repeated measures.</p>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerModLmerTest&#39;]
+## Formula: moodswing_score ~ phase + (1 | id)
+##    Data: hormone_symptoms
+## REML criterion at convergence: 8006.314
+## Random effects:
+##  Groups   Name        Std.Dev.
+##  id       (Intercept) 0.9781  
+##  Residual             1.0035  
+## Number of obs: 2751, groups:  id, 42
+## Fixed Effects:
+##     (Intercept)  phasefollicular      phaseluteal   phasemenstrual  
+##         1.42765         -0.02442          0.10441          0.34466</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerModLmerTest&#39;]
+## Formula: fatigue_score ~ phase + (1 | id)
+##    Data: hormone_symptoms
+## REML criterion at convergence: 8847.962
+## Random effects:
+##  Groups   Name        Std.Dev.
+##  id       (Intercept) 0.9068  
+##  Residual             1.1735  
+## Number of obs: 2751, groups:  id, 42
+## Fixed Effects:
+##     (Intercept)  phasefollicular      phaseluteal   phasemenstrual  
+##         2.34636          0.02167          0.10965          0.30571</code></pre>
+<p>Mood swings are lowest near ovulation, slightly higher in Luteal, and
+peak during Menstrual phase. Fatigue shows a similar pattern: lowest
+near ovulation, increasing through Luteal, highest during Menstrual
+phase. Random effects indicate that some individuals are chronically
+more fatigued or mood-sensitive than others, while residual variance
+captures day-to-day variability.</p>
+<p>###Flow Volume Distribution Across Phases</p>
+<p>Topic: Visualize flow volume variation across phases with violin
+plots to assess distribution patterns.
+<img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+Luteal phase shows a right-skewed distribution, indicating most low-flow
+observations but a few high-flow days. Menstrual phase is narrow and
+tall, indicating consistently higher flow intensity.</p>
+<p>Average Flow Volume and Appetite Across Phases</p>
+<p>Topic: Summarize average flow volume and appetite to observe general
+trends across the menstrual cycle.
+<img src="report_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+Menstrual phase has the highest average flow (2.38), Luteal is lowest
+(0.03), Fertility is 0.07, and Follicular is 0.23.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
+Luteal 2.95, Menstrual 2.90.</p>
+<p>###Linear Mixed Model: Appetite vs Estrogen Topic: Explore the
+relationship between estrogen levels and appetite scores, accounting for
+repeated measures.</p>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
+## Formula: appetite_score ~ estrogen + (1 | id)
+##    Data: hormone_symptoms
+## 
+## REML criterion at convergence: 6107.7
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.0464 -0.5701  0.0334  0.5181  3.9022 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.1746   0.4178  
+##  Residual             0.5223   0.7227  
+## Number of obs: 2725, groups:  id, 42
+## 
+## Fixed effects:
+##              Estimate Std. Error        df t value Pr(&gt;|t|)    
+## (Intercept) 2.894e+00  6.943e-02 4.854e+01  41.677   &lt;2e-16 ***
+## estrogen    1.294e-04  1.489e-04 2.721e+03   0.869    0.385    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##          (Intr)
+## estrogen -0.291</code></pre>
+<p>Random intercept variance (0.1746) indicates participant-specific
+baseline appetite differences. The fixed effect of estrogen is small
+(0.00013 per unit) and not significant (t = 0.869).</p>
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
