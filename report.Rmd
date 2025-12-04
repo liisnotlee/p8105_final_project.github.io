@@ -442,7 +442,7 @@ all_daily_data <- hormone_symptoms |>
 
 
 # EDA
--hormone
+## hormone
 
 ```{r, include=FALSE}
 hormone_symptoms=
@@ -451,7 +451,7 @@ hormone_symptoms=
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
-###LH & Estrogen Across Phases
+LH & Estrogen Across Phases
 Topic: Examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 ```{r, echo=FALSE}
 hormone_avg <- hormone_symptoms |>
@@ -478,8 +478,8 @@ ggplot(hormone_avg, aes(x = phase)) +
 ```
 Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
 
-
-###Mood Swing Distribution Across Phases
+## Life factors
+### Mood Swing Distribution Across Phases
 Topic: Assess whether menstrual cycle phases influence mood swing intensity using violin plots.
 ```{r, echo=FALSE}
 # Mood swing
