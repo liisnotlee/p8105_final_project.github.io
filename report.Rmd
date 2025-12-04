@@ -433,8 +433,88 @@ all_daily_data <- hormone_symptoms |>
 # Exploratory Data Analysis
 
 ## Participant Characteristics
+### Age distribution
+- View mean age in total (2022 & 2024)
+```{r}
+overall_n <- subject_info |> 
+  distinct(id) |> 
+  count(name = "n")
 
-## hormone
+age_boxplot_all <- subject_info |> 
+  ggplot(aes(x="All participants", y = mean_age)) +
+  geom_boxplot(fill = "#bcbddc")+
+  geom_text(
+    data = overall_n,
+    aes(
+      x = "All participants", 
+      y = max(subject_info$age, na.rm = TRUE) + 3,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Mean age (years)",
+    title = "Mean age of all participants"
+  ) +
+  ylim(15, NA) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    plot.title  = element_text(hjust = 0.5)
+  )
+age_boxplot_all
+```
+The cohort includes 42 participants with a median age of ~21 years and a small number of older outliers (ages 27 and 29). This relatively narrow, young age range reduces age-related heterogeneity in reproductive hormones and symptomatic expression, helping to isolate phase-related effects. 
+
+### Age of first menarche
+```{r}
+menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
+  geom_boxplot(fill = "cornflowerblue") +
+  labs(title = "Age of Menarche",
+    y = "Age (years)",
+    x = "") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+
+menarche_plot
+```
+Age of first menarche ranges roughly from 10 to 15 years with a median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche distribution suggests a relatively standard reproductive development history across participants; because very early or very late menarche can influence cycle regularity and hormonal profiles, the lack of extreme variability here supports attributing observed hormone–symptom patterns primarily to current cycle phase rather than developmental differences.
+
+### BMI
+
+```{r bmi-boxplot}
+overall_bmi_n <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  summarize(n = n())
+
+bmi_all <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  ggplot(aes(x = "All participants", y = bmi)) +
+  geom_boxplot(fill = "#bcbddc") +
+  geom_text(
+    data = overall_bmi_n,
+    aes(
+      x = "All participants",
+      y = 45, 
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "BMI (kg/m^2)",
+    title = "Overall Mean BMI Distribution"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+
+bmi_all
+```
+Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation. 
+
+
+## Hormone
 
 ```{r, include=FALSE}
 hormone_symptoms_eda=
