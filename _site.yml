@@ -11,7 +11,7 @@ navbar:
     - text: "Lifestyle Factors Analyses"
       menu:
       - text: "Hormone & Symptoms"
-        href: hormone.html
+        href: hormone_final.html
       - text: "Sleep & Stress"
         href: sleep_stress_khue.html
       - text: "Exercise"
@@ -29,3 +29,11 @@ output:
     code_folding: show
     toc: true
     toc_float: true
+    
+    
+site:
+  exclude:
+    - "clean_data/"        
+    - "data/"       
+    - "old_analyses/"
+    - "*.pptx"  

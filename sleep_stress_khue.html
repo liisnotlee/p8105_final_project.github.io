@@ -11,7 +11,7 @@
 
 
 
-<title>sleep_stress_EDA</title>
+<title>sleep_stress_khue</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -36,8 +36,6 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -344,7 +342,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -385,14 +383,15 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">sleep_stress_EDA</h1>
 
 </div>
 
 
+<div id="sleep_stress_eda" class="section level1">
+<h1>sleep_stress_EDA</h1>
 <p>Load the data</p>
-<p><strong>View the sleep time for different participants in each study
-interval</strong></p>
+<p>View the sleep time for different participants in each study
+interval</p>
 <pre class="r"><code># plot the mean timein bed in hour
 sleep |&gt;
   group_by(id, study_interval)|&gt;
@@ -403,7 +402,10 @@ sleep |&gt;
   ggplot(aes(x = id, y = mean_sleep, color = id))+
   geom_point()+
   facet_grid(study_interval~.)</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre><code>## `summarise()` has grouped output by &#39;id&#39;. You can override
+## using the `.groups` argument.</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-2-1.png" /><!-- --></p>
 <p>The average sleep time for each person is different each study
 interval and varied across participants. In 2022, some participants
 slept less than 5 hours and some slept more than 8 hours. In 2024, most
@@ -445,13 +447,42 @@ exercise_daily = exercise_clean %&gt;%
     activity_types = paste(unique(activityname), collapse = &quot;, &quot;),
     .groups = &quot;drop&quot;
   ) %&gt;%
-  rename(day_in_study = start_day_in_study)
-exercise_daily1 = exercise_daily |&gt;
+  rename(day_in_study = start_day_in_study)</code></pre>
+<pre><code>## Warning: There were 6 warnings in `summarise()`.
+## The first warning was:
+## ℹ In argument: `max_heartrate = max(averageheartrate,
+##   na.rm = TRUE)`.
+## ℹ In group 924: `id = 30`, `study_interval = 2024`,
+##   `start_day_in_study = 861`.
+## Caused by warning in `max()`:
+## ! no non-missing arguments to max; returning -Inf
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5
+##   remaining warnings.</code></pre>
+<pre class="r"><code>exercise_daily1 = exercise_daily |&gt;
   select(id, day_in_study, total_active_min, study_interval)
 # check of na values
-#sum(is.na(sleep_stress$overall_score))
-#sum(is.na(sleep_stress$stress_score))</code></pre>
+sum(is.na(sleep_stress$overall_score))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>sum(is.na(sleep_stress$stress_score))</code></pre>
+<pre><code>## [1] 0</code></pre>
 <p>Showing the sleep score and stress score changes</p>
+<pre class="r"><code># graphs to show the score across ids
+sleep_stress|&gt;
+  group_by(id) |&gt; 
+  summarize(
+    mean_sleep_score = mean(overall_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  ggplot(aes(x = id, mean_sleep_score)) +
+  geom_smooth(aes(y = mean_sleep_score, color = &quot;mean_sleep_score&quot;), se= FALSE )+
+  geom_smooth(aes(y = mean_stress_score, color = &quot;mean_stress_score&quot;), se = FALSE) </code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-4-1.png" /><!-- --></p>
 <p>Load and clean the hormone data for menstrual phases</p>
 <pre class="r"><code>hormone1 = hormone |&gt;
   select(id,phase, day_in_study, lh, estrogen,fatigue,moodswing)|&gt;
@@ -466,7 +497,7 @@ phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertili
 <p>Joined data with the phase in hormone dataset</p>
 <pre class="r"><code>sleep_stress_hormone =
   inner_join(sleep_stress,hormone1, join_by(id, day_in_study))</code></pre>
-<p>We explore the changes of the stress score with the menstrual cycle.
+<p>Now explore the changes of the stress score with the menstrual cycle.
 The participants slept best during the menstrual time, probably a good
 sign to rest well during this time. The lowest sleep score were recorded
 during ovulation/ fertility time in which the increased estrogen and lh
@@ -537,119 +568,40 @@ plot_2  =
     axis.text.x = element_text(angle = 45, hjust = 1))
 
 plot_1+ plot_2</code></pre>
-<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p><strong>Variation of sleep score across menstrual cycle
-phases</strong></p>
-<p>We used Kruskal Wallis test to check the differences of the sleep
-score between different menstrual phases. The post-hoc Dunn Test
-resulted showed the statistically significant differences in sleep score
-between Follicular and Fertility, Fertility and menstrual and Luteal and
-Menstrual. There is no significant differences in sleep score between
-Fertility vs Luteal or Follicular vs Luteal and Follicular vs
-Menstrual.</p>
-<pre class="r"><code>kruskal.test(overall_score ~ phase, data = sleep_stress_hormone)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  overall_score by phase
-## Kruskal-Wallis chi-squared = 16.413, df = 3, p-value = 0.0009331</code></pre>
-<pre class="r"><code>dunnTest(overall_score ~ phase, data = sleep_stress_hormone, method = &quot;bh&quot;)</code></pre>
-<pre><code>## Dunn (1964) Kruskal-Wallis multiple comparison</code></pre>
-<pre><code>##   p-values adjusted with the Benjamini-Hochberg method.</code></pre>
-<pre><code>##               Comparison         Z      P.unadj       P.adj
-## 1 Fertility - Follicular -2.543704 0.0109683834 0.021936767
-## 2     Fertility - Luteal -1.189820 0.2341171778 0.234117178
-## 3    Follicular - Luteal  1.564583 0.1176808099 0.176521215
-## 4  Fertility - Menstrual -3.735434 0.0001873919 0.001124352
-## 5 Follicular - Menstrual -1.366255 0.1718590716 0.206230886
-## 6     Luteal - Menstrual -2.905549 0.0036660970 0.010998291</code></pre>
-<pre class="r"><code># Dunn test results formatted for ggplot
-stat_test &lt;- sleep_stress_hormone %&gt;%
-  dunn_test(overall_score ~ phase, p.adjust.method = &quot;BH&quot;) %&gt;%
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj &lt; 0.001, &quot;&lt;0.001&quot;, p.adj)  # clean LT threshold
-  ) %&gt;%
-  add_xy_position(x = &quot;phase&quot;)
-
-sleep_stress_hormone |&gt;
-  mutate(phase = factor(phase, levels = phase_order)
-         )|&gt;
-  ggplot(aes(x = phase, y = overall_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test,
-    label = &quot;p.adj&quot;,
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-7-1.png" /><!-- --></p>
+<p>Variation of sleep score across menstrual cycle phases</p>
+<pre class="r"><code>sleep_stress_hormone |&gt;
+  ggplot(aes(x = phase, y = overall_score, fill = phase))+
+  geom_violin(alpha = 0.5)+
+  geom_boxplot(width = 0.2)+
+      labs(
     title = &quot;Sleep Score Across Menstrual Cycle Phases&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Sleep Score&quot;
+    y = &quot;score&quot;
   ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = &quot;none&quot;,
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p><strong>Variation of stress score across menstrual cycle
-phases</strong> Similarly we used Kruskal Wallis and post-hoc Dunn Test
-to check the significant differences of stress score across menstrual
-phases. The resuls showed that there are statistically significant
-differences for stress score across menstrual phases.</p>
-<pre class="r"><code>kruskal.test(stress_score ~ phase, data = sleep_stress_hormone)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  stress_score by phase
-## Kruskal-Wallis chi-squared = 33.11, df = 3, p-value = 3.053e-07</code></pre>
-<pre class="r"><code>dunnTest(stress_score ~ phase, data = sleep_stress_hormone, method = &quot;bh&quot;)</code></pre>
-<pre><code>## Dunn (1964) Kruskal-Wallis multiple comparison</code></pre>
-<pre><code>##   p-values adjusted with the Benjamini-Hochberg method.</code></pre>
-<pre><code>##               Comparison          Z      P.unadj        P.adj
-## 1 Fertility - Follicular -4.3839735 1.165340e-05 3.496019e-05
-## 2     Fertility - Luteal  0.6002609 5.483324e-01 5.483324e-01
-## 3    Follicular - Luteal  5.3788701 7.495476e-08 4.497286e-07
-## 4  Fertility - Menstrual -1.8230514 6.829561e-02 8.195474e-02
-## 5 Follicular - Menstrual  2.3015036 2.136318e-02 3.204477e-02
-## 6     Luteal - Menstrual -2.5241780 1.159692e-02 2.319384e-02</code></pre>
-<pre class="r"><code># Dunn test results formatted for ggplot
-stat_test2 &lt;- sleep_stress_hormone %&gt;%
-  dunn_test(stress_score ~ phase, p.adjust.method = &quot;BH&quot;) %&gt;%
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj &lt; 0.001, &quot;&lt;0.001&quot;, p.adj)  # clean LT threshold
-  ) %&gt;%
-  add_xy_position(x = &quot;phase&quot;)
-
-sleep_stress_hormone |&gt;
-  mutate(phase = factor(phase, levels = phase_order)
-         )|&gt;
-  ggplot(aes(x = phase, y = stress_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test2,
-    label = &quot;p.adj&quot;,
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
-    title = &quot;Sleep Score Across Menstrual Cycle Phases&quot;,
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-8-1.png" /><!-- --></p>
+<p>Variation of stress score across menstrual cycle phases</p>
+<pre class="r"><code>sleep_stress_hormone |&gt;
+  ggplot(aes(x = phase, y = stress_score, fill = phase))+
+  geom_violin(alpha = 0.5)+
+  geom_boxplot(width = 0.2)+
+      labs(
+    title = &quot;Stress Score Across Menstrual Cycle Phases&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Sleep Score&quot;
+    y = &quot;score&quot;
   ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = &quot;none&quot;,
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-9-1.png" /><!-- --></p>
 <p>Explore the variation among different participants. adding the id,
 ethnicity and birthyear of the subjects.</p>
 <pre class="r"><code>sleep_stress_hormone2 = subject |&gt;
@@ -689,12 +641,8 @@ each</p>
   ) +
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-11-1.png" /><!-- -->
 variation of sleep score and stress score across different ethnicity</p>
 <pre class="r"><code>dodge &lt;- position_dodge(width = 0.5)
 sleep_stress_hormone2 |&gt;
@@ -715,7 +663,8 @@ sleep_stress_hormone2 |&gt;
   geom_violin(position = dodge,alpha = 0.5, trim = TRUE) +
   geom_boxplot(width = 0.5, alpha= 0.1)+
     labs(y = &quot;Score&quot;, fill = &quot;Metric&quot;)</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-12-1.png" /><!-- --></p>
 <pre class="r"><code>sleep_stress_hormone_add |&gt;
   group_by(phase, id) |&gt;
   summarize(
@@ -732,9 +681,10 @@ sleep_stress_hormone2 |&gt;
   ) +
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;phase&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre><code>## `summarise()` has grouped output by &#39;phase&#39;. You can
+## override using the `.groups` argument.</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-14-1.png" /><!-- --></p>
 <p>See the correlation in sleep score file</p>
 <pre class="r"><code>sleep_score |&gt;
   group_by(id)|&gt;
@@ -742,9 +692,10 @@ sleep_stress_hormone2 |&gt;
             mean_overall_score = mean(overall_score))|&gt;
   ggplot(aes(x= mean_overall_score, y = mean_deep_sleep )) +
   geom_point()</code></pre>
-<pre><code>## Warning: Removed 2 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre><code>## Warning: Removed 2 rows containing missing values or values outside
+## the scale range (`geom_point()`).</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-15-1.png" /><!-- --></p>
 <p>NOT WORKING_try to put all in one scale</p>
 <p>See time in bed and deep sleep vs menstrual cycle</p>
 <pre class="r"><code>coeff = 5.5 # 5 is the best overlap
@@ -771,15 +722,23 @@ plot_3 = sleep_stress_hormone_add |&gt;
     axis.title.y.right = element_text(color = deep_sleep_color, size=13)
   )
 plot_3</code></pre>
-<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-17-1.png" /><!-- --></p>
 <pre class="r"><code>plot_1 + plot_2 + plot_3</code></pre>
-<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~
+## x&#39;</code></pre>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-17-2.png" /><!-- --></p>
 <p>Mesntruators spent more time in bed during menstrual time but their
 deep sleep hours were lowest. This showed that the physical exhaustion
 during menstrual days requiring them to rest but preventing them from
@@ -810,7 +769,8 @@ sleep_stress_hormone_add |&gt;
     axis.title.y = element_text(color = total_active_min_color, size=13),
     axis.title.y.right = element_text(color = stress_score_color, size=13)
   )</code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-18-1.png" width="672" />
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-18-1.png" /><!-- -->
 We need to check if the exercise activities/ time link to stress
 score?</p>
 <p>We have <code>stress score</code>, <code>sleep score</code>,
@@ -886,7 +846,9 @@ intercept_values = random.effects(m1)
 fitted_stress_score = fitted.values(m1)
 # check the residuals
 qqnorm(residuals(m1)) </code></pre>
-<p><img src="sleep_stress_khue_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img
+src="sleep_stress_khue_files/figure-gfm/unnamed-chunk-19-1.png" /><!-- --></p>
+</div>
 
 
 

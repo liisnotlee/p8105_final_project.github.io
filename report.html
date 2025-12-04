@@ -344,7 +344,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -519,10 +519,6 @@ stress score, daily exercise data.</li>
 Besides <code>subejct_info</code>, other dataframes can be further
 linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
 <hr />
-<details>
-<summary>
-Dataframes
-<p>
 <div id="subject_info---subject-relevant-data" class="section level3">
 <h3><code>subject_info</code> - Subject-Relevant Data</h3>
 <p>The <code>subject_info</code> dataframe contains participants
@@ -917,24 +913,20 @@ session or if both stress and sleep scores are present.</p>
   )  
   # MERGE demographic data
   # left_join(subject_info, by = c(&quot;id&quot;, &quot;study_interval&quot;)) </code></pre>
-</p>
-</details>
 </div>
 </div>
 </div>
-<div id="eda" class="section level1">
-<h1>EDA</h1>
+<div id="exploratory-data-analysis" class="section level1">
+<h1>Exploratory Data Analysis</h1>
+<div id="participant-characteristics" class="section level2">
+<h2>Participant Characteristics</h2>
+</div>
 <div id="hormone" class="section level2">
 <h2>hormone</h2>
 <p>LH &amp; Estrogen Across Phases Topic: Examine average estrogen and
 LH levels across menstrual cycle phases to see if hormonal patterns
-match biological expectations</p>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+match biological expectations
+<img src="report_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 Estrogen levels are highest in the Fertility (ovulatory) phase, second
 highest in Luteal, and relatively low in Menstrual, gradually rising
 from Follicular to Luteal. LH is much lower than estrogen overall,
@@ -946,8 +938,8 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <h3>Mood Swing Distribution Across Phases</h3>
 <p>Topic: Assess whether menstrual cycle phases influence mood swing
 intensity using violin plots.</p>
-<pre><code>## Warning: Removed 476 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 488 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 Violin plots show substantial inter-individual variability. Menstrual
 phase has the highest mood swing intensity (right-skewed distribution,

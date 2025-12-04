@@ -345,7 +345,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -393,30 +393,14 @@ div.tocify {
 
 
 <p>#Loading packages</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-## ✔ purrr     1.1.0     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(janitor)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;janitor&#39;
-## 
-## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     chisq.test, fisher.test</code></pre>
-<pre class="r"><code>library(broom)</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(janitor)
+library(broom)</code></pre>
 <p>#Pulling datasets needed</p>
 <pre class="r"><code>hormones_raw = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;) %&gt;%
   clean_names()</code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -427,7 +411,7 @@ div.tocify {
 <pre class="r"><code>subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) %&gt;%
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche
@@ -444,7 +428,7 @@ div.tocify {
    mutate(
     bmi = avg_height / ( (avg_weight / 100)^2 ))</code></pre>
 <pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
 ## 
@@ -535,20 +519,24 @@ hormones_clean = hormones_data %&gt;%
 ## The first warning was:
 ## ℹ In argument: `stress_num = recode(...)`.
 ## Caused by warning:
-## ! Unreplaced values treated as NA as `.x` is not compatible.
-## Please specify replacements exhaustively or supply `.default`.
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning.</code></pre>
+## ! Unreplaced values treated as NA as `.x` is not
+##   compatible.
+## Please specify replacements exhaustively or supply
+## `.default`.
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining
+##   warning.</code></pre>
 <pre class="r"><code>ht_wt_data = subject_info %&gt;%
   select(c(id, avg_height, avg_weight, bmi))
 
 merged_df = demographic_data %&gt;%
   left_join(hormones_clean, by = &quot;id&quot;) %&gt;%
   left_join(ht_wt_data, by = &quot;id&quot;)</code></pre>
-<pre><code>## Warning in left_join(., ht_wt_data, by = &quot;id&quot;): Detected an unexpected many-to-many relationship between `x` and `y`.
+<pre><code>## Warning in left_join(., ht_wt_data, by = &quot;id&quot;): Detected an unexpected many-to-many relationship between
+## `x` and `y`.
 ## ℹ Row 631 of `x` matches multiple rows in `y`.
 ## ℹ Row 1 of `y` matches multiple rows in `x`.
-## ℹ If a many-to-many relationship is expected, set `relationship =
-##   &quot;many-to-many&quot;` to silence this warning.</code></pre>
+## ℹ If a many-to-many relationship is expected, set
+##   `relationship = &quot;many-to-many&quot;` to silence this warning.</code></pre>
 <p>#Running model</p>
 <pre class="r"><code>symptom_model = glm(
   menstruation ~ stress_num + fatigue_num + cramps_num + sleepissue_num + exerciselevel_num + appetite_num + bloating_num + moodswing_num + headache_num + foodcrave_num + indigestion_num + sorebreasts_num, 

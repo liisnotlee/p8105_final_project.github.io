@@ -344,7 +344,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -391,169 +391,42 @@ div.tocify {
 
 
 <p>##yue’s interest: phase, lh, estrogen, moodswing, fatigue</p>
-<p>first, explore relationship between LH and estrogen</p>
-<pre class="r"><code>my_int_avg= 
-  my_int|&gt;
-  group_by(phase)|&gt;
-  summarise(
-    estrogen_mean = mean(estrogen, na.rm = TRUE),
-    lh_mean = mean(lh, na.rm = TRUE)
-  )|&gt;
-  mutate(phase = factor(phase, levels = phase_order))|&gt;
-  filter(!is.na(phase))
-
-# Plot the summarized data
-ggplot(my_int_avg, aes(x = phase)) +
-  geom_line(aes(y = estrogen_mean, color = &quot;Estrogen&quot;, group = 1), size = 1) +
-  geom_line(aes(y = lh_mean, color = &quot;LH&quot;, group = 1), size = 1) +
-  geom_point(aes(y = estrogen_mean, color = &quot;Estrogen&quot;), size = 3) +
-  geom_point(aes(y = lh_mean, color = &quot;LH&quot;),size= 3) +
-  labs(
-    title = &quot;Average Estrogen and LH Levels Across Menstrual Cycle Phases&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Hormone Level&quot;,
-    color = &quot;Hormone&quot;
-  ) +
-  scale_color_manual(values = c(&quot;Estrogen&quot; = &quot;red&quot;, &quot;LH&quot; = &quot;blue&quot;)) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" />
-#estrogen surge at fertility(actually it should be called ovulation) #lh
-also peak at ovulation</p>
+<p>first, explore relationship between LH and estrogen
+<img src="hormone_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+EDA Average hormone profiles varied systematically across menstrual
+cycle phases. Estrogen exhibited a clear surge during the Fertility
+(ovulatory) phase, while LH showed a small peak at the same phase,
+consistent with the known physiological LH surge that triggers
+ovulation. Both hormones were relatively low during the Menstrual phase
+and increased through the Follicular phase before peaking in Fertility,
+then declining during the Luteal phase. These patterns confirm that the
+hormonal data capture biologically meaningful endocrine rhythms across
+the cycle.</p>
 <p>fatigue and moodswing</p>
 <p>##this two bar graph show the proportion of fatigue and moodswing
 among four phases, but they are hard to read.</p>
 <p>#so i aim to change the catogorical value (low, moderate, high) to
 1,2,3, and so on. i want to sum and avrage. to show a typical cahnge of
 fatigue and mood in four phases.</p>
-<pre class="r"><code># Convert moodswing and fatigue to numeric intensity scores
-my_int_numeric &lt;- my_int_clean %&gt;%
-  mutate(
-    moodswing_num = case_when(
-      moodswing == &quot;Not at all&quot; ~0,
-      moodswing == &quot;Very Low/Little&quot; ~ 1,
-      moodswing == &quot;Low&quot; ~ 2,
-      moodswing == &quot;Moderate&quot; ~ 3,
-      moodswing == &quot;High&quot; ~ 4,
-      moodswing == &quot;Very High&quot; ~ 5,
-      TRUE ~ NA_real_
-    ),
-    fatigue_num = case_when(
-      fatigue == &quot;Not at all&quot; ~0,
-      fatigue == &quot;Low&quot; ~ 1,
-      fatigue == &quot;Moderate&quot; ~ 2,
-      fatigue == &quot;High&quot; ~ 3,
-      fatigue == &quot;Very High&quot; ~ 4,
-      TRUE ~ NA_real_
-    )
-  )
-
-# Calculate average intensity by phase
-symptom_means &lt;- my_int_numeric %&gt;%
-  group_by(phase = factor(phase, levels = phase_order)) %&gt;%
-  summarise(
-    avg_moodswing = mean(moodswing_num, na.rm = TRUE),
-    avg_fatigue = mean(fatigue_num, na.rm = TRUE),
-    n = n(),
-    .groups = &#39;drop&#39;
-  )
-
-symptom_means</code></pre>
-<pre><code>## # A tibble: 4 × 4
-##   phase      avg_moodswing avg_fatigue     n
-##   &lt;fct&gt;              &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;
-## 1 Menstrual           1.96        2.10   533
-## 2 Follicular          1.53        1.90   719
-## 3 Fertility           1.52        1.81   629
-## 4 Luteal              1.56        1.86   965</code></pre>
-<p>#overall scatterplot (can be deleted)</p>
-<pre class="r"><code>ggplot(my_int_numeric, aes(x = phase, y = fatigue_num)) +
-  geom_jitter(width = 0.2, alpha = 0.4, size = 1.5) +
-  stat_summary(fun = mean, geom = &quot;point&quot;, color = &quot;red&quot;, size = 4) +
-  labs(
-    title = &quot;Fatigue Intensity Across Menstrual Cycle Phases&quot;,
-    x = &quot;Phase&quot;,
-    y = &quot;Fatigue (0–4 scale)&quot;
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(my_int_numeric, aes(x = phase, y = moodswing_num)) +
-  geom_jitter(width = 0.2, alpha = 0.4, size = 1.5) +
-  stat_summary(fun = mean, geom = &quot;point&quot;, color = &quot;blue&quot;, size = 4) +
-  labs(
-    title = &quot;Mood Swing Intensity Across Menstrual Cycle Phases&quot;,
-    x = &quot;Phase&quot;,
-    y = &quot;Mood Swing (0–5 scale)&quot;
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<pre class="r"><code># Mood swing single line plot
-ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
-  geom_line(color = &quot;purple&quot;, size = 1.5, alpha = 0.7) +
-  geom_point(color = &quot;purple&quot;, size = 3) +
-  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = &quot;bold&quot;) +
-  labs(
-    title = &quot;Average Mood Swing Intensity Across Menstrual Cycle Phases&quot;,
-    subtitle = &quot;Higher values indicate more severe mood swings (Scale: 1-4)&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Average Mood Swing Intensity&quot;
-  ) +
-  ylim(1, 4) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = &quot;bold&quot;),
-    panel.grid.major = element_line(color = &quot;grey90&quot;)
-  )</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<pre class="r"><code># Fatigue single line plot
-ggplot(symptom_means, aes(x = phase, y = avg_fatigue, group = 1)) +
-  geom_line(color = &quot;darkorange&quot;, size = 1.5, alpha = 0.7) +
-  geom_point(color = &quot;darkorange&quot;, size = 3) +
-  geom_text(aes(label = round(avg_fatigue, 2)), vjust = -1, size = 4, fontface = &quot;bold&quot;) +
-  labs(
-    title = &quot;Average Fatigue Intensity Across Menstrual Cycle Phases&quot;,
-    subtitle = &quot;Higher values indicate more severe fatigue (Scale: 1-4)&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Average Fatigue Intensity&quot;
-  ) +
-  ylim(1, 4) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = &quot;bold&quot;),
-    panel.grid.major = element_line(color = &quot;grey90&quot;)
-  )</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<img src="hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>violin graphs for moodswing</p>
+<pre><code>## Warning: Removed 544 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+violin for fatigue</p>
+<pre><code>## Warning: Removed 331 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<div
-id="for-the-test-i-want-to-test-if-moodswing-and-fatigue-have-statsitically-difference-between-those-four-phases."
-class="section level2">
-<h2>for the test, i want to test if moodswing and fatigue have
-statsitically difference between those four phases.</h2>
-<pre class="r"><code>kruskal.test(moodswing_num ~ phase, data = my_int_numeric)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  moodswing_num by phase
-## Kruskal-Wallis chi-squared = 36.244, df = 3, p-value = 6.648e-08</code></pre>
-<pre class="r"><code>kruskal.test(fatigue_num ~ phase, data = my_int_numeric)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  fatigue_num by phase
-## Kruskal-Wallis chi-squared = 18.896, df = 3, p-value = 0.0002873</code></pre>
-<p>#Mood swing intensity differs significantly across menstrual
-phases.</p>
-<p>#Fatigue intensity also differs significantly across phases.</p>
-<p>#swich approach: longtidual changes</p>
-<pre class="r"><code>library(lme4)
-
-
-# Moodswing model
-m1 &lt;- lmer(moodswing_num ~ phase + (1 | id), data = my_int_numeric)
-summary(m1)</code></pre>
+<p>Both mood swing and fatigue showed clear phase-dependent variation.
+After converting ordinal symptom ratings into numeric intensity scores,
+average mood swing and fatigue levels were highest during the Menstrual
+phase and lowest during the Follicular phase. Violin plots revealed
+substantial inter-individual variability but consistent right-skewed
+distributions during Menstrual and Luteal phases, indicating higher
+symptom burden during these periods.</p>
+<div id="approach-longtidual-changes" class="section level1">
+<h1>approach: longtidual changes</h1>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
 ## lmerModLmerTest]
 ## Formula: moodswing_num ~ phase + (1 | id)
@@ -585,9 +458,6 @@ summary(m1)</code></pre>
 ## phaseFrtlty -0.166              
 ## phaseLuteal -0.184  0.525       
 ## phaseMnstrl -0.159  0.457  0.506</code></pre>
-<pre class="r"><code># Fatigue model
-m2 &lt;- lmer(fatigue_num ~ phase + (1 | id), data = my_int_numeric)
-summary(m2)</code></pre>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
 ## lmerModLmerTest]
 ## Formula: fatigue_num ~ phase + (1 | id)
@@ -619,372 +489,54 @@ summary(m2)</code></pre>
 ## phaseFrtlty -0.216              
 ## phaseLuteal -0.239  0.525       
 ## phaseMnstrl -0.206  0.457  0.506</code></pre>
-<p>#for moodswing: Luteal phase: +0.13 (t = 2.49) Menstrual phase: +0.36
-(t = 5.86) After accounting for repeated measures within individuals,
-mood swings are significantly higher in the Luteal and Menstrual phases
-compared to the Follicular phase.</p>
-<p>#for fatigue: Menstrual phase: +0.27 (t = 4.94) Luteal (+0.07) and
-Fertility (~0) phases not significant. only the Menstrual phase shows
-significantly higher fatigue compared to the Follicular phase.</p>
-<p>reletionship between hormone and flow color, flor volume, and
+<p>Longitudinal Mixed-Effects Modeling of Symptoms</p>
+<p>To account for repeated measurements within individuals, linear
+mixed-effects models with random intercepts for participant ID were
+fitted. For mood swings, relative to the Follicular phase, the Luteal
+phase showed a significant increase of approximately +0.13 units (t =
+2.49), while the Menstrual phase showed a much larger increase of
+approximately +0.36 units (t = 5.86). For fatigue, only the Menstrual
+phase differed significantly from the Follicular phase, with an increase
+of approximately +0.27 units (t = 4.94); Fertility and Luteal phases
+showed negligible and non-significant differences. These results
+demonstrate that within individuals, mood disturbances and fatigue are
+most strongly elevated during the Menstrual phase.</p>
+<p>reletionship between hormone and flow color, flow volume, and
 appetite</p>
-<pre class="r"><code>my_i = 
-  hormone |&gt;
-  select(id, phase, lh, estrogen, flow_color, flow_volume, appetite) |&gt;
-  mutate(
-    phase = factor(phase, levels = c(&quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;, &quot;Menstrual&quot;)),
-    flow_volume = factor(flow_volume, 
-                         levels = c(&quot;Not at all&quot;, &quot;Spotting / Very Light&quot;,&quot;Light&quot;,&quot;Moderate&quot;,
-                                     &quot;Somewhat Heavy&quot;,&quot;Heavy&quot;, &quot;Very Heavy&quot;)),
-    flow_color = factor(flow_color,
-                        levels = c(&quot;Not at all&quot;, &quot;Pink&quot;,&quot;Bright Red&quot;, &quot;Dark Brown / Dark Red&quot;, &quot;Grey&quot;, 
-                                    &quot;Black&quot;,&quot;Other&quot;)),
-    appetite = factor(appetite,
-                      levels = c(&quot;Very Low&quot;,&quot;Low&quot;,  &quot;Moderate&quot;, &quot;High&quot;, &quot;Very High&quot;))
-  )   
-
-phase_order = c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)
-colSums(is.na(my_i[, c(&quot;flow_volume&quot;, &quot;flow_color&quot;, &quot;appetite&quot;)]))</code></pre>
-<pre><code>## flow_volume  flow_color    appetite 
-##        2567        2617        2333</code></pre>
-<pre class="r"><code># Flow volume frequencies by phase
-table_flow_vol &lt;- my_i %&gt;%
-  filter(!is.na(flow_volume)) %&gt;%
-  count(phase, flow_volume) %&gt;%
-  group_by(phase) %&gt;%
-  mutate(pct = n / sum(n) * 100) %&gt;%
-  arrange(phase)
-table_flow_vol</code></pre>
-<pre><code>## # A tibble: 25 × 4
-## # Groups:   phase [5]
-##    phase      flow_volume               n    pct
-##    &lt;fct&gt;      &lt;fct&gt;                 &lt;int&gt;  &lt;dbl&gt;
-##  1 Follicular Not at all              652 80.8  
-##  2 Follicular Spotting / Very Light    99 12.3  
-##  3 Follicular Light                    39  4.83 
-##  4 Follicular Moderate                 14  1.73 
-##  5 Follicular Somewhat Heavy            3  0.372
-##  6 Fertility  Not at all              666 94.9  
-##  7 Fertility  Spotting / Very Light    21  2.99 
-##  8 Fertility  Light                     6  0.855
-##  9 Fertility  Moderate                  7  0.997
-## 10 Fertility  Somewhat Heavy            1  0.142
-## # ℹ 15 more rows</code></pre>
-<pre class="r"><code># Flow color
-table_flow_color &lt;- my_i %&gt;%
-  filter(!is.na(flow_color)) %&gt;%
-  count(phase, flow_color) %&gt;%
-  group_by(phase) %&gt;%
-  mutate(pct = n / sum(n) * 100)
-table_flow_color</code></pre>
-<pre><code>## # A tibble: 24 × 4
-## # Groups:   phase [5]
-##    phase      flow_color                n    pct
-##    &lt;fct&gt;      &lt;fct&gt;                 &lt;int&gt;  &lt;dbl&gt;
-##  1 Follicular Not at all              639 82.2  
-##  2 Follicular Pink                      7  0.901
-##  3 Follicular Bright Red               23  2.96 
-##  4 Follicular Dark Brown / Dark Red    81 10.4  
-##  5 Follicular Grey                      4  0.515
-##  6 Follicular Black                     4  0.515
-##  7 Follicular Other                    19  2.45 
-##  8 Fertility  Not at all              639 94.8  
-##  9 Fertility  Bright Red                1  0.148
-## 10 Fertility  Dark Brown / Dark Red     3  0.445
-## # ℹ 14 more rows</code></pre>
-<pre class="r"><code># Appetite
-table_appetite &lt;- my_i %&gt;%
-  filter(!is.na(appetite)) %&gt;%
-  count(phase, appetite) %&gt;%
-  group_by(phase) %&gt;%
-  mutate(pct = n / sum(n) * 100)
-table_appetite</code></pre>
-<pre><code>## # A tibble: 21 × 4
-## # Groups:   phase [5]
-##    phase      appetite      n   pct
-##    &lt;fct&gt;      &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;
-##  1 Follicular Very Low     55  6.55
-##  2 Follicular Low         193 23.0 
-##  3 Follicular Moderate    438 52.1 
-##  4 Follicular High        140 16.7 
-##  5 Follicular Very High    14  1.67
-##  6 Fertility  Very Low     37  5.05
-##  7 Fertility  Low         156 21.3 
-##  8 Fertility  Moderate    384 52.5 
-##  9 Fertility  High        132 18.0 
-## 10 Fertility  Very High    23  3.14
-## # ℹ 11 more rows</code></pre>
 <p>Overall scatter plot for three variables:</p>
-<pre class="r"><code>my_i_plot &lt;- my_i %&gt;%
-  filter(!is.na(phase) &amp; (!is.na(flow_volume) | !is.na(flow_color) | !is.na(appetite)))
-
-# Optional: convert ordered factors to numeric for plotting
-my_i_plot &lt;- my_i_plot %&gt;%
-  mutate(
-    flow_volume_num = as.numeric(flow_volume),
-    flow_color_num  = as.numeric(flow_color),
-    appetite_num    = as.numeric(appetite)
-  )
-
-# 1) FLOW VOLUME
-ggplot(my_i_plot, aes(x = phase, y = flow_volume_num)) +
-  geom_jitter(width = 0.2, height = 0, alpha = 0.4, color = &quot;blue&quot;) +
-  stat_summary(fun = mean, geom = &quot;point&quot;, size = 3, color = &quot;red&quot;) +
-  stat_summary(fun = mean, geom = &quot;line&quot;, aes(group = 1), color = &quot;red&quot;, size = 1) +
-  scale_y_continuous(
-    breaks = 1:length(levels(my_i$flow_volume)),
-    labels = levels(my_i$flow_volume)
-  ) +
-  labs(title = &quot;Flow Volume Across Menstrual Cycle Phases&quot;,
-       y = &quot;Flow Volume&quot;,
-       x = &quot;Phase&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <pre><code>## Warning: Removed 460 rows containing non-finite outside the scale
 ## range (`stat_summary()`).
 ## Removed 460 rows containing non-finite outside the scale
 ## range (`stat_summary()`).</code></pre>
 <pre><code>## Warning: Removed 460 rows containing missing values or values
 ## outside the scale range (`geom_point()`).</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<pre class="r"><code># 2) FLOW COLOR
-ggplot(my_i_plot, aes(x = phase, y = flow_color_num)) +
-  geom_jitter(width = 0.2, height = 0, alpha = 0.4, color = &quot;darkgreen&quot;) +
-  stat_summary(fun = mean, geom = &quot;point&quot;, size = 3, color = &quot;red&quot;) +
-  stat_summary(fun = mean, geom = &quot;line&quot;, aes(group = 1), color = &quot;red&quot;, size = 1) +
-  scale_y_continuous(
-    breaks = 1:length(levels(my_i$flow_color)),
-    labels = levels(my_i$flow_color)
-  ) +
-  labs(title = &quot;Flow Color Across Menstrual Cycle Phases&quot;,
-       y = &quot;Flow Color&quot;,
-       x = &quot;Phase&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <pre><code>## Warning: Removed 510 rows containing non-finite outside the scale
 ## range (`stat_summary()`).</code></pre>
 <pre><code>## Warning: Removed 510 rows containing non-finite outside the scale
 ## range (`stat_summary()`).</code></pre>
 <pre><code>## Warning: Removed 510 rows containing missing values or values
 ## outside the scale range (`geom_point()`).</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
-<pre class="r"><code># 3) APPETITE
-ggplot(my_i_plot, aes(x = phase, y = appetite_num)) +
-  geom_jitter(width = 0.2, height = 0, alpha = 0.4, color = &quot;purple&quot;) +
-  stat_summary(fun = mean, geom = &quot;point&quot;, size = 3, color = &quot;red&quot;) +
-  stat_summary(fun = mean, geom = &quot;line&quot;, aes(group = 1), color = &quot;red&quot;, size = 1) +
-  scale_y_continuous(
-    breaks = 1:length(levels(my_i$appetite)),
-    labels = levels(my_i$appetite)
-  ) +
-  labs(title = &quot;Appetite Across Menstrual Cycle Phases&quot;,
-       y = &quot;Appetite&quot;,
-       x = &quot;Phase&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
 <pre><code>## Warning: Removed 226 rows containing non-finite outside the scale
 ## range (`stat_summary()`).</code></pre>
 <pre><code>## Warning: Removed 226 rows containing non-finite outside the scale
 ## range (`stat_summary()`).</code></pre>
 <pre><code>## Warning: Removed 226 rows containing missing values or values
 ## outside the scale range (`geom_point()`).</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
-<pre class="r"><code>#give them order to do the avereage graph
-my_i_num &lt;- my_i %&gt;%
-  filter(!is.na(phase)) %&gt;%
-  mutate(
-    # Flow volume: example mapping
-    flow_volume_num = case_when(
-      flow_volume == &quot;Not at all&quot; ~ 0,
-      flow_volume == &quot;Spotting / Very Light&quot; ~ 1,
-      flow_volume == &quot;Light&quot; ~ 2,
-      flow_volume == &quot;Moderate&quot; ~ 3,
-      flow_volume == &quot;Somewhat Heavy&quot; ~ 4,
-      flow_volume == &quot;Heavy&quot; ~ 5,
-      flow_volume == &quot;Very Heavy&quot; ~ 6,
-      TRUE ~ NA_real_
-    ),
-    # Flow color: example mapping
-    flow_color_num = case_when(
-      flow_color == &quot;Not at all&quot; ~ 0,
-      flow_color == &quot;Pink&quot; ~ 1,
-      flow_color == &quot;Bright Red&quot; ~ 2,
-      flow_color == &quot;Dark Brown / Dark Red&quot; ~ 3,
-      flow_color == &quot;Grey&quot; ~ 4,
-      flow_color == &quot;Black&quot; ~ 5,
-      flow_color == &quot;Other&quot; ~ 6,
-      TRUE ~ NA_real_
-    ),
-    # Appetite: example mapping
-    appetite_num = case_when(
-      appetite == &quot;Very Low&quot; ~ 0,
-      appetite == &quot;Low&quot; ~ 1,
-      appetite == &quot;Moderate&quot; ~ 2,
-      appetite == &quot;High&quot; ~ 3,
-      appetite == &quot;Very High&quot; ~ 4,
-      TRUE ~ NA_real_
-    )
-  )</code></pre>
-<pre class="r"><code>#graphing
-phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)
-
-my_i_avg &lt;- my_i_num %&gt;%
-  group_by(phase = factor(phase, levels = phase_order)) %&gt;%
-  summarise(
-    avg_flow_volume = mean(flow_volume_num, na.rm = TRUE),
-    avg_flow_color  = mean(flow_color_num, na.rm = TRUE),
-    avg_appetite    = mean(appetite_num, na.rm = TRUE),
-    .groups = &#39;drop&#39;
-  )
-
-flow_volume_levels &lt;- c(&quot;Not at all&quot;, &quot;Spotting / Very Light&quot;, &quot;Light&quot;, &quot;Moderate&quot;,
-                        &quot;Somewhat Heavy&quot;, &quot;Heavy&quot;, &quot;Very Heavy&quot;)
-
-ggplot(my_i_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
-  geom_line(color = &quot;blue&quot;, size = 1.5) +
-  geom_point(color = &quot;red&quot;, size = 3) +
-  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(0,6), breaks = 0:6, labels = flow_volume_levels) +
-  labs(title = &quot;Average Flow Volume Across Menstrual Cycle Phases&quot;,
-       x = &quot;Phase&quot;, y = &quot;Flow Volume&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-14-3.png" width="672" /></p>
+<p><img src="hormone_files/figure-html/unnamed-chunk-16-1.png" width="672" /><img src="hormone_files/figure-html/unnamed-chunk-16-2.png" width="672" /><img src="hormone_files/figure-html/unnamed-chunk-16-3.png" width="672" />
+add violin data:</p>
+<pre><code>## Warning: Removed 2567 rows containing non-finite outside the scale
+## range (`stat_ydensity()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
-<pre class="r"><code># Flow color
-flow_color_levels &lt;- c(&quot;Not at all&quot;, &quot;Pink&quot;, &quot;Bright Red&quot;, &quot;Dark Brown / Dark Red&quot;,
-                       &quot;Grey&quot;, &quot;Black&quot;, &quot;Other&quot;)
-
-ggplot(my_i_avg, aes(x = phase, y = avg_flow_color, group = 1)) +
-  geom_line(color = &quot;darkgreen&quot;, size = 1.5) +
-  geom_point(color = &quot;red&quot;, size = 3) +
-  geom_text(aes(label = round(avg_flow_color,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(0,6), breaks = 0:6, labels = flow_color_levels) +
-  labs(title = &quot;Average Flow Color Across Menstrual Cycle Phases&quot;,
-       x = &quot;Phase&quot;, y = &quot;Flow Color&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
-<pre class="r"><code># Appetite
-appetite_levels &lt;- c(&quot;Very Low&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Very High&quot;)
-
-ggplot(my_i_avg, aes(x = phase, y = avg_appetite, group = 1)) +
-  geom_line(color = &quot;purple&quot;, size = 1.5) +
-  geom_point(color = &quot;red&quot;, size = 3) +
-  geom_text(aes(label = round(avg_appetite,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(0,4), breaks = 0:4, labels = appetite_levels) +
-  labs(title = &quot;Average Appetite Across Menstrual Cycle Phases&quot;,
-       x = &quot;Phase&quot;, y = &quot;Appetite&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-17-3.png" width="672" /></p>
-<p>#the not at all strongly affect the curve. so i tried another scatter
-plot for each (delete the not at all)</p>
-<pre class="r"><code>my_i_filtered &lt;- my_i %&gt;%
-  filter(flow_volume != &quot;Not at all&quot;, flow_color != &quot;Not at all&quot;) %&gt;%
-  mutate(
-    # Flow volume numeric mapping
-    flow_volume_num = case_when(
-      flow_volume == &quot;Spotting / Very Light&quot; ~ 1,
-      flow_volume == &quot;Light&quot; ~ 2,
-      flow_volume == &quot;Moderate&quot; ~ 3,
-      flow_volume == &quot;Somewhat Heavy&quot; ~ 4,
-      flow_volume == &quot;Heavy&quot; ~ 5,
-      flow_volume == &quot;Very Heavy&quot; ~ 6,
-      TRUE ~ NA_real_
-    ),
-    # Flow color numeric mapping
-    flow_color_num = case_when(
-      flow_color == &quot;Pink&quot; ~ 1,
-      flow_color == &quot;Bright Red&quot; ~ 2,
-      flow_color == &quot;Dark Brown / Dark Red&quot; ~ 3,
-      flow_color == &quot;Grey&quot; ~ 4,
-      flow_color == &quot;Black&quot; ~ 5,
-      flow_color == &quot;Other&quot; ~ 6,
-      TRUE ~ NA_real_
-    )
-  )
-phase_order &lt;- c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;)
-
-avg_flow &lt;- my_i_filtered %&gt;%
-  group_by(phase = factor(phase, levels = phase_order)) %&gt;%
-  summarise(
-    avg_flow_volume = mean(flow_volume_num, na.rm = TRUE),
-    avg_flow_color = mean(flow_color_num, na.rm = TRUE),
-    .groups = &#39;drop&#39;
-  )
-flow_volume_levels &lt;- c(&quot;Spotting / Very Light&quot;, &quot;Light&quot;, &quot;Moderate&quot;, 
-                        &quot;Somewhat Heavy&quot;, &quot;Heavy&quot;, &quot;Very Heavy&quot;)
-
-ggplot(avg_flow, aes(x = phase, y = avg_flow_volume, group = 1)) +
-  geom_line(color = &quot;blue&quot;, size = 1.5) +
-  geom_point(color = &quot;red&quot;, size = 3) +
-  geom_text(aes(label = round(avg_flow_volume,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_volume_levels) +
-  labs(title = &quot;Average Flow Volume Across Menstrual Cycle Phases (excluding &#39;Not at all&#39;)&quot;,
-       x = &quot;Phase&quot;, y = &quot;Flow Volume&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<pre><code>## NULL</code></pre>
+<pre><code>## Warning: Removed 2617 rows containing non-finite outside the scale
+## range (`stat_ydensity()`).</code></pre>
 <p><img src="hormone_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<pre class="r"><code># Flow Color
-flow_color_levels &lt;- c(&quot;Pink&quot;, &quot;Bright Red&quot;, &quot;Dark Brown / Dark Red&quot;, &quot;Grey&quot;,
-                       &quot;Black&quot;, &quot;Other&quot;)
-
-ggplot(avg_flow, aes(x = phase, y = avg_flow_color, group = 1)) +
-  geom_line(color = &quot;darkgreen&quot;, size = 1.5) +
-  geom_point(color = &quot;red&quot;, size = 3) +
-  geom_text(aes(label = round(avg_flow_color,2)), vjust = -0.5) +
-  scale_y_continuous(limits = c(1,6), breaks = 1:6, labels = flow_color_levels) +
-  labs(title = &quot;Average Flow Color Across Menstrual Cycle Phases (excluding &#39;Not at all&#39;)&quot;,
-       x = &quot;Phase&quot;, y = &quot;Flow Color&quot;) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="hormone_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
-<pre class="r"><code>#(with the not at all data)
-library(dplyr)
-library(tidyr)
-
-# FLOW VOLUME
-fv_df &lt;- my_i_num %&gt;%
-  filter(!is.na(flow_volume_num)) %&gt;%
-  group_by(id, phase) %&gt;%
-  summarise(flow_volume_num = mean(flow_volume_num, na.rm = TRUE), .groups = &#39;drop&#39;) %&gt;%
-  pivot_wider(names_from = phase, values_from = flow_volume_num) %&gt;%
-  drop_na()
-
-friedman.test(as.matrix(fv_df[,-1]))  # exclude id column</code></pre>
-<pre><code>## 
-##  Friedman rank sum test
-## 
-## data:  as.matrix(fv_df[, -1])
-## Friedman chi-squared = 105.42, df = 3, p-value &lt; 2.2e-16</code></pre>
-<pre class="r"><code># FLOW COLOR
-fc_df &lt;- my_i_num %&gt;%
-  filter(!is.na(flow_color_num)) %&gt;%
-  group_by(id, phase) %&gt;%
-  summarise(flow_color_num = mean(flow_color_num, na.rm = TRUE), .groups = &#39;drop&#39;) %&gt;%
-  pivot_wider(names_from = phase, values_from = flow_color_num) %&gt;%
-  drop_na()
-
-friedman.test(as.matrix(fc_df[,-1]))</code></pre>
-<pre><code>## 
-##  Friedman rank sum test
-## 
-## data:  as.matrix(fc_df[, -1])
-## Friedman chi-squared = 98.208, df = 3, p-value &lt; 2.2e-16</code></pre>
-<pre class="r"><code># APPETITE
-app_df &lt;- my_i_num %&gt;%
-  filter(!is.na(appetite_num)) %&gt;%
-  group_by(id, phase) %&gt;%
-  summarise(appetite_num = mean(appetite_num, na.rm = TRUE), .groups = &#39;drop&#39;) %&gt;%
-  pivot_wider(names_from = phase, values_from = appetite_num) %&gt;%
-  drop_na()
-
-friedman.test(as.matrix(app_df[,-1]))</code></pre>
-<pre><code>## 
-##  Friedman rank sum test
-## 
-## data:  as.matrix(app_df[, -1])
-## Friedman chi-squared = 7.449, df = 3, p-value = 0.05888</code></pre>
+<pre><code>## Warning: Removed 2333 rows containing non-finite outside the scale
+## range (`stat_ydensity()`).</code></pre>
+<p><img src="hormone_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p>#Flow volume &amp; flow color: There are clear differences across
 menstrual cycle phases. Likely patterns: heavier flow and darker color
 in the Menstrual phase, lighter/spotting in Follicular/Luteal.</p>
@@ -993,15 +545,10 @@ significant at α = 0.05. There may be a trend, but the variation is
 smaller or more individual-specific.</p>
 <p>To account for within-subject repeated measures and get
 phase-specific effects, we can fit CLMM models:</p>
-<pre class="r"><code>library(ordinal)
-
-# Flow Volume
-clmm_flowvol &lt;- clmm(flow_volume ~ phase + (1 | id), data = my_i, Hess = TRUE)
-summary(clmm_flowvol)</code></pre>
 <pre><code>## Cumulative Link Mixed Model fitted with the Laplace approximation
 ## 
 ## formula: flow_volume ~ phase + (1 | id)
-## data:    my_i
+## data:    other_interest
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
 ##  logit flexible  3091 -1801.42 3622.83 824(3300) 2.08e-03 1.6e+02
@@ -1028,15 +575,12 @@ summary(clmm_flowvol)</code></pre>
 ## Somewhat Heavy|Heavy               5.2151     0.2229  23.396
 ## Heavy|Very Heavy                   6.5315     0.2810  23.241
 ## (2568 observations deleted due to missingness)</code></pre>
-<pre class="r"><code># Flow Color
-clmm_flowcolor &lt;- clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRUE)</code></pre>
 <pre><code>## Warning in update.uC(rho): Non finite negative log-likelihood
 ##   at iteration 48</code></pre>
-<pre class="r"><code>summary(clmm_flowcolor)</code></pre>
 <pre><code>## Cumulative Link Mixed Model fitted with the Laplace approximation
 ## 
 ## formula: flow_color ~ phase + (1 | id)
-## data:    my_i
+## data:    other_interest
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
 ##  logit flexible  3041 -1733.01 3486.03 891(3564) 2.66e-03 7.1e+02
@@ -1063,13 +607,10 @@ clmm_flowcolor &lt;- clmm(flow_color ~ phase + (1 | id), data = my_i, Hess = TRU
 ## Grey|Black                         4.4633     0.1926  23.178
 ## Black|Other                        4.5598     0.1957  23.306
 ## (2618 observations deleted due to missingness)</code></pre>
-<pre class="r"><code># Appetite
-clmm_app &lt;- clmm(appetite ~ phase + (1 | id), data = my_i, Hess = TRUE)
-summary(clmm_app)</code></pre>
 <pre><code>## Cumulative Link Mixed Model fitted with the Laplace approximation
 ## 
 ## formula: appetite ~ phase + (1 | id)
-## data:    my_i
+## data:    other_interest
 ## 
 ##  link  threshold nobs logLik   AIC     niter     max.grad cond.H 
 ##  logit flexible  3325 -3615.00 7246.01 603(2993) 1.73e-03 9.3e+01
@@ -1094,12 +635,61 @@ summary(clmm_app)</code></pre>
 ## Moderate|High    1.8759     0.1989   9.430
 ## High|Very High   4.3591     0.2249  19.384
 ## (2334 observations deleted due to missingness)</code></pre>
-<p>#interpretation: Flow volume and flow color: strong differences
-across phases (p &lt; 0.001, Friedman).</p>
-<p>Appetite: generally stable, but slightly higher in Luteal phase (CLMM
-significant).</p>
-<p>Individual differences are substantial, as shown by random effect
-variance.</p>
+<p>#interpretation: Flow volume: The relatively low AIC (3622.83)
+compared with the other models indicates a strong phase-dependent
+structure in flow volume.Because flow volume is directly driven by
+bleeding physiology, the good model fit supports that menstrual phase is
+the dominant determinant of bleeding intensity.</p>
+<p>Flow color: The lowest AIC across all three models (3486.03)
+indicates that flow color is even more strongly phase-locked than flow
+volume.</p>
+<p>Appetite: Model converged very well (low gradient, strong Hessian
+stability). The random intercept variance for individual appetite
+baseline was: Variance = 1.398, SD = 1.183, 42 individuals. This
+indicates large between-person differences in baseline appetite,
+confirming the necessity of mixed-effects modeling instead of
+independent-sample methods.</p>
+<p>Conclusion: Flow volume is strongly structured by menstrual phase,
+with the cleanest signal among all three outcomes.</p>
+<p>Flow color is the most phase-sensitive outcome in your entire
+dataset, tightly anchored to menstrual cycle transitions.</p>
+<p>Only the Luteal phase showed a statistically significant increase in
+appetite relative to the Follicular phase, This estimate is on the
+log-odds scale, meaning that the odds of reporting higher appetite
+categories increase substantially in the Luteal phase within the same
+individuals. Appetite did not differ significantly in the fertility and
+menstrual phase. This confirms that appetite elevation is a
+Luteal-specific physiological effect, not a general cycle-wide
+fluctuation.</p>
+<p>Clustering:
+<img src="hormone_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre><code>## # A tibble: 3 × 7
+##   cluster    lh estrogen moodswing_num fatigue_num appetite_num flow_volume_num
+##   &lt;fct&gt;   &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;           &lt;dbl&gt;
+## 1 1        3.82     101.          1.85        2.08         1.92           2.45 
+## 2 2       11.5      256.          1.45        1.93         2.14           0.212
+## 3 3        4.58     119.          1.47        1.82         1.83           0.146</code></pre>
+<p>Unsupervised k-means clustering applied to six standardized features
+(LH, estrogen, mood swing, fatigue, appetite, and flow volume)
+identified three distinct physiological–symptom phenotypes:</p>
+<p>Cluster 1 (Menstrual–High Symptom–High Flow Group) was characterized
+by low hormones (LH = 3.82, estrogen = 101.00), the highest mood swing
+(1.85) and fatigue (2.08), and markedly elevated flow volume (2.45).</p>
+<p>Cluster 2 (Ovulatory–High Hormone–High Appetite Group) showed
+extremely high hormones (LH = 11.47, estrogen = 256.48), the highest
+appetite (2.14), low mood swing (1.45) and fatigue (1.93), and minimal
+flow (0.21).</p>
+<p>Cluster 3 (Baseline–Low Symptom Group) exhibited moderate hormone
+levels (LH = 4.58, estrogen = 119.21), the lowest mood swing (1.47) and
+fatigue (1.82), stable appetite (1.83), and minimal flow (0.15).</p>
+<p>These clusters closely align with known biological states of the
+menstrual cycle, corresponding to menstrual symptomatic states,
+ovulatory high-hormone states, and baseline low-symptom states.</p>
+<p>Overall final results: Flow volume and flow color exhibited the
+strongest phase-locking across the menstrual cycle, while appetite
+showed a robust, individual-specific increase restricted to the Luteal
+phase, with substantial between-person variability dominating overall
+appetite levels.</p>
 </div>
 
 

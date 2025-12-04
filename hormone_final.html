@@ -345,7 +345,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -394,13 +394,8 @@ div.tocify {
 
 <p>###LH &amp; Estrogen Across Phases Topic: Examine average estrogen
 and LH levels across menstrual cycle phases to see if hormonal patterns
-match biological expectations</p>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<p><img src="hormone_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+match biological expectations
+<img src="hormone_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 EDA: Estrogen levels are highest in the Fertility (ovulatory) phase,
 second highest in Luteal, and relatively low in Menstrual, gradually
 rising from Follicular to Luteal. LH is much lower than estrogen
@@ -414,8 +409,8 @@ levels, reflecting the hormonal reset.</p>
 <p>###Mood Swing Distribution Across Phases Topic: Assess whether
 menstrual cycle phases influence mood swing intensity using violin
 plots.</p>
-<pre><code>## Warning: Removed 472 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 480 rows containing missing values or values
+## outside the scale range (`geom_point()`).</code></pre>
 <p><img src="hormone_final_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 EDA: Violin plots show substantial inter-individual variability.
 Menstrual phase has the highest mood swing intensity (right-skewed
@@ -439,7 +434,7 @@ suggested by the violin plot.</p>
 <p>Mood Swing &amp; Fatigue Linear Mixed Models</p>
 <p>Topic: Test whether mood swing and fatigue differ by menstrual phase,
 accounting for repeated measures.</p>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+<pre><code>## Linear mixed model fit by REML [&#39;lmerModLmerTest&#39;]
 ## Formula: moodswing_score ~ phase + (1 | id)
 ##    Data: hormone_symptoms
 ## REML criterion at convergence: 8006.314
@@ -451,7 +446,7 @@ accounting for repeated measures.</p>
 ## Fixed Effects:
 ##     (Intercept)  phasefollicular      phaseluteal   phasemenstrual  
 ##         1.42765         -0.02442          0.10441          0.34466</code></pre>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+<pre><code>## Linear mixed model fit by REML [&#39;lmerModLmerTest&#39;]
 ## Formula: fatigue_score ~ phase + (1 | id)
 ##    Data: hormone_symptoms
 ## REML criterion at convergence: 8847.962
@@ -503,7 +498,8 @@ phase-specific but subtle.</p>
 <p>###Linear Mixed Model: Appetite vs Estrogen Topic: Explore the
 relationship between estrogen levels and appetite scores, accounting for
 repeated measures.</p>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
 ## Formula: appetite_score ~ estrogen + (1 | id)
 ##    Data: hormone_symptoms
 ## 
@@ -520,9 +516,11 @@ repeated measures.</p>
 ## Number of obs: 2725, groups:  id, 42
 ## 
 ## Fixed effects:
-##              Estimate Std. Error t value
-## (Intercept) 2.8935583  0.0694275  41.677
-## estrogen    0.0001294  0.0001489   0.869
+##              Estimate Std. Error        df t value Pr(&gt;|t|)    
+## (Intercept) 2.894e+00  6.943e-02 4.854e+01  41.677   &lt;2e-16 ***
+## estrogen    1.294e-04  1.489e-04 2.721e+03   0.869    0.385    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##          (Intr)

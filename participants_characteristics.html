@@ -346,7 +346,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -437,7 +437,7 @@ both 2022 and 2024, keep the latest one as enrollment year</li>
   ) |&gt;
   ungroup()</code></pre>
 <pre><code>## Rows: 42 Columns: 5
-## ── Column specification ───────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
 ## 
@@ -485,7 +485,7 @@ data</h3>
 <pre class="r"><code>hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
   janitor::clean_names() </code></pre>
 <pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ───────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
 ## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
@@ -515,7 +515,7 @@ data</h3>
 subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
   janitor::clean_names()</code></pre>
 <pre><code>## Rows: 42 Columns: 8
-## ── Column specification ───────────────────────────────────
+## ── Column specification ────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
 ## dbl (3): id, birth_year, age_of_first_menarche

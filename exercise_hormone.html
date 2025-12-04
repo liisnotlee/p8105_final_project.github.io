@@ -346,7 +346,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone.html">Hormone &amp; Symptoms</a>
+      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -557,10 +557,10 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
 <pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale range
-## (`stat_smooth()`).</code></pre>
-<pre><code>## Warning: Removed 92 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale
+## range (`stat_smooth()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing missing values or values outside
+## the scale range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code># LH (luteinizing hormone) vs exercise
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
@@ -572,8 +572,8 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        y = &quot;Exercise Duration (min)&quot;,
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Removed 91 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 91 rows containing missing values or values outside
+## the scale range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 <pre class="r"><code># Progesterone (PdG) vs exercise duration
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0 &amp; !is.na(pdg)), 
@@ -658,11 +658,12 @@ ggplot(individual_patterns, aes(x = phase, y = mean_duration, group = id)) +
        x = &quot;Menstrual Phase&quot;, 
        y = &quot;Mean Exercise Duration (min)&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2
+## 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where
+## this warning was generated.</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code># Don&#39;t really see much variation, seems exercise duration does not change dramatically across phases</code></pre>
 <div id="summary-statistics" class="section level3">
@@ -701,7 +702,6 @@ so each individual contributes equally to the analysis</p>
 # install.packages(&quot;broom.mixed&quot;)
 # install.packages(&quot;ggeffects&quot;)
 library(lme4)</code></pre>
-<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.5.2</code></pre>
 <pre><code>## Loading required package: Matrix</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;Matrix&#39;</code></pre>
@@ -709,7 +709,6 @@ library(lme4)</code></pre>
 ## 
 ##     expand, pack, unpack</code></pre>
 <pre class="r"><code>library(lmerTest)</code></pre>
-<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;lmerTest&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:lme4&#39;:
@@ -718,10 +717,8 @@ library(lme4)</code></pre>
 <pre><code>## The following object is masked from &#39;package:stats&#39;:
 ## 
 ##     step</code></pre>
-<pre class="r"><code>library(broom.mixed)</code></pre>
-<pre><code>## Warning: package &#39;broom.mixed&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(ggeffects)</code></pre>
-<pre><code>## Warning: package &#39;ggeffects&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(broom.mixed)
+library(ggeffects)</code></pre>
 <pre class="r"><code># Preparing analysis dataset
 analysis_data = merged_data %&gt;%
   mutate(study_interval = factor(study_interval))
