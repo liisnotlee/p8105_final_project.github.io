@@ -69,7 +69,7 @@ ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
 ```
 EDA: Violin plots show substantial inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), while Luteal phase shows lower values with a wider base (more individuals with low mood swing).
 
-Discussion: This distribution suggests that mood swings are most severe during menstruation, likely due to the simultaneous withdrawal of estrogen and progesterone. Luteal phase has moderate symptom expression, consistent with premenstrual hormonal shifts.
+Discussion: (Mood Swing Distribution Across Phases)This distribution suggests that mood swings are most severe during menstruation, likely due to the simultaneous withdrawal of estrogen and progesterone. Luteal phase has moderate symptom expression, consistent with premenstrual hormonal shifts.
 
 
 
@@ -108,7 +108,7 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
 
 EDA: Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase (1.41), with intermediate levels in Follicular and Fertility phases.
 
-Discussion: These averages align with known biological mechanisms: estrogen and progesterone withdrawal during menstruation contributes to elevated mood instability. This confirms the phase-dependent pattern suggested by the violin plot.
+Discussion: Average Mood Swing Across Phases: menstrual has the highest luteal phase. 
 
 
 
