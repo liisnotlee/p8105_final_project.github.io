@@ -519,9 +519,10 @@ stress score, daily exercise data.</li>
 Besides <code>subejct_info</code>, other dataframes can be further
 linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
 <hr />
-</div>
-<div id="dataframes" class="section level2">
-<h2>Dataframes</h2>
+<details>
+<summary>
+Dataframes
+<p>
 <div id="subject_info---subject-relevant-data" class="section level3">
 <h3><code>subject_info</code> - Subject-Relevant Data</h3>
 <p>The <code>subject_info</code> dataframe contains participants
@@ -916,6 +917,8 @@ session or if both stress and sleep scores are present.</p>
   )  
   # MERGE demographic data
   # left_join(subject_info, by = c(&quot;id&quot;, &quot;study_interval&quot;)) </code></pre>
+</p>
+</details>
 </div>
 </div>
 </div>
@@ -943,7 +946,7 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <h3>Mood Swing Distribution Across Phases</h3>
 <p>Topic: Assess whether menstrual cycle phases influence mood swing
 intensity using violin plots.</p>
-<pre><code>## Warning: Removed 468 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 476 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 Violin plots show substantial inter-individual variability. Menstrual

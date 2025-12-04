@@ -80,7 +80,6 @@ All dataframes can be linked by participant's `id`. Besides `subejct_info`, othe
 
 ------------------------------------------------------------------------
 
-## Dataframes
 ### `subject_info` - Subject-Relevant Data
 
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
@@ -426,7 +425,11 @@ all_daily_data <- hormone_symptoms |>
 ```
 
 
-# EDA
+
+# Exploratory Data Analysis
+
+## Participant Characteristics
+
 ## hormone
 
 ```{r, include=FALSE}
