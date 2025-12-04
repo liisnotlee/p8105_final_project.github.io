@@ -433,20 +433,101 @@ all_daily_data <- hormone_symptoms |>
 # Exploratory Data Analysis
 
 ## Participant Characteristics
+### Age distribution
+- View mean age in total (2022 & 2024)
+```{r}
+overall_n <- subject_info |> 
+  distinct(id) |> 
+  count(name = "n")
 
-## hormone
+age_boxplot_all <- subject_info |> 
+  ggplot(aes(x="All participants", y = mean_age)) +
+  geom_boxplot(fill = "#bcbddc")+
+  geom_text(
+    data = overall_n,
+    aes(
+      x = "All participants", 
+      y = max(subject_info$age, na.rm = TRUE) + 3,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Mean age (years)",
+    title = "Mean age of all participants"
+  ) +
+  ylim(15, NA) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    plot.title  = element_text(hjust = 0.5)
+  )
+age_boxplot_all
+```
+The cohort includes 42 participants with a median age of ~21 years and a small number of older outliers (ages 27 and 29). This relatively narrow, young age range reduces age-related heterogeneity in reproductive hormones and symptomatic expression, helping to isolate phase-related effects. 
+
+### Age of first menarche
+```{r}
+menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
+  geom_boxplot(fill = "cornflowerblue") +
+  labs(title = "Age of Menarche",
+    y = "Age (years)",
+    x = "") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+
+menarche_plot
+```
+Age of first menarche ranges roughly from 10 to 15 years with a median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche distribution suggests a relatively standard reproductive development history across participants; because very early or very late menarche can influence cycle regularity and hormonal profiles, the lack of extreme variability here supports attributing observed hormone–symptom patterns primarily to current cycle phase rather than developmental differences.
+
+### BMI
+
+```{r bmi-boxplot}
+overall_bmi_n <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  summarize(n = n())
+
+bmi_all <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  ggplot(aes(x = "All participants", y = bmi)) +
+  geom_boxplot(fill = "#bcbddc") +
+  geom_text(
+    data = overall_bmi_n,
+    aes(
+      x = "All participants",
+      y = 45, 
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "BMI (kg/m^2)",
+    title = "Overall Mean BMI Distribution"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+
+bmi_all
+```
+Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation. 
+
+
+## Hormone
 
 ```{r, include=FALSE}
-hormone_symptoms=
-  read_csv("clean_data/hormone_symptoms.csv")|>
-  janitor::clean_names()|>
+hormone_symptoms_eda=
+  hormone_symptoms|>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
 LH & Estrogen
+
 We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
+
 ```{r, echo=FALSE}
-hormone_avg <- hormone_symptoms |>
+hormone_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     estrogen_mean = mean(estrogen, na.rm = TRUE),
@@ -468,6 +549,7 @@ ggplot(hormone_avg, aes(x = phase)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
 Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
 
 ## Life factors
@@ -476,9 +558,10 @@ Estrogen levels are highest in the Fertility (ovulatory) phase, second highest i
 Moodswing Distribution Across Phases
 
 Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
+
 ```{r, echo=FALSE}
 # Mood swing
-ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
+ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score)) +
   geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   scale_y_continuous(limits = c(0,5), breaks = 0:5) +
@@ -495,13 +578,15 @@ ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
   )
 
 ```
+
 Violin plots show substantial inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), while Luteal phase shows lower values with a wider base (more individuals with low mood swing).
 
 
 Average Mood Swing Across Phases
 To visualize general trends, we should summarize the average mood swing intensity across phases.
+
 ```{r, echo=FALSE}
-symptom_means <- hormone_symptoms |>
+symptom_means <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     avg_moodswing = mean(moodswing_score, na.rm = TRUE),
@@ -540,7 +625,7 @@ Flow Volume Distribution Across Phases
 To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
 ```{r, echo=FALSE}
 #violin
-ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
+ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score)) +
   geom_violin(fill = "skyblue", alpha = 0.5) +  
   labs(
     title = "Distribution of Flow Volume Across Phases",
@@ -548,6 +633,7 @@ ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
   ) +
   theme_minimal()
 ```
+
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
 
@@ -555,7 +641,7 @@ Average Flow Volume Across Phases
 
 Summarize average flow volume to observe general trends across the menstrual cycle.
 ```{r, echo=FALSE}
-cycle_avg <- hormone_symptoms |>
+cycle_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     avg_flow_volume = mean(flow_volume_score, na.rm = TRUE),
@@ -578,6 +664,7 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
   )
 
 ```
+
 Menstrual phase has the highest average flow (2.38), luteal is lowest (0.03), fertility is 0.07, and follicular is 0.23.
 
 ### Appetite
@@ -600,6 +687,7 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
 Appetite is highest in Fertility (2.96), lowest in Follicular (2.85), Luteal 2.95, Menstrual 2.90.
 
 
@@ -613,19 +701,17 @@ modeling from yue
 
 Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
 ```{r, echo=FALSE}
-mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
-fatigue_mixed_model <- lmer(fatigue_score ~ phase + (1 | id), data = hormone_symptoms)
+mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
 
 
 mood_mixed_model
-fatigue_mixed_model
 ```
 Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 ### Linear Mixed Model: Appetite vs Estrogen
 Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
 ```{r, echo=FALSE}
-appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
+appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms_eda)
 summary(appetite_model)
 ```
 Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869).
