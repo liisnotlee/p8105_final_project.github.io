@@ -1,5 +1,5 @@
 ---
-title: "sleep_stress_EDA"
+title: "Sleep & stress"
 output: github_document
 ---
 
@@ -31,8 +31,7 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-Load the data 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 all_data_df = 
   read_csv("clean_data/all_daily_data.csv") |>
   janitor::clean_names()
@@ -53,15 +52,18 @@ sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
 ```{r, message=FALSE, warning=FALSE}
 # plot the mean timein bed in hour
 sleep_stress_df |>
-  group_by(id, study_interval)|>
-  summarize(mean_sleep = mean(timeinbed_mean/60),
-            sd_sleep = sd(timeinbed_mean))|>
-  ggplot(aes(x = id, y = mean_sleep, color = id))+
-  geom_point()+
-  facet_grid(study_interval~.)
+  filter(!is.na(study_interval)) |>
+  ggplot(aes(x = id, y = timeinbed_mean/60, group = id, color = id))+
+  geom_boxplot()+
+  facet_grid(study_interval~.) +
+  labs(
+    x = "Participant",
+    y = "Average time in bed (hours)"
+  ) 
 ```
 
-The average sleep time for each person is different each study interval and varied across participants.  In 2022, some participants slept less than 5 hours and some slept more than 8 hours. In 2024, most participants have better sleep length, 7-8 hours.
+
+The average sleep time for each person is different each study interval and varied across participants.  In 2022, some participants slept less than 5 hours and some slept more than 8 hours. In 2024, most participants have better sleep length, 7-8 hours. 
 
 ```{r,message=FALSE, warning=FALSE}
 sleep_stress_df|>
@@ -82,7 +84,7 @@ sleep_stress_df|>
 ```
 
 
-Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
+Menstruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
 
 We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
 The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
@@ -225,35 +227,45 @@ sleep_stress_df |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-
-We used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
+Our dataset are from two studies in two different times, year 2022 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts. Therefore the assumptions of independence is violated so we cannot use statistical tests that required independence assumptions. 
+Instead, we used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
 
 ```{r,message=FALSE, warning=FALSE}
-m1 <- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
-tidy(m1, effects = "fixed")|>
-  select(term, estimate, std.error,p.value) |>
+m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+tidy(m1, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(
+    title = "Linear mixed effect models for stress score variation by menstrual phases",
+    digits = 3)
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+m2 = lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
   mutate(
   significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
 ```
 
-
-```{r,message=FALSE, warning=FALSE}
-m2 <- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
-tidy(m2, effects = "fixed")|>
-  select(term, estimate, std.error,p.value) |>
+```{r}
+m3 = lmer(timeinbed_mean ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
   mutate(
   significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
 ```
-
 
 ```{r, message=FALSE, warning=FALSE}
 #  model
-m3 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+m4 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
            timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
-tidy(m3, effects = "fixed")|>
-  select(term, estimate, std.error,p.value) |>
+tidy(m4, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |>
   mutate(
   significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
@@ -263,4 +275,3 @@ fitted_stress_score = fitted.values(m1)
 # check the residuals
 qqnorm(residuals(m3)) 
 ```
-

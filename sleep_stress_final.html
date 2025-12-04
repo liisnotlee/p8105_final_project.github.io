@@ -11,7 +11,7 @@
 
 
 
-<title>sleep_stress_EDA</title>
+<title>Sleep &amp; stress</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -385,36 +385,23 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">sleep_stress_EDA</h1>
+<h1 class="title toc-ignore">Sleep &amp; stress</h1>
 
 </div>
 
 
-<p>Load the data</p>
-<pre class="r"><code>all_data_df = 
-  read_csv(&quot;clean_data/all_daily_data.csv&quot;) |&gt;
-  janitor::clean_names()
-subject_info = 
-  read_csv(&quot;clean_data/subject_info.csv&quot;) |&gt;
-  janitor::clean_names() |&gt;
-  select(id, ethnicity, education_abrv)
-sleep_stress_df = all_data_df|&gt;
-  filter(!is.na(stress_score) &amp; !is.na(sleep_score) &amp; !is.na(timeinbed_mean)) |&gt;
-  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |&gt;
-  mutate(
-    phase = fct_relevel(phase,&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)
-  )
-sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))</code></pre>
 <p><strong>View the sleep time for different participants in each study
 interval</strong></p>
 <pre class="r"><code># plot the mean timein bed in hour
 sleep_stress_df |&gt;
-  group_by(id, study_interval)|&gt;
-  summarize(mean_sleep = mean(timeinbed_mean/60),
-            sd_sleep = sd(timeinbed_mean))|&gt;
-  ggplot(aes(x = id, y = mean_sleep, color = id))+
-  geom_point()+
-  facet_grid(study_interval~.)</code></pre>
+  filter(!is.na(study_interval)) |&gt;
+  ggplot(aes(x = id, y = timeinbed_mean/60, group = id, color = id))+
+  geom_boxplot()+
+  facet_grid(study_interval~.) +
+  labs(
+    x = &quot;Participant&quot;,
+    y = &quot;Average time in bed (hours)&quot;
+  ) </code></pre>
 <p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>The average sleep time for each person is different each study
 interval and varied across participants. In 2022, some participants
@@ -436,12 +423,12 @@ participants have better sleep length, 7-8 hours.</p>
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>Mesntruators spent more time in bed during menstrual time but their
+<p>Menstruators spent more time in bed during menstrual time but their
 deep sleep hours were lowest. This showed that the physical exhaustion
 during menstrual days requiring them to rest but preventing them from
-having a restorative sleep quality. Follicular time is the when
-menstruators feel most energetic and spent less time in bed but having
-much better deep sleep.</p>
+having a restorative sleep quality. Follicular time is when menstruators
+feel most energetic and spent less time in bed but having much better
+deep sleep.</p>
 <p>We explore the changes of the stress score with the menstrual cycle.
 The participants slept best during the menstrual time, probably a good
 sign to rest well during this time. The lowest sleep score were recorded
@@ -549,112 +536,8 @@ plot_3 =
     axis.text.x = element_text(angle = 45, hjust = 1))
 plot_1 + plot_2 + plot_3</code></pre>
 <p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p><strong>Variation of sleep score across menstrual cycle
-phases</strong></p>
-<p>We used Kruskal Wallis test to check the differences of the sleep
-score between different menstrual phases. The post-hoc Dunn Test
-resulted showed the statistically significant differences in sleep score
-between Fertility vs Menstrual (adjusted p value = 0.008), Luteal vs
-Menstrual (adjusted P value = 0.03), and Fertility vs Folicular
-(adjusted p value = 0.03). There is no significant differences in sleep
-score between Fertility vs Luteal or Follicular vs Luteal and Follicular
-vs Menstrual.</p>
-<pre class="r"><code>kruskal.test(sleep_score ~ phase, data = sleep_stress_df)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  sleep_score by phase
-## Kruskal-Wallis chi-squared = 20.849, df = 3, p-value = 0.0001132</code></pre>
-<pre class="r"><code>dunnTest(sleep_score ~ phase, data = sleep_stress_df, method = &quot;bh&quot;)</code></pre>
-<pre><code>##               Comparison         Z      P.unadj        P.adj
-## 1 fertility - follicular -2.268122 2.332177e-02 4.664354e-02
-## 2     fertility - luteal -1.208911 2.266970e-01 2.266970e-01
-## 3    follicular - luteal  1.247011 2.123933e-01 2.548720e-01
-## 4  fertility - menstrual -4.335801 1.452304e-05 8.713824e-05
-## 5 follicular - menstrual -2.221379 2.632533e-02 3.948800e-02
-## 6     luteal - menstrual -3.534880 4.079610e-04 1.223883e-03</code></pre>
-<pre class="r"><code># Dunn test results formatted for ggplot
-stat_test &lt;- sleep_stress_df|&gt;
-  dunn_test(sleep_score ~ phase, p.adjust.method = &quot;BH&quot;) %&gt;%
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj &lt; 0.001, &quot;&lt;0.001&quot;, p.adj)  # clean LT threshold
-  ) |&gt;
-  add_xy_position(x = &quot;phase&quot;)
-
-sleep_stress_df |&gt;
-  ggplot(aes(x = phase, y = sleep_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test,
-    label = &quot;p.adj&quot;,
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
-    title = &quot;Sleep Score Across Menstrual Cycle Phases&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Sleep Score&quot;
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = &quot;none&quot;,
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )</code></pre>
-<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p><strong>Variation of stress score across menstrual cycle
-phases</strong> Similarly we used Kruskal Wallis and post-hoc Dunn Test
-to check the significant differences of stress score across menstrual
-phases. The resuls showed that there are statistically significant
-differences for stress score across menstrual phases with p values &lt;
-0.001.</p>
-<pre class="r"><code>kruskal.test(stress_score ~ phase, data = sleep_stress_df)</code></pre>
-<pre><code>## 
-##  Kruskal-Wallis rank sum test
-## 
-## data:  stress_score by phase
-## Kruskal-Wallis chi-squared = 59.197, df = 3, p-value = 8.725e-13</code></pre>
-<pre class="r"><code>dunnTest(stress_score ~ phase, data = sleep_stress_df, method = &quot;bh&quot;)</code></pre>
-<pre><code>##               Comparison         Z      P.unadj        P.adj
-## 1 fertility - follicular -5.539769 3.028712e-08 9.086136e-08
-## 2     fertility - luteal  1.322033 1.861572e-01 1.861572e-01
-## 3    follicular - luteal  7.382001 1.559277e-13 9.355660e-13
-## 4  fertility - menstrual -1.938014 5.262147e-02 6.314577e-02
-## 5 follicular - menstrual  3.321649 8.948720e-04 1.342308e-03
-## 6     luteal - menstrual -3.342947 8.289362e-04 1.657872e-03</code></pre>
-<pre class="r"><code># Dunn test results formatted for ggplot
-stat_test2 &lt;- sleep_stress_df|&gt;
-  dunn_test(stress_score ~ phase, p.adjust.method = &quot;BH&quot;) |&gt;
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj &lt; 0.001, &quot;&lt;0.001&quot;, p.adj)  # clean LT threshold
-  ) |&gt;
-  add_xy_position(x = &quot;phase&quot;)
-
-sleep_stress_df |&gt;
-  ggplot(aes(x = phase, y = stress_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test2,
-    label = &quot;p.adj&quot;,
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
-    title = &quot;Sleep Score Across Menstrual Cycle Phases&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
-    y = &quot;Sleep Score&quot;
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = &quot;none&quot;,
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )</code></pre>
-<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>View the stress and sleep score across menstrual cycle phases for
-each ethnicity</p>
+<p><strong>View the stress and sleep score across menstrual cycle phases
+for each ethnicity</strong></p>
 <pre class="r"><code>sleep_stress_df |&gt;
   group_by(phase, ethnicity) |&gt;
   summarize(
@@ -685,27 +568,240 @@ each ethnicity</p>
   ) +
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p><strong>Variation of sleep score and stress score across different
-ethnicity</strong></p>
-<p>We have <code>stress score</code>, <code>sleep score</code>,
-<code>phase</code>, <code>excersise time</code>, <code>estrogen</code>,
-<code>lh</code></p>
-<p>We can try to predict the stress score based on phase, time in bed,
-deep sleep time?</p>
-<pre class="r"><code>#  model
-m1 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
-           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
-tidy(m1, effects = &quot;fixed&quot;)|&gt;
-  select(term, estimate, std.error,p.value) |&gt;
-  knitr::kable(digits = 3)</code></pre>
+<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Our dataset are from two studies in two different times, year 2022 and
+year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
+Therefore the assumptions of independence is violated so we cannot use
+statistical tests that required independence assumptions. Instead, we
+used generalized linear mixed effects model to evaluate the significant
+different of stress score and sleep score between menstrual phases.</p>
+<pre class="r"><code>m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(
+    title = &quot;Linear mixed effect models for stress score variation by menstrual phases&quot;,
+    digits = 3)</code></pre>
 <table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">term</th>
 <th align="right">estimate</th>
 <th align="right">std.error</th>
 <th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">76.654</td>
+<td align="right">0.785</td>
+<td align="right">0.000</td>
+<td align="right">74.828</td>
+<td align="right">78.479</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">0.120</td>
+<td align="right">0.249</td>
+<td align="right">0.630</td>
+<td align="right">-0.368</td>
+<td align="right">0.608</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.690</td>
+<td align="right">0.247</td>
+<td align="right">0.005</td>
+<td align="right">-1.175</td>
+<td align="right">-0.206</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.865</td>
+<td align="right">0.231</td>
+<td align="right">0.000</td>
+<td align="right">-1.318</td>
+<td align="right">-0.411</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>m2 = lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">77.436</td>
+<td align="right">0.707</td>
+<td align="right">0</td>
+<td align="right">76.007</td>
+<td align="right">78.865</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.021</td>
+<td align="right">0.282</td>
+<td align="right">0</td>
+<td align="right">-1.575</td>
+<td align="right">-0.467</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-1.336</td>
+<td align="right">0.280</td>
+<td align="right">0</td>
+<td align="right">-1.886</td>
+<td align="right">-0.786</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-1.108</td>
+<td align="right">0.262</td>
+<td align="right">0</td>
+<td align="right">-1.622</td>
+<td align="right">-0.594</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>m3 = lmer(timeinbed_mean ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">459.022</td>
+<td align="right">5.401</td>
+<td align="right">0.000</td>
+<td align="right">448.133</td>
+<td align="right">469.911</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-5.952</td>
+<td align="right">3.180</td>
+<td align="right">0.061</td>
+<td align="right">-12.185</td>
+<td align="right">0.282</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-10.394</td>
+<td align="right">3.159</td>
+<td align="right">0.001</td>
+<td align="right">-16.586</td>
+<td align="right">-4.202</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-4.595</td>
+<td align="right">2.953</td>
+<td align="right">0.120</td>
+<td align="right">-10.384</td>
+<td align="right">1.195</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#  model
+m4 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m4, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="11%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="10%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
 </tr>
 </thead>
 <tbody>
@@ -713,49 +809,73 @@ tidy(m1, effects = &quot;fixed&quot;)|&gt;
 <td align="left">(Intercept)</td>
 <td align="right">73.254</td>
 <td align="right">1.848</td>
+<td align="right">69.591</td>
+<td align="right">76.917</td>
 <td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
 <td align="right">-1.166</td>
 <td align="right">0.866</td>
+<td align="right">-2.869</td>
+<td align="right">0.536</td>
 <td align="right">0.179</td>
+<td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
 <td align="right">-0.964</td>
 <td align="right">0.854</td>
+<td align="right">-2.643</td>
+<td align="right">0.714</td>
 <td align="right">0.259</td>
+<td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
 <td align="right">-0.840</td>
 <td align="right">0.753</td>
+<td align="right">-2.321</td>
+<td align="right">0.641</td>
 <td align="right">0.265</td>
+<td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">deep_sleep_in_minutes</td>
 <td align="right">0.032</td>
 <td align="right">0.016</td>
+<td align="right">0.001</td>
+<td align="right">0.063</td>
 <td align="right">0.043</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">timeinbed_mean</td>
 <td align="right">0.009</td>
 <td align="right">0.004</td>
+<td align="right">0.002</td>
+<td align="right">0.016</td>
 <td align="right">0.013</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="odd">
 <td align="left">total_active_min</td>
 <td align="right">-0.009</td>
 <td align="right">0.008</td>
+<td align="right">-0.024</td>
+<td align="right">0.006</td>
 <td align="right">0.232</td>
+<td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">moodswing_score</td>
 <td align="right">-0.199</td>
 <td align="right">0.255</td>
+<td align="right">-0.701</td>
+<td align="right">0.303</td>
 <td align="right">0.436</td>
+<td align="left">No</td>
 </tr>
 </tbody>
 </table>
@@ -763,8 +883,8 @@ tidy(m1, effects = &quot;fixed&quot;)|&gt;
 intercept_values = random.effects(m1)
 fitted_stress_score = fitted.values(m1)
 # check the residuals
-qqnorm(residuals(m1)) </code></pre>
-<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+qqnorm(residuals(m3)) </code></pre>
+<p><img src="sleep_stress_final_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 
 
 
