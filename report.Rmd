@@ -31,8 +31,7 @@ options(
 ```
 
 # Motivation
-
-Half of the world's population has experineced or will experience menstruation; for many, this physiologic function occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstration can be a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids or endometriosis. However, abnormal symptoms such as heavy bleeding or extreme pain can also be attributed to lifestyle characteristics. By leveraging a cohort of young adult menstruators, we hope to better understand the relationship between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise. Understanding how day-to-day factors influence menstrual health can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern.
+Half of the world's population has experienced or will experience menstruation; for many, this physiologic function occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstruation can be a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids or endometriosis. However, abnormal symptoms such as heavy bleeding or extreme pain can also be attributed to lifestyle characteristics. By leveraging a cohort of young adult menstruators, we hope to better understand the relationship between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise. Understanding how day-to-day factors influence menstrual health can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern.
 
 # Related Work
 
