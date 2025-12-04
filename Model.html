@@ -12,7 +12,7 @@
 
 <meta name="date" content="2025-12-01" />
 
-<title>model</title>
+<title>Regression Model</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -386,215 +386,101 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">model</h1>
+<h1 class="title toc-ignore">Regression Model</h1>
 <h4 class="date">2025-12-01</h4>
 
 </div>
 
 
-<p>#Loading packages</p>
-<pre class="r"><code>library(tidyverse)
-library(janitor)
-library(broom)</code></pre>
-<p>#Pulling datasets needed</p>
-<pre class="r"><code>hormones_raw = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;) %&gt;%
-  clean_names()</code></pre>
-<pre><code>## Rows: 5659 Columns: 22
-## ── Column specification ────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (15): phase, flow_volume, flow_color, appetite, exerciselevel, headaches...
-## dbl  (6): id, study_interval, day_in_study, lh, estrogen, pdg
-## lgl  (1): is_weekend
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) %&gt;%
-  janitor::clean_names()</code></pre>
-<pre><code>## Rows: 42 Columns: 8
-## ── Column specification ────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (5): gender, ethnicity, education, sexually_active, self_report_menstrua...
-## dbl (3): id, birth_year, age_of_first_menarche
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>ht_wt_raw = read_csv(&quot;data/height_and_weight.csv&quot;)%&gt;%
-  janitor::clean_names() %&gt;%
-  rowwise() %&gt;%
-  mutate(
-    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
-    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)) %&gt;%
-  ungroup() %&gt;%
-   mutate(
-    bmi = avg_height / ( (avg_weight / 100)^2 ))</code></pre>
-<pre><code>## Rows: 42 Columns: 5
-## ── Column specification ────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## dbl (5): id, height_2022, weight_2022, height_2024, weight_2024
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>#Cleaning data similar to other reports, pulled directly for
-consistency</p>
-<pre class="r"><code>study_flag &lt;- hormones_raw  |&gt; 
-  distinct(id, study_interval) |&gt; 
-  mutate(flag = 1,
-         study_interval = paste0(&quot;study_&quot;, study_interval)) |&gt; 
-  pivot_wider(
-    names_from = study_interval,
-    values_from = flag,
-    values_fill = 0)
+<div id="data-cleaning" class="section level2">
+<h2>Data Cleaning</h2>
+<div
+id="pulling-datasets-needed-and-merging-into-one-to-prepare-for-regression-analysis"
+class="section level4">
+<h4>Pulling datasets needed and merging into one to prepare for
+regression analysis</h4>
+<pre class="r"><code>subject_info_raw = read.csv(&quot;clean_data/subject_info.csv&quot;)
+all_daily_raw = read.csv(&quot;clean_data/all_daily_data.csv&quot;)
 
-subject_info &lt;- subject_info_raw  |&gt; 
-  # merging
-  left_join(ht_wt_raw, by = &quot;id&quot;) |&gt; 
-  left_join(study_flag, by = &quot;id&quot;) |&gt;
-  # add a study_flag
+#Adding a category simplifying race that will only be used for regression analysis 
+subject_info = subject_info_raw %&gt;%
   mutate(
-    study = case_when(
-      study_2022 == 1 &amp; study_2024 == 1 ~ 3L,  # both 2022 &amp; 2024
-      study_2022 == 1 &amp; study_2024 == 0 ~ 1L,  
-      study_2024 == 1 &amp; study_2022 == 0 ~ 2L,  
-      TRUE ~ NA_integer_
-    )
-  ) |&gt; 
-  # pivot_long for wt &amp; ht
-  pivot_longer(
-    cols = c(weight_2022, weight_2024, height_2022, height_2024),
-    names_to  = c(&quot;.value&quot;, &quot;year&quot;), 
-    names_sep = &quot;_&quot;                 
-  ) |&gt; 
-  rename(
-    weight_yr = weight,
-    height_yr = height
-  ) |&gt; 
-  # keep only the relevant study year
-  filter(
-    (study == 1 &amp; year == 2022) |
-    (study == 2 &amp; year == 2024) |
-    (study == 3)
-  ) |&gt; 
-  # calculate age
-  mutate(
-    year = as.numeric(year),
-    birth_year = as.numeric(birth_year),
-    age = year - birth_year
-  ) |&gt; 
-  # get a mean age for each id
-  group_by(id) |&gt; 
-  mutate(
-    mean_age = mean(age, na.rm = TRUE)
-  ) |&gt; 
-  ungroup() |&gt; 
-  # get BMI
-  mutate(
-    bmi = weight_yr / ( (height_yr / 100)^2 )
-  )</code></pre>
-<p>#Setting up for linear model</p>
-<pre class="r"><code>demographic_data = subject_info_raw %&gt;%
-  select(id, age_of_first_menarche)
+    race_category = case_when(
+      ethnicity %in% c(&quot;East Asian&quot;, &quot;South Asian&quot;, &quot;Southeast Asian&quot;) ~ &quot;Asian&quot;,
+      ethnicity == &quot;White&quot; ~ &quot;White&quot;,
+      TRUE ~ &quot;Other&quot;),
+    race_category = factor(
+      race_category, levels = c(&quot;Asian&quot;, &quot;White&quot;, &quot;Other&quot;)))
 
-hormones_data = hormones_raw %&gt;%
-  select(c(id, phase, lh, estrogen, appetite, exerciselevel, headaches, cramps, sorebreasts, fatigue, sleepissue, moodswing, stress, foodcravings, indigestion, bloating)) %&gt;%
-  mutate(menstruation = factor(if_else(phase == &quot;Menstrual&quot;, 1, 0),
+#creating a menstruation binary variable in all_daily
+all_daily = all_daily_raw %&gt;%
+  mutate(menstruation = factor(if_else(phase == &quot;menstrual&quot;, 1, 0),
                           levels = c(0, 1),
                           labels = c(&quot;No&quot;, &quot;Yes&quot;)))
 
-likert_to_num = c(&quot;Not at all&quot; = 0, &quot;Very Low&quot; = 1, &quot;Little&quot; = 1, &quot;Very Low/Little&quot; = 1, &quot;Low&quot; = 2, &quot;Moderate&quot; = 3, &quot;High&quot; = 4, &quot;Very High&quot; = 5)
-
-hormones_clean = hormones_data %&gt;%
-  mutate(stress_num = recode(stress, !!!likert_to_num),
-    fatigue_num = recode(fatigue, !!!likert_to_num),
-    cramps_num = recode(cramps, !!!likert_to_num),
-    sleepissue_num = recode(sleepissue, !!!likert_to_num),
-    exerciselevel_num = recode(exerciselevel, !!!likert_to_num),
-    appetite_num = recode(appetite, !!!likert_to_num),
-    bloating_num = recode(bloating, !!!likert_to_num),
-    moodswing_num = recode(moodswing, !!!likert_to_num),
-    headache_num = recode(headaches, !!!likert_to_num),
-    foodcrave_num = recode(foodcravings, !!!likert_to_num),
-    indigestion_num = recode(indigestion, !!!likert_to_num),
-    sorebreasts_num = recode(sorebreasts, !!!likert_to_num))</code></pre>
-<pre><code>## Warning: There were 2 warnings in `mutate()`.
-## The first warning was:
-## ℹ In argument: `stress_num = recode(...)`.
-## Caused by warning:
-## ! Unreplaced values treated as NA as `.x` is not
-##   compatible.
-## Please specify replacements exhaustively or supply
-## `.default`.
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining
-##   warning.</code></pre>
-<pre class="r"><code>ht_wt_data = subject_info %&gt;%
-  select(c(id, avg_height, avg_weight, bmi))
-
-merged_df = demographic_data %&gt;%
-  left_join(hormones_clean, by = &quot;id&quot;) %&gt;%
-  left_join(ht_wt_data, by = &quot;id&quot;)</code></pre>
-<pre><code>## Warning in left_join(., ht_wt_data, by = &quot;id&quot;): Detected an unexpected many-to-many relationship between
-## `x` and `y`.
-## ℹ Row 631 of `x` matches multiple rows in `y`.
-## ℹ Row 1 of `y` matches multiple rows in `x`.
-## ℹ If a many-to-many relationship is expected, set
-##   `relationship = &quot;many-to-many&quot;` to silence this warning.</code></pre>
-<p>#Running model</p>
+#Creating a merged data frame 
+merged_df = all_daily %&gt;%
+  left_join(subject_info, by = &quot;id&quot;, relationship = &quot;many-to-many&quot;)</code></pre>
+<p>This section leverages the same cleaned data set used in other parts
+of this analysis. For further simplification with regression, two new
+variables were created - <code>race_simplified</code>, which collapses
+specific ethnicity categories into broader racial groups (any with a
+count &lt; 3 was put into other if there was not an applicable category
+already). Additionally, for simplicity of running the regression
+focusing on solely menstrual symptoms, a binary variable reporting
+<code>menstruation</code> as “no” (0) or “yes” (1) was created.
+<code>merged_df</code> was created to easily run both demographic and
+daily data through a regression model.</p>
+</div>
+</div>
+<div id="running-basic-model-to-identify-significant-symptoms"
+class="section level2">
+<h2>Running basic model to identify significant symptoms</h2>
+<div
+id="identified-symptoms-that-were-significant-with-mensturation-at-p0.05-or-less"
+class="section level4">
+<h4>Identified symptoms that were significant with mensturation at
+p&lt;0.05 or less</h4>
 <pre class="r"><code>symptom_model = glm(
-  menstruation ~ stress_num + fatigue_num + cramps_num + sleepissue_num + exerciselevel_num + appetite_num + bloating_num + moodswing_num + headache_num + foodcrave_num + indigestion_num + sorebreasts_num, 
+  menstruation ~ fatigue_score + cramps_score + sleepissue_score + exerciselevel_score + appetite_score + bloating_score + moodswing_score + indigestion_score + sorebreasts_score, 
   data = merged_df,
   family = binomial())
 
 summary(symptom_model)</code></pre>
 <pre><code>## 
 ## Call:
-## glm(formula = menstruation ~ stress_num + fatigue_num + cramps_num + 
-##     sleepissue_num + exerciselevel_num + appetite_num + bloating_num + 
-##     moodswing_num + headache_num + foodcrave_num + indigestion_num + 
-##     sorebreasts_num, family = binomial(), data = merged_df)
+## glm(formula = menstruation ~ fatigue_score + cramps_score + sleepissue_score + 
+##     exerciselevel_score + appetite_score + bloating_score + moodswing_score + 
+##     indigestion_score + sorebreasts_score, family = binomial(), 
+##     data = merged_df)
 ## 
 ## Coefficients:
-##                   Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)       -1.99459    0.18843 -10.585  &lt; 2e-16 ***
-## stress_num        -0.04524    0.03366  -1.344 0.178897    
-## fatigue_num        0.11508    0.03464   3.322 0.000894 ***
-## cramps_num         0.54939    0.03509  15.657  &lt; 2e-16 ***
-## sleepissue_num    -0.07016    0.03430  -2.045 0.040815 *  
-## exerciselevel_num -0.10091    0.03971  -2.541 0.011049 *  
-## appetite_num       0.01852    0.04942   0.375 0.707808    
-## bloating_num       0.17997    0.04005   4.493 7.01e-06 ***
-## moodswing_num      0.01228    0.03497   0.351 0.725542    
-## headache_num      -0.08011    0.03178  -2.521 0.011713 *  
-## foodcrave_num     -0.07212    0.03372  -2.139 0.032462 *  
-## indigestion_num   -0.05254    0.04092  -1.284 0.199177    
-## sorebreasts_num   -0.01090    0.04001  -0.272 0.785276    
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)         -2.032321   0.177791 -11.431  &lt; 2e-16 ***
+## fatigue_score        0.081521   0.032659   2.496   0.0126 *  
+## cramps_score         0.536199   0.034724  15.442  &lt; 2e-16 ***
+## sleepissue_score    -0.088836   0.033911  -2.620   0.0088 ** 
+## exerciselevel_score -0.100241   0.039571  -2.533   0.0113 *  
+## appetite_score      -0.008086   0.046372  -0.174   0.8616    
+## bloating_score       0.165547   0.039751   4.165 3.12e-05 ***
+## moodswing_score     -0.020020   0.033350  -0.600   0.5483    
+## indigestion_score   -0.068959   0.040306  -1.711   0.0871 .  
+## sorebreasts_score   -0.037081   0.038949  -0.952   0.3411    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 4908.6  on 5013  degrees of freedom
-## Residual deviance: 4410.4  on 5001  degrees of freedom
+## Residual deviance: 4423.5  on 5004  degrees of freedom
 ##   (4406 observations deleted due to missingness)
-## AIC: 4436.4
+## AIC: 4443.5
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
-<pre class="r"><code>tidy(symptom_model)</code></pre>
-<pre><code>## # A tibble: 13 × 5
-##    term              estimate std.error statistic  p.value
-##    &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-##  1 (Intercept)        -1.99      0.188    -10.6   3.49e-26
-##  2 stress_num         -0.0452    0.0337    -1.34  1.79e- 1
-##  3 fatigue_num         0.115     0.0346     3.32  8.94e- 4
-##  4 cramps_num          0.549     0.0351    15.7   2.96e-55
-##  5 sleepissue_num     -0.0702    0.0343    -2.05  4.08e- 2
-##  6 exerciselevel_num  -0.101     0.0397    -2.54  1.10e- 2
-##  7 appetite_num        0.0185    0.0494     0.375 7.08e- 1
-##  8 bloating_num        0.180     0.0401     4.49  7.01e- 6
-##  9 moodswing_num       0.0123    0.0350     0.351 7.26e- 1
-## 10 headache_num       -0.0801    0.0318    -2.52  1.17e- 2
-## 11 foodcrave_num      -0.0721    0.0337    -2.14  3.25e- 2
-## 12 indigestion_num    -0.0525    0.0409    -1.28  1.99e- 1
-## 13 sorebreasts_num    -0.0109    0.0400    -0.272 7.85e- 1</code></pre>
-<pre class="r"><code>physiology_model = glm(menstruation ~ estrogen + lh, 
+<pre class="r"><code>symptom_model = tidy(symptom_model)
+
+#This section does physiology model - do we still need it? Removing if so 
+physiology_model = glm(menstruation ~ estrogen + lh, 
                        data = merged_df, 
                        family=binomial())
 
@@ -620,13 +506,161 @@ summary(physiology_model)</code></pre>
 ## AIC: 8311.3
 ## 
 ## Number of Fisher Scoring iterations: 6</code></pre>
-<pre class="r"><code>tidy(physiology_model)</code></pre>
-<pre><code>## # A tibble: 3 × 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept) -0.382    0.0613       -6.23 4.79e-10
-## 2 estrogen    -0.00672  0.000473    -14.2  8.48e-46
-## 3 lh          -0.0617   0.00761      -8.12 4.73e-16</code></pre>
+<pre class="r"><code>physiology_model = tidy(physiology_model)</code></pre>
+<p>We ran a binomial regression between menstruation and self-reported
+symptoms. The results of our preliminary regression analysis show that
+menstruation was positively associated with <code>fatigue</code>,
+<code>cramps</code>, and <code>bloating</code>. There was a negative
+association with reported between menstruation and
+<code>sleep issues</code>.</p>
+</div>
+</div>
+<div id="demographic-and-lifestyle-factors-and-symptoms"
+class="section level2">
+<h2>Demographic and Lifestyle Factors and Symptoms</h2>
+<div
+id="focusing-on-symptoms-that-were-reported-as-statistically-significant"
+class="section level4">
+<h4>Focusing on symptoms that were reported as statistically
+significant</h4>
+<pre class="r"><code>#Fatigue and Demographic/Lifestyle Factors
+fatigue_model = glm( 
+  fatigue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age, data = merged_df)
+
+summary(fatigue_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = fatigue_score ~ total_active_min + sleep_score + 
+##     stress_score + education_abrv + race_category + bmi + age, 
+##     data = merged_df)
+## 
+## Coefficients:
+##                              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                -3.5121205  2.3756730  -1.478 0.141047    
+## total_active_min           -0.0002001  0.0027374  -0.073 0.941805    
+## sleep_score                 0.0037369  0.0142906   0.261 0.794010    
+## stress_score               -0.0341487  0.0187202  -1.824 0.069777 .  
+## education_abrvHigh School   3.1745020  0.6042046   5.254 4.15e-07 ***
+## education_abrvSome College  2.7479675  0.4681979   5.869 2.05e-08 ***
+## race_categoryWhite          0.4508341  0.4650936   0.969 0.333669    
+## race_categoryOther         -4.2786012  1.0838609  -3.948 0.000113 ***
+## bmi                         0.1499390  0.0645358   2.323 0.021272 *  
+## age                         0.1666527  0.1142686   1.458 0.146455    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1.523974)
+## 
+##     Null deviance: 606.73  on 190  degrees of freedom
+## Residual deviance: 275.84  on 181  degrees of freedom
+##   (9229 observations deleted due to missingness)
+## AIC: 634.24
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>#Cramps and Demographic/Lifestyle Factors
+cramps_model = glm( 
+  cramps_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age, data = merged_df)
+
+summary(cramps_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = cramps_score ~ total_active_min + sleep_score + 
+##     stress_score + education_abrv + race_category + bmi + age, 
+##     data = merged_df)
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)                -2.428090   1.911620  -1.270   0.2057  
+## total_active_min            0.002897   0.002160   1.341   0.1817  
+## sleep_score                 0.002377   0.011355   0.209   0.8344  
+## stress_score               -0.008888   0.015634  -0.568   0.5704  
+## education_abrvHigh School   0.831935   0.478124   1.740   0.0836 .
+## education_abrvSome College  0.151611   0.368146   0.412   0.6810  
+## race_categoryWhite         -0.441265   0.375230  -1.176   0.2412  
+## race_categoryOther         -1.316126   0.887547  -1.483   0.1399  
+## bmi                         0.089426   0.052538   1.702   0.0905 .
+## age                         0.064045   0.091096   0.703   0.4829  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.9315757)
+## 
+##     Null deviance: 195.44  on 186  degrees of freedom
+## Residual deviance: 164.89  on 177  degrees of freedom
+##   (9233 observations deleted due to missingness)
+## AIC: 529.15
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>#Bloating and Demographic/Lifestyle Factors
+bloating_model = glm( 
+  bloating_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age, data = merged_df)
+
+summary(bloating_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = bloating_score ~ total_active_min + sleep_score + 
+##     stress_score + education_abrv + race_category + bmi + age, 
+##     data = merged_df)
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                -4.732274   1.830204  -2.586 0.010524 *  
+## total_active_min           -0.001471   0.002068  -0.711 0.477775    
+## sleep_score                -0.006605   0.010871  -0.608 0.544281    
+## stress_score                0.022447   0.014968   1.500 0.135480    
+## education_abrvHigh School   1.651605   0.457761   3.608 0.000401 ***
+## education_abrvSome College  1.614611   0.352467   4.581 8.71e-06 ***
+## race_categoryWhite         -1.987693   0.359249  -5.533 1.12e-07 ***
+## race_categoryOther         -3.373617   0.849747  -3.970 0.000104 ***
+## bmi                         0.257785   0.050300   5.125 7.74e-07 ***
+## age                        -0.075011   0.087216  -0.860 0.390917    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.8539142)
+## 
+##     Null deviance: 434.74  on 186  degrees of freedom
+## Residual deviance: 151.14  on 177  degrees of freedom
+##   (9233 observations deleted due to missingness)
+## AIC: 512.87
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>#Sleep Issues and Demographic/Lifestyle Factors 
+sleepissues_model = glm( 
+  sleepissue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age, data = merged_df)
+
+summary(sleepissues_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = sleepissue_score ~ total_active_min + sleep_score + 
+##     stress_score + education_abrv + race_category + bmi + age, 
+##     data = merged_df)
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                -5.164571   2.327853  -2.219 0.027786 *  
+## total_active_min            0.002376   0.002630   0.903 0.367504    
+## sleep_score                -0.003241   0.013827  -0.234 0.814964    
+## stress_score                0.007548   0.019038   0.396 0.692220    
+## education_abrvHigh School   2.216375   0.582230   3.807 0.000194 ***
+## education_abrvSome College  2.018639   0.448305   4.503 1.21e-05 ***
+## race_categoryWhite         -0.066419   0.456932  -0.145 0.884593    
+## race_categoryOther         -5.294059   1.080800  -4.898 2.17e-06 ***
+## bmi                         0.255497   0.063977   3.994 9.53e-05 ***
+## age                        -0.008751   0.110931  -0.079 0.937214    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1.381421)
+## 
+##     Null deviance: 508.01  on 186  degrees of freedom
+## Residual deviance: 244.51  on 177  degrees of freedom
+##   (9233 observations deleted due to missingness)
+## AIC: 602.83
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+</div>
+</div>
 
 
 
