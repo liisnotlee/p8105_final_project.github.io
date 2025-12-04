@@ -178,7 +178,7 @@ subject_info <- subject_info_raw  |>
     across(c(avg_weight, avg_height), 
            ~ if_else(is.nan(.), NA_real_, .))
   ) |> 
-  #this factors variables and also creates "gender abrv" and "education abrv", which are simplified versions of these variables for cleaner tables and figures 
+  #this factors variables and also creates "gender abrv", "education abrv", "race_category" which are simplified versions of these variables for use in tables, some figures, and regression models later on 
   mutate(
     education = str_trim(education),
     education_abrv = case_when(
@@ -200,7 +200,13 @@ subject_info <- subject_info_raw  |>
       gender %in% c("Prefer not to say", "Other") ~ "Prefer not to say or Other", 
       gender == "Woman" ~ "Woman"),
       gender_abrv = factor(gender_abrv, levels = c("Woman", "Gender Fluid or Non-binary", "Prefer not to say or Other")), 
-      sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say"))) |> 
+      sexually_active = factor(sexually_active, levels = c("Yes", "No", "Prefer not to say")),
+    race_category = case_when(
+      ethnicity %in% c("East Asian", "South Asian", "Southeast Asian") ~ "Asian",
+      ethnicity == "White" ~ "White",
+      TRUE ~ "Other"),
+    race_category = factor(
+      race_category, levels = c("Asian", "White", "Other"))) |> 
   # only need 1 study_interval flag to indicate the study year
   mutate(study_interval = year) |> 
   select(-study_2022, -study_2024, -year, -study) |> 
@@ -413,7 +419,10 @@ all_daily_data <- hormone_symptoms |>
   # add flag exercised_flag for easy filtering in the future analyses
   # only need to keep exercised_flag==1 to have all rows with exercise data
   mutate(
-    exercised_flag = ifelse(!is.na(n_sessions) & n_sessions > 0, 1, 0)
+    exercised_flag = ifelse(!is.na(n_sessions) & n_sessions > 0, 1, 0),
+    menstruation = factor(if_else(phase == "menstrual", 1, 0),
+                          levels = c(0, 1),
+                          labels = c("No", "Yes"))
   ) |> 
   # MERGE sleep & stress score data
   # noticed hormone_symptoms df has a stress_score column 
