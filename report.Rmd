@@ -38,49 +38,62 @@ Half of the world's population has experineced or will experience menstruation; 
 
 
 # Data
+## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
 
-Data was collected from 42 menstruating young adults in Canada over two 3-month intervals (one in 2022, and the other in 2024). Participants wore Fitbit Sense smartwatches to measure physiological signals, and Mira Plus Starter Kits to track their hormone levels. Participants also self-reported daily symptom experiences like cramps, sleep quality, and stress levels via a smartphone diary app.
+Data was collected from 42 menstruating young adults in Canada over two 3-month intervals: Interval 1 (January–April 2022) and Interval 2 (July–October 2024). Participants wore Fitbit Sense smartwatches to measure physiological signals, and Mira Plus Starter Kits to track their hormone levels. Participants also self-reported daily symptom experiences like cramps, sleep quality, and stress levels via a smartphone diary app.
 
 The original dataset contains 23 structured tables organized by signal category. For this project, we focused on the lifestyle factors such as exercise, sleep, and stress, and menstrual cycle symptoms. The datasets we used are the following:
 
 -   Demographics:
-    -   `subject_info.csv`: static information such as age, education, and age at menarche
-    -   `height_and_weight.csv`: participant's baselien height and weight
+    -   `subject_info.csv`: demographic data such as age, education, and age at menarche, and background survey responses collected at the start of the study
+    -   `height_and_weight.csv`: participant's baseline height and weight
 -   Hormone and Symptoms:
-    -   `hormones_and_selfreport.csv`：self-reported daily data including symptoms (e.g., cramps, mood, menstrual flow) and manually entered hormone levels (LH, E3G, PdG)
+    -   `hormones_and_selfreport.csv`：hormone data (LH, E3G, PdG) from the Mira fertility device and daily self-reported symptom survey responses (e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from 0 ("Not at all") to 5 ("Very high")
 -   Lifestyle Factors:
-    -   `stress_score.csv` [TODO]
-    -   `sleep.csv`: sleep stages, time in bed
-    -   `sleep_score.csv`
+    -   `stress_score.csv`: daily Stress Management Score from those who have access to the Stress Management experience
+    -   `sleep.csv`: sleep session logs including timestamps, durations, and quality metrics collected by Fitbit
+    -   `sleep_score.csv`: daily sleep score breakdowns provided by Fitbit, summarizing overall sleep quality based on multiple contributing factors
 
 ------------------------------------------------------------------------
 
-In total, we have 4 dataframes:
+**In total, we have 5 tidy dataframes: **
 
-1.  `subject_info` (demographics data)
-2.  `hormone_symptoms` (hormone and symtoms data)
-3.  `sleep_stress` (sleep and stress related data)
-4.  `exercise` (exercise related data).
+1.  `subject_info` 
+    - Contains demographics and background survey responses data where each row represents a participant
+    - A total of 62 observations of 18 variables
+2.  `hormone_symptoms` 
+    - Contains daily hormone and self-reported symptom-related data
+    - A total of 5659 observations of 36 variables
+3.  `sleep_stress_daily`
+    - Contains daily sleep and stress related data
+    - A total of 5400 observations of 7 variables 
+4.  `exercise_daily` 
+    - Contains daily exercise related data
+    - A total of 1744 observations of 12 variables 
+5.  `all_daily_data` 
+    - The multimodal merged version of dataframes 2,3,4, where each row represents a **daily** data for a person in a specific study year, including hormone and self-reported symptoms, sleep score, stress score, daily exercise data.
+    - A total of 5659 observations of 50 variables 
 
-For different analyses, we merged the dataframes above by participant `id` as needed.
+All dataframes can be linked by participant's `id`. Besides `subejct_info`, other dataframes can be further linked by `day_in_study` and `study_interval`.
 
 ------------------------------------------------------------------------
 
-### `subject_info`  - Subject-Relevant Data
+## Dataframes
+### `subject_info` - Subject-Relevant Data
 
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
 
-It contains a total of 62 observations of 19 variables. Some key variables are the following:
+It contains a total of 62 observations of 18 variables. Some key variables are the following:
 
 -   `id`: participant's unique identifier
 -   Age relevant variables: `birth_year` and `age_of_first_menarche`
 -   Height and weight related variables: `avg_height`, `avg_weight`, `bmi`
 -   Study enrollment related information: `study` (flag of which study the participant enrolled in, `1`=2022, `2`=2024, `3`=both), `year` (the year of study)
--   Categorical variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
+-   Categorical/Factor variables like `ethnicity`, `education`, `self_report_menstrual_health_literacy`, etc.
 
-```{r ht-and-wt, message=FALSE}
+```{r, message=FALSE}
 ht_wt = read_csv("data/height_and_weight.csv")|> 
   janitor::clean_names() |> 
   # calculate mean height/weight
@@ -90,9 +103,7 @@ ht_wt = read_csv("data/height_and_weight.csv")|>
     avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
   ) |>
   ungroup()
-```
 
-```{r, message=FALSE}
 # import csv file
 hormones_and_selfreport = read_csv("data/hormones_and_selfreport.csv") |> 
   janitor::clean_names() 
@@ -106,9 +117,7 @@ study_flag <- hormones_and_selfreport  |>
     values_from = flag,
     values_fill = 0  
   )
-```
 
-```{r, message=FALSE}
 # read in subject-info.csv
 subject_info_raw = read_csv("data/subject-info.csv") |> 
   janitor::clean_names()
@@ -198,9 +207,20 @@ subject_info <- subject_info_raw  |>
   
 ```
 
-### `hormone_symptoms` - Hormone & Self-reported Data
+### `hormone_symptoms` - Daily Hormone and Self-Reported Symptom-Related Data
 
-[TODO] add overview
+The `hormone_symptoms` dataframe contains participants' daily hormone data (LH, E3G, PdG) and self-reported symptom-related data (e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from 0 ("Not at all") to 5 ("Very high"), from `hormones_and_selfreport.csv`.
+
+It contains a total of 5659 observations of 36 variables. Some key variables are the following:
+
+-   `id`: participant's unique identifier
+-   `study_interval`: the year of study that participant enrolled in 2022 or 2024)
+-   `day_in_study`: normalized day index starting from day 1 of each participant’s study interval
+-   `phase`: factor menstrual cycle phase label (follicular, ovulation, luteal, or fertility)
+-   Hormone data: `lh` (luteinizing hormone (mIU/mL) level, `estrogen` (estrone-3-glucuronide level (ng/mL)), and `pdg` (pregnanediol glucuronide (mcg/mL))
+-   Factor flow data: `flow_volume` on a Likert scale (Lowest = “Not at all” to highest = “Very Heavy”), and `flow_color` (categorical indicator of menstrual flow or discharge color)
+-   Factor symptoms severity data on Likert scale, such as `cramps`, `fatigue`, and `moodswing`.
+-   Numeric symptoms severity data converted from factor symptoms severity data, such as `cramps_score`, `fatigue_score`, and `moodswing_score`.
 
 ```{r, message=FALSE}
 # read in raw csv file
@@ -270,44 +290,22 @@ hormone_symptoms <- hormone_symptoms_raw |>
       TRUE ~ NA_real_
     )
   )
-
-
-#hormone_symptoms |> 
-#  filter(is.na(phase))
 ```
 
-### `exercise`
+### `sleep_stress_daily` - Daily Sleep and Stress Related Data
 
-```{r, include = FALSE}
-# Read data
-exercise_raw <- read_csv("data/exercise.csv") |> 
-  janitor::clean_names() 
+The `sleep_stress_daily` dataframe contains participants' daily sleep and stress data from 3 csv files (`sleep.csv`, `sleep_score.csv` and `stress_score.csv`).
 
-exercise_daily <- exercise_raw |> 
-  distinct() |> 
-#  select(id, study_interval, start_day_in_study, activityname, duration, activeduration, averageheartrate) |> 
-  # Aggregate to daily level
-  group_by(id, study_interval, start_day_in_study) %>%
-  summarise(
-    total_calories = sum(calories, na.rm = TRUE),
-    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
-    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
-    total_steps = sum(steps, na.rm = TRUE),
-    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
-    max_heartrate = ifelse(all(is.na(averageheartrate)), NA, max(averageheartrate, na.rm = TRUE)),  # Handling -Inf
-    total_elevation = sum(elevationgain, na.rm = TRUE),
-    n_sessions = n(),
-    activity_types = paste(unique(activityname), collapse = ", "),
-    .groups = "drop"
-  ) |> 
-  rename(day_in_study = start_day_in_study) 
-```
+It contains a total of 5400 observations of 7 variables. Some key variables are the following:
 
+-   `id`: participant's unique identifier
+-   `study_interval`: the year of study that participant enrolled in 2022 or 2024)
+-   `day_in_study`: normalized day index starting from day 1 of each participant’s study interval
+-   Sleep session logs data like `timeinbed_mean` (average minutes in bed) and `deep_sleep_in_minutes` (minutes spent in deep sleep)
+-   `sleep_score`: overall sleep score out of 100, the higher the better
+- `stress_score`: overall sleep score out of 100, the higher the better
 
-### `sleep_stress`
-[TODO] add overview
-
-```{r, message=FALSE}
+```{r, load-sleep-stress-scores-data, message=FALSE, results='hide'}
 # load raw data from csv files
 sleep_score_raw <- read_csv("data/sleep_score.csv") |>
   janitor::clean_names()
@@ -331,26 +329,8 @@ stress_score <- stress_score_raw |>
   select(id, study_interval, day_in_study, stress_score)|>
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
-
 sleep_stress_score <- full_join(sleep_score, stress_score, by=c("id", "study_interval", "day_in_study"))
 
-# check duplicates >> no duplicates nice
-#sleep_stress_score %>%
-#  group_by(id, study_interval, day_in_study) %>%
-#  filter(n() > 1)
-
-# check of na values
-#sum(is.na(sleep_stress$overall_score))
-#sum(is.na(sleep_stress$stress_score))
-
-# check how many days have both scores
-#sleep_stress_score %>%
-#  filter(!is.na(stress_score) & !is.na(sleep_score)) |> 
-#  nrow()
-```
-
-
-```{r, message=FALSE}
 # working on sleep data
 sleep <- sleep_raw|>
   select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |>
@@ -372,44 +352,56 @@ sleep <- sleep_raw|>
   # no need flag
   select(-mainsleep)
 
-# check duplicates
-#sleep |> 
- # filter(study_interval == 2022) |> 
-#  pull(timeinbed) |> 
-#  mean(na.rm = TRUE)
-  
-#sleep |> count(id, study_interval, day_in_study) |>
- # filter(n > 1)
-
+# MERGE
 sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))
+```
 
+### `exercise_daily` - Daily Exercise Related Data
 
-#sleep %>%
- # group_by(id, study_interval, day_in_study) %>%
-  #summarise(
-   # total_timeinbed = sum(timeinbed, na.rm = TRUE),
-    #.groups = "drop"  # 去除分组，返回一个没有分组的 data frame
-#  ) |> 
- # filter(total_timeinbed>2000)
-  
- # ggplot(aes(x = total_timeinbed)) +
-#  geom_density(fill = "skyblue", alpha = 0.5) +  # 填充颜色为淡蓝色，透明度为0.5
-#  labs(title = "Density Distribution of Total Time in Bed", 
- #      x = "Total Time in Bed (hours)", 
-  #     y = "Density")
+The `exercise_daily` dataframe contains participants' daily exercise related data from `exercise.csv`).
+
+It contains a total of 1744 observations of 12 variables. Some key variables are the following:
+
+-   `id`: participant's unique identifier
+-   `study_interval`: the year of study that participant enrolled in 2022 or 2024)
+-   `day_in_study`: normalized day index starting from day 1 of each participant’s study interval
+-   Exercise session logs data:
+    - Numeric data like `total_duration_min` (amount of time spent in active movement during the session in minutes), `total_steps` (total number of steps recorded), `total_calores` (total calories burned), heart rate data (`avg_heartrate` and `max_heartrate`)
+    - Categorical data like `activity_types` (e.g. sport, walk)
+- `n_sessions`: numeric indicator of how many exercise sessions a participant had per day
+
+```{r, message = FALSE}
+# Read data
+exercise_raw <- read_csv("data/exercise.csv") |> 
+  janitor::clean_names() 
+
+exercise_daily <- exercise_raw |> 
+  distinct() |> 
+  # aggregate to daily level
+  group_by(id, study_interval, start_day_in_study) %>%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = ifelse(all(is.na(averageheartrate)), NA, max(averageheartrate, na.rm = TRUE)),  # Handling -Inf
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = ", "),
+    .groups = "drop"
+  ) |> 
+  rename(day_in_study = start_day_in_study) 
 ```
 
 
-### `all_daily_data` - Merged dataset
 
-We used `hormone_symptoms` as our anchor dataframe since all of our outcome variables are from `hormone_symptoms`; hence, we used `left_join` on it. In other words, if a person did not have any hormone/symptoms related data on a given day, she would not have any other types of data on that day (e.g. no exercise/stress/sleep) in the merged dataset called `all_daily_data`.
+### `all_daily_data` - Merged Multimodal Daily Data
 
-So now in this `all_daily_data`, each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
+The `all_daily_data` is a merged multimodal dataframe that contains all **daily-level** data from `hormone_symptoms`, `exercise_daily`, and `sleep_stress_daily` dataframes, and used `hormone_symptoms` as the anchor dataframe. Each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
 
-First merged daily exercise data, then merged daily stress and sleep data. 
-
+It contains a total of 5659 observations of 50 variables, with unique combination of key identifiers (`id`, `study_interval`, and `day_in_study`). Additional flag variables that are not in 3 multimodal dataframes are `exercise_flag` and `sleep_stress_flag` to indicate if the observation day had at least one recorded exercise session or if both stress and sleep scores are present.
 ```{r, message=FALSE}
-
 all_daily_data <- hormone_symptoms |> 
   # MERGE exercise & hormone
   left_join(exercise_daily, by = c("id", "study_interval", "day_in_study")) |>
@@ -417,13 +409,7 @@ all_daily_data <- hormone_symptoms |>
   # only need to keep exercised_flag==1 to have all rows with exercise data
   mutate(
     exercised_flag = ifelse(!is.na(n_sessions) & n_sessions > 0, 1, 0)
-    # Replace NA with 0 for days without exercise ## NA might be not wearing the device instead of not exercising, I think it's better to remove them. Converting to 0 might cause very biased (right skewed) data/results
-    #total_duration_min = replace_na(total_duration_min, 0),
-    #total_active_min = replace_na(total_active_min, 0),
   ) |> 
-  # Remove individuals with no phase
-  # filter(!is.na(phase))
-
   # MERGE sleep & stress score data
   # noticed hormone_symptoms df has a stress_score column 
   # drop it
@@ -437,7 +423,6 @@ all_daily_data <- hormone_symptoms |>
   )  
   # MERGE demographic data
   # left_join(subject_info, by = c("id", "study_interval")) 
-  
 ```
 
 

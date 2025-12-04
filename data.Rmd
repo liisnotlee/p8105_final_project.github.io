@@ -455,7 +455,7 @@ sleep_stress_score %>%
     3. Noted duplicated `timeinbed` for study 2024; we suspected it as data entry issues. We decided to remove duplicate records by replacing multiple `timeinbed` values with their mean. As we checked the density distribution of the `mean_timeinbed` for duplicates, its mode is close to the average timeinbed in 2022 (401.5758 minutes).
     4. Checked data completeness and ensured no duplicates. **No missing values in `sleep` dataframe.**
 
-```{r, , load-sleep-data, message=FALSE}
+```{r, load-sleep-data, message=FALSE}
 # working on sleep data
 sleep <- sleep_raw|>
   select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |>
