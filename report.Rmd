@@ -437,16 +437,15 @@ all_daily_data <- hormone_symptoms |>
 ## hormone
 
 ```{r, include=FALSE}
-hormone_symptoms=
-  read_csv("clean_data/hormone_symptoms.csv")|>
-  janitor::clean_names()|>
+hormone_symptoms_eda=
+  hormone_symptoms|>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
 LH & Estrogen
 We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 ```{r, echo=FALSE}
-hormone_avg <- hormone_symptoms |>
+hormone_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     estrogen_mean = mean(estrogen, na.rm = TRUE),
@@ -478,7 +477,7 @@ Moodswing Distribution Across Phases
 Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
 ```{r, echo=FALSE}
 # Mood swing
-ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
+ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score)) +
   geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   scale_y_continuous(limits = c(0,5), breaks = 0:5) +
@@ -501,7 +500,7 @@ Violin plots show substantial inter-individual variability. Menstrual phase has 
 Average Mood Swing Across Phases
 To visualize general trends, we should summarize the average mood swing intensity across phases.
 ```{r, echo=FALSE}
-symptom_means <- hormone_symptoms |>
+symptom_means <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     avg_moodswing = mean(moodswing_score, na.rm = TRUE),
@@ -540,7 +539,7 @@ Flow Volume Distribution Across Phases
 To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
 ```{r, echo=FALSE}
 #violin
-ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
+ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score)) +
   geom_violin(fill = "skyblue", alpha = 0.5) +  
   labs(
     title = "Distribution of Flow Volume Across Phases",
@@ -555,7 +554,7 @@ Average Flow Volume Across Phases
 
 Summarize average flow volume to observe general trends across the menstrual cycle.
 ```{r, echo=FALSE}
-cycle_avg <- hormone_symptoms |>
+cycle_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
     avg_flow_volume = mean(flow_volume_score, na.rm = TRUE),
@@ -613,19 +612,17 @@ modeling from yue
 
 Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
 ```{r, echo=FALSE}
-mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
-fatigue_mixed_model <- lmer(fatigue_score ~ phase + (1 | id), data = hormone_symptoms)
+mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
 
 
 mood_mixed_model
-fatigue_mixed_model
 ```
 Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 ### Linear Mixed Model: Appetite vs Estrogen
 Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
 ```{r, echo=FALSE}
-appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
+appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms_eda)
 summary(appetite_model)
 ```
 Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869).
