@@ -17,6 +17,7 @@ library(patchwork)
 library(lme4)
 library(lmerTest)
 library(ggsci)
+library(knitr)
 library(broom.mixed) # for tidy
 
 # Set plot theme
@@ -1004,7 +1005,105 @@ tidy(m4, effects = "fixed", conf.int = TRUE)|>
   knitr::kable(digits = 3)
 ```
 
+### Multimodel Modeling 
+This section leverages the same cleaned data set used in other parts of this analysis. For further simplification with regression, two new variables were created - `race_simplified`, which collapses specific ethnicity categories into broader racial groups (any with a count < 3 was put into other if there was not an applicable category already). Additionally, for simplicity of running the regression focusing on solely menstrual symptoms, a binary variable reporting `menstruation` as "no" (0) or "yes" (1) was created. `merged_df_model` was created to easily run both demographic and daily data through a regression model. 
+```{r, include=FALSE}
+merged_df_model = all_daily_data %>%
+  left_join(subject_info, by = "id", relationship = "many-to-many")
 
+symptom_model = glmer(
+  menstruation ~ fatigue_score + cramps_score + sleepissue_score + exerciselevel_score + appetite_score + bloating_score + moodswing_score + indigestion_score + sorebreasts_score + (1 | id), data = merged_df_model, family = binomial)
+
+summary(symptom_model)
+symptom_model_table = tidy(symptom_model) %>%
+  select(-group, -effect) %>%
+  kable()
+
+
+physiology_model = glmer(
+  menstruation ~ estrogen + lh + (1 | id), data = merged_df_model, family=binomial())
+
+summary(physiology_model)
+physiology_model_table = tidy(physiology_model) %>%
+  select(-group, -effect) %>%
+  kable()
+```
+
+```{r}
+#Symptom Model Table
+symptom_model_table
+
+#Hormone Model Table
+physiology_model_table
+```
+
+We ran a binomial regression between menstruation and self-reported symptoms. The results of our preliminary regression analysis show that menstruation was positively associated with `fatigue`, `cramps`, and `bloating`. There was a negative association between menstruation and reported `sleep issues` and `sore breasts` as well as measured `estrogen` and `luteinizing hormone (lh)`. 
+
+## Demographic and Lifestyle Factors and Symptoms 
+#### Focusing on symptoms that were reported as statistically significant 
+```{r, include=FALSE}
+#Fatigue and Demographic/Lifestyle Factors
+fatigue_model = lmer( 
+  fatigue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+
+summary(fatigue_model)
+fatigue_model_table = tidy(fatigue_model) %>%
+  select(-group, -effect) %>%
+  kable() 
+
+#Cramps and Demographic/Lifestyle Factors
+cramps_model = lmer( 
+  cramps_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+
+summary(cramps_model)
+cramps_model_table = tidy(cramps_model) %>%
+  select(-group, -effect) %>%
+  kable()
+
+#Bloating and Demographic/Lifestyle Factors
+bloating_model = lmer( 
+  bloating_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+
+summary(bloating_model)
+bloating_model_table = tidy(bloating_model) %>%
+  select(-group, -effect) %>%
+  kable()
+
+#Sleep Issues and Demographic/Lifestyle Factors 
+sleepissues_model = lmer( 
+  sleepissue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+
+summary(sleepissues_model)
+sleepissues_model_table = tidy(sleepissues_model) %>%
+  select(-group, -effect) %>%
+  kable()
+
+#Sore Breasts and Demographic/Lifestyle factors 
+sorebreasts_model = lmer( 
+  sorebreasts_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+
+summary(sorebreasts_model)
+sorebreasts_model_table = tidy(sorebreasts_model) %>%
+  select(-group, -effect) %>%
+  kable()
+```
+
+```{r}
+#Fatigue Model Table
+fatigue_model_table
+
+#Bloating Model Table
+bloating_model_table
+
+#Sleep Issues Model Table
+sleepissues_model_table
+
+#Sore Breasts Model Table
+sorebreasts_model_table
+
+#Cramps Model Table
+cramps_model_table
+```
 # Discussion
 
 ### Data Handling
@@ -1024,3 +1123,5 @@ Appetite demonstrated more subtle cycle-related variation, with the highest aver
 ## Limitation
 
 Yue(Several limitations should be considered when interpreting these findings. First, the dataset relies on self-reported symptom scores, which may be subject to recall bias or subjective interpretation. Second, while repeated measures are accounted for using linear mixed models, the sample size for some phases may be limited, reducing statistical power to detect subtle effects. Finally, other biological and lifestyle factors—such as stress, sleep, diet, and physical activity—were not controlled for, which could influence mood, appetite, and fatigue. Therefore, the results should be interpreted as suggestive of phase-related trends rather than definitive causal effects.)
+
+

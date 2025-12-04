@@ -391,20 +391,21 @@ div.tocify {
 
 
 <pre class="r"><code># Load packages 
-library(tidyverse)
-library(ggplot2)
+library(tidyverse)</code></pre>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(ggplot2)
 library(modelr)
 library(mgcv)
 library(dplyr)
 library(tidyr)
 library(patchwork)
 library(lme4)
-library(lmerTest)</code></pre>
-<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(ggsci)
-library(broom.mixed) # for tidy</code></pre>
-<pre><code>## Warning: package &#39;broom.mixed&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code># Set plot theme
+library(lmerTest)
+library(ggsci)
+library(knitr)
+library(broom.mixed) # for tidy
+
+# Set plot theme
 theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
 options(
   ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
@@ -415,10 +416,10 @@ options(
 )</code></pre>
 <div id="motivation" class="section level1">
 <h1>Motivation</h1>
-<p>Half of the world’s population has experineced or will experience
+<p>Half of the world’s population has experienced or will experience
 menstruation; for many, this physiologic function occurs monthly for
 several decades. For young adults who menstruate, symptoms and regular
-menstration can be a vital health indicator. Abnormal symptoms can
+menstruation can be a vital health indicator. Abnormal symptoms can
 further suggest reproductive tract abnormalities, such as uterine
 fibroids or endometriosis. However, abnormal symptoms such as heavy
 bleeding or extreme pain can also be attributed to lifestyle
@@ -633,7 +634,7 @@ subject_info &lt;- subject_info_raw  |&gt;
     across(c(avg_weight, avg_height), 
            ~ if_else(is.nan(.), NA_real_, .))
   ) |&gt; 
-  #this factors variables and also creates &quot;gender abrv&quot; and &quot;education abrv&quot;, which are simplified versions of these variables for cleaner tables and figures 
+  #this factors variables and also creates &quot;gender abrv&quot;, &quot;education abrv&quot;, &quot;race_category&quot; which are simplified versions of these variables for use in tables, some figures, and regression models later on 
   mutate(
     education = str_trim(education),
     education_abrv = case_when(
@@ -655,7 +656,13 @@ subject_info &lt;- subject_info_raw  |&gt;
       gender %in% c(&quot;Prefer not to say&quot;, &quot;Other&quot;) ~ &quot;Prefer not to say or Other&quot;, 
       gender == &quot;Woman&quot; ~ &quot;Woman&quot;),
       gender_abrv = factor(gender_abrv, levels = c(&quot;Woman&quot;, &quot;Gender Fluid or Non-binary&quot;, &quot;Prefer not to say or Other&quot;)), 
-      sexually_active = factor(sexually_active, levels = c(&quot;Yes&quot;, &quot;No&quot;, &quot;Prefer not to say&quot;))) |&gt; 
+      sexually_active = factor(sexually_active, levels = c(&quot;Yes&quot;, &quot;No&quot;, &quot;Prefer not to say&quot;)),
+    race_category = case_when(
+      ethnicity %in% c(&quot;East Asian&quot;, &quot;South Asian&quot;, &quot;Southeast Asian&quot;) ~ &quot;Asian&quot;,
+      ethnicity == &quot;White&quot; ~ &quot;White&quot;,
+      TRUE ~ &quot;Other&quot;),
+    race_category = factor(
+      race_category, levels = c(&quot;Asian&quot;, &quot;White&quot;, &quot;Other&quot;))) |&gt; 
   # only need 1 study_interval flag to indicate the study year
   mutate(study_interval = year) |&gt; 
   select(-study_2022, -study_2024, -year, -study) |&gt; 
@@ -911,7 +918,10 @@ session or if both stress and sleep scores are present.</p>
   # add flag exercised_flag for easy filtering in the future analyses
   # only need to keep exercised_flag==1 to have all rows with exercise data
   mutate(
-    exercised_flag = ifelse(!is.na(n_sessions) &amp; n_sessions &gt; 0, 1, 0)
+    exercised_flag = ifelse(!is.na(n_sessions) &amp; n_sessions &gt; 0, 1, 0),
+    menstruation = factor(if_else(phase == &quot;menstrual&quot;, 1, 0),
+                          levels = c(0, 1),
+                          labels = c(&quot;No&quot;, &quot;Yes&quot;))
   ) |&gt; 
   # MERGE sleep &amp; stress score data
   # noticed hormone_symptoms df has a stress_score column 
@@ -1058,7 +1068,7 @@ phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 481 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 473 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>Violin plots show substantial inter-individual variability. Menstrual
@@ -1585,6 +1595,811 @@ tidy(m4, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
 </tr>
 </tbody>
 </table>
+</div>
+<div id="multimodel-modeling" class="section level3">
+<h3>Multimodel Modeling</h3>
+<p>This section leverages the same cleaned data set used in other parts
+of this analysis. For further simplification with regression, two new
+variables were created - <code>race_simplified</code>, which collapses
+specific ethnicity categories into broader racial groups (any with a
+count &lt; 3 was put into other if there was not an applicable category
+already). Additionally, for simplicity of running the regression
+focusing on solely menstrual symptoms, a binary variable reporting
+<code>menstruation</code> as “no” (0) or “yes” (1) was created.
+<code>merged_df_model</code> was created to easily run both demographic
+and daily data through a regression model.</p>
+<pre class="r"><code>#Symptom Model Table
+symptom_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-2.8740171</td>
+<td align="right">0.2617332</td>
+<td align="right">-10.9807146</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">fatigue_score</td>
+<td align="right">0.0828354</td>
+<td align="right">0.0393638</td>
+<td align="right">2.1043564</td>
+<td align="right">0.0353474</td>
+</tr>
+<tr class="odd">
+<td align="left">cramps_score</td>
+<td align="right">0.6793594</td>
+<td align="right">0.0390456</td>
+<td align="right">17.3991299</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">sleepissue_score</td>
+<td align="right">-0.0988170</td>
+<td align="right">0.0408318</td>
+<td align="right">-2.4200999</td>
+<td align="right">0.0155162</td>
+</tr>
+<tr class="odd">
+<td align="left">exerciselevel_score</td>
+<td align="right">-0.0361540</td>
+<td align="right">0.0448749</td>
+<td align="right">-0.8056623</td>
+<td align="right">0.4204376</td>
+</tr>
+<tr class="even">
+<td align="left">appetite_score</td>
+<td align="right">0.0213424</td>
+<td align="right">0.0543035</td>
+<td align="right">0.3930204</td>
+<td align="right">0.6943044</td>
+</tr>
+<tr class="odd">
+<td align="left">bloating_score</td>
+<td align="right">0.1999493</td>
+<td align="right">0.0455793</td>
+<td align="right">4.3868400</td>
+<td align="right">0.0000115</td>
+</tr>
+<tr class="even">
+<td align="left">moodswing_score</td>
+<td align="right">0.0239376</td>
+<td align="right">0.0396493</td>
+<td align="right">0.6037320</td>
+<td align="right">0.5460218</td>
+</tr>
+<tr class="odd">
+<td align="left">indigestion_score</td>
+<td align="right">0.0004687</td>
+<td align="right">0.0460565</td>
+<td align="right">0.0101775</td>
+<td align="right">0.9918797</td>
+</tr>
+<tr class="even">
+<td align="left">sorebreasts_score</td>
+<td align="right">0.1716191</td>
+<td align="right">0.0473758</td>
+<td align="right">3.6225016</td>
+<td align="right">0.0002918</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.7640327</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Hormone Model Table
+physiology_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-0.0847316</td>
+<td align="right">0.1118283</td>
+<td align="right">-0.7576941</td>
+<td align="right">0.4486341</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0107894</td>
+<td align="right">0.0006200</td>
+<td align="right">-17.4031832</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0399830</td>
+<td align="right">0.0076412</td>
+<td align="right">-5.2325618</td>
+<td align="right">0.0000002</td>
+</tr>
+<tr class="even">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.5473710</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>We ran a binomial regression between menstruation and self-reported
+symptoms. The results of our preliminary regression analysis show that
+menstruation was positively associated with <code>fatigue</code>,
+<code>cramps</code>, and <code>bloating</code>. There was a negative
+association between menstruation and reported <code>sleep issues</code>
+and <code>sore breasts</code> as well as measured <code>estrogen</code>
+and <code>luteinizing hormone (lh)</code>.</p>
+</div>
+<div id="demographic-and-lifestyle-factors-and-symptoms"
+class="section level2">
+<h2>Demographic and Lifestyle Factors and Symptoms</h2>
+<div
+id="focusing-on-symptoms-that-were-reported-as-statistically-significant"
+class="section level4">
+<h4>Focusing on symptoms that were reported as statistically
+significant</h4>
+<pre class="r"><code>#Fatigue Model Table
+fatigue_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.4346051</td>
+<td align="right">2.2408483</td>
+<td align="right">-0.6402062</td>
+<td align="right">189</td>
+<td align="right">0.5228139</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0002023</td>
+<td align="right">0.0026844</td>
+<td align="right">0.0753474</td>
+<td align="right">189</td>
+<td align="right">0.9400180</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0053336</td>
+<td align="right">0.0140101</td>
+<td align="right">0.3806943</td>
+<td align="right">189</td>
+<td align="right">0.7038576</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">-0.0375512</td>
+<td align="right">0.0183168</td>
+<td align="right">-2.0500948</td>
+<td align="right">189</td>
+<td align="right">0.0417360</td>
+</tr>
+<tr class="odd">
+<td align="left">education_abrv.L</td>
+<td align="right">-2.2241012</td>
+<td align="right">0.4229328</td>
+<td align="right">-5.2587573</td>
+<td align="right">189</td>
+<td align="right">0.0000004</td>
+</tr>
+<tr class="even">
+<td align="left">education_abrv.Q</td>
+<td align="right">-0.9761060</td>
+<td align="right">0.2229059</td>
+<td align="right">-4.3790038</td>
+<td align="right">189</td>
+<td align="right">0.0000197</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">0.3656198</td>
+<td align="right">0.4647150</td>
+<td align="right">0.7867614</td>
+<td align="right">189</td>
+<td align="right">0.4324069</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-4.4100955</td>
+<td align="right">1.0598369</td>
+<td align="right">-4.1611079</td>
+<td align="right">189</td>
+<td align="right">0.0000480</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.1534302</td>
+<td align="right">0.0631337</td>
+<td align="right">2.4302417</td>
+<td align="right">189</td>
+<td align="right">0.0160230</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.1646671</td>
+<td align="right">0.1115099</td>
+<td align="right">1.4767037</td>
+<td align="right">189</td>
+<td align="right">0.1414193</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0119495</td>
+<td align="right">0.0144548</td>
+<td align="right">-0.8266844</td>
+<td align="right">189</td>
+<td align="right">0.4094584</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">0.0003853</td>
+<td align="right">0.0009437</td>
+<td align="right">0.4083111</td>
+<td align="right">189</td>
+<td align="right">0.6835075</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">1.1950942</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Bloating Model Table
+bloating_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-2.4401831</td>
+<td align="right">1.7008021</td>
+<td align="right">-1.4347249</td>
+<td align="right">185</td>
+<td align="right">0.1530538</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">-0.0020409</td>
+<td align="right">0.0020051</td>
+<td align="right">-1.0178424</td>
+<td align="right">185</td>
+<td align="right">0.3100821</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">-0.0077098</td>
+<td align="right">0.0104901</td>
+<td align="right">-0.7349610</td>
+<td align="right">185</td>
+<td align="right">0.4632939</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0195130</td>
+<td align="right">0.0143930</td>
+<td align="right">1.3557218</td>
+<td align="right">185</td>
+<td align="right">0.1768403</td>
+</tr>
+<tr class="odd">
+<td align="left">education_abrv.L</td>
+<td align="right">-1.0180026</td>
+<td align="right">0.3144360</td>
+<td align="right">-3.2375508</td>
+<td align="right">185</td>
+<td align="right">0.0014289</td>
+</tr>
+<tr class="even">
+<td align="left">education_abrv.Q</td>
+<td align="right">-0.6470382</td>
+<td align="right">0.1667751</td>
+<td align="right">-3.8797044</td>
+<td align="right">185</td>
+<td align="right">0.0001453</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-1.7936598</td>
+<td align="right">0.3571002</td>
+<td align="right">-5.0228473</td>
+<td align="right">185</td>
+<td align="right">0.0000012</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-3.1112942</td>
+<td align="right">0.8248872</td>
+<td align="right">-3.7717813</td>
+<td align="right">185</td>
+<td align="right">0.0002180</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.2388541</td>
+<td align="right">0.0488082</td>
+<td align="right">4.8937306</td>
+<td align="right">185</td>
+<td align="right">0.0000021</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">-0.0930152</td>
+<td align="right">0.0835520</td>
+<td align="right">-1.1132617</td>
+<td align="right">185</td>
+<td align="right">0.2670405</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">0.0099888</td>
+<td align="right">0.0107001</td>
+<td align="right">0.9335203</td>
+<td align="right">185</td>
+<td align="right">0.3517682</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0014476</td>
+<td align="right">0.0007225</td>
+<td align="right">-2.0036441</td>
+<td align="right">185</td>
+<td align="right">0.0465674</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.8802719</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Sleep Issues Model Table
+sleepissues_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-3.6990907</td>
+<td align="right">2.1783917</td>
+<td align="right">-1.6980834</td>
+<td align="right">185</td>
+<td align="right">0.0911733</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0031274</td>
+<td align="right">0.0025681</td>
+<td align="right">1.2177770</td>
+<td align="right">185</td>
+<td align="right">0.2248597</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0005158</td>
+<td align="right">0.0134357</td>
+<td align="right">0.0383934</td>
+<td align="right">185</td>
+<td align="right">0.9694154</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0019146</td>
+<td align="right">0.0184347</td>
+<td align="right">0.1038615</td>
+<td align="right">185</td>
+<td align="right">0.9173918</td>
+</tr>
+<tr class="odd">
+<td align="left">education_abrv.L</td>
+<td align="right">-1.5536426</td>
+<td align="right">0.4027305</td>
+<td align="right">-3.8577729</td>
+<td align="right">185</td>
+<td align="right">0.0001579</td>
+</tr>
+<tr class="even">
+<td align="left">education_abrv.Q</td>
+<td align="right">-0.7917524</td>
+<td align="right">0.2136060</td>
+<td align="right">-3.7066016</td>
+<td align="right">185</td>
+<td align="right">0.0002774</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-0.2658462</td>
+<td align="right">0.4573748</td>
+<td align="right">-0.5812436</td>
+<td align="right">185</td>
+<td align="right">0.5617837</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-5.5682087</td>
+<td align="right">1.0565177</td>
+<td align="right">-5.2703412</td>
+<td align="right">185</td>
+<td align="right">0.0000004</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.2657641</td>
+<td align="right">0.0625136</td>
+<td align="right">4.2512983</td>
+<td align="right">185</td>
+<td align="right">0.0000337</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">-0.0138125</td>
+<td align="right">0.1070136</td>
+<td align="right">-0.1290722</td>
+<td align="right">185</td>
+<td align="right">0.8974408</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0240233</td>
+<td align="right">0.0137048</td>
+<td align="right">-1.7529140</td>
+<td align="right">185</td>
+<td align="right">0.0812732</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">0.0007335</td>
+<td align="right">0.0009254</td>
+<td align="right">0.7926353</td>
+<td align="right">185</td>
+<td align="right">0.4290056</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">1.1274544</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Sore Breasts Model Table
+sorebreasts_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-3.9263822</td>
+<td align="right">1.7162016</td>
+<td align="right">-2.2878327</td>
+<td align="right">185</td>
+<td align="right">0.0232785</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">-0.0007838</td>
+<td align="right">0.0020232</td>
+<td align="right">-0.3874223</td>
+<td align="right">185</td>
+<td align="right">0.6988889</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">-0.0031126</td>
+<td align="right">0.0105851</td>
+<td align="right">-0.2940582</td>
+<td align="right">185</td>
+<td align="right">0.7690431</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0050235</td>
+<td align="right">0.0145234</td>
+<td align="right">0.3458886</td>
+<td align="right">185</td>
+<td align="right">0.7298194</td>
+</tr>
+<tr class="odd">
+<td align="left">education_abrv.L</td>
+<td align="right">0.0030779</td>
+<td align="right">0.3172830</td>
+<td align="right">0.0097007</td>
+<td align="right">185</td>
+<td align="right">0.9922705</td>
+</tr>
+<tr class="even">
+<td align="left">education_abrv.Q</td>
+<td align="right">0.1668905</td>
+<td align="right">0.1682852</td>
+<td align="right">0.9917124</td>
+<td align="right">185</td>
+<td align="right">0.3226332</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">0.0024793</td>
+<td align="right">0.3603335</td>
+<td align="right">0.0068805</td>
+<td align="right">185</td>
+<td align="right">0.9945176</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-1.0957357</td>
+<td align="right">0.8323560</td>
+<td align="right">-1.3164268</td>
+<td align="right">185</td>
+<td align="right">0.1896594</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.0370000</td>
+<td align="right">0.0492501</td>
+<td align="right">0.7512671</td>
+<td align="right">185</td>
+<td align="right">0.4534465</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.1923219</td>
+<td align="right">0.0843085</td>
+<td align="right">2.2811687</td>
+<td align="right">185</td>
+<td align="right">0.0236779</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0159611</td>
+<td align="right">0.0107970</td>
+<td align="right">-1.4782900</td>
+<td align="right">185</td>
+<td align="right">0.1410307</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0014135</td>
+<td align="right">0.0007290</td>
+<td align="right">-1.9388633</td>
+<td align="right">185</td>
+<td align="right">0.0540395</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.8882421</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Cramps Model Table
+cramps_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.9179136</td>
+<td align="right">1.7515177</td>
+<td align="right">-1.0950010</td>
+<td align="right">185</td>
+<td align="right">0.2749397</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0032695</td>
+<td align="right">0.0020649</td>
+<td align="right">1.5834046</td>
+<td align="right">185</td>
+<td align="right">0.1150373</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0015470</td>
+<td align="right">0.0108029</td>
+<td align="right">0.1432001</td>
+<td align="right">185</td>
+<td align="right">0.8862880</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">-0.0096558</td>
+<td align="right">0.0148222</td>
+<td align="right">-0.6514380</td>
+<td align="right">185</td>
+<td align="right">0.5155722</td>
+</tr>
+<tr class="odd">
+<td align="left">education_abrv.L</td>
+<td align="right">-0.6289376</td>
+<td align="right">0.3238121</td>
+<td align="right">-1.9422919</td>
+<td align="right">185</td>
+<td align="right">0.0536201</td>
+</tr>
+<tr class="even">
+<td align="left">education_abrv.Q</td>
+<td align="right">0.2234194</td>
+<td align="right">0.1717481</td>
+<td align="right">1.3008550</td>
+<td align="right">185</td>
+<td align="right">0.1949260</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-0.4411321</td>
+<td align="right">0.3677484</td>
+<td align="right">-1.1995486</td>
+<td align="right">185</td>
+<td align="right">0.2318487</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-1.4300749</td>
+<td align="right">0.8494843</td>
+<td align="right">-1.6834625</td>
+<td align="right">185</td>
+<td align="right">0.0939723</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.0870362</td>
+<td align="right">0.0502636</td>
+<td align="right">1.7315966</td>
+<td align="right">185</td>
+<td align="right">0.0850124</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.0651615</td>
+<td align="right">0.0860434</td>
+<td align="right">0.7573094</td>
+<td align="right">185</td>
+<td align="right">0.4498280</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0035349</td>
+<td align="right">0.0110192</td>
+<td align="right">-0.3207978</td>
+<td align="right">185</td>
+<td align="right">0.7487257</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0000529</td>
+<td align="right">0.0007440</td>
+<td align="right">-0.0710404</td>
+<td align="right">185</td>
+<td align="right">0.9434423</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.9065204</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 <div id="discussion" class="section level1">
