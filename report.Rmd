@@ -443,8 +443,8 @@ hormone_symptoms=
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
-LH & Estrogen Across Phases
-Topic: Examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
+LH & Estrogen
+We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 ```{r, echo=FALSE}
 hormone_avg <- hormone_symptoms |>
   group_by(phase) |>
@@ -471,8 +471,11 @@ ggplot(hormone_avg, aes(x = phase)) +
 Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
 
 ## Life factors
-### Mood Swing Distribution Across Phases
-Topic: Assess whether menstrual cycle phases influence mood swing intensity using violin plots.
+### Mood Swing
+
+Moodswing Distribution Across Phases
+
+Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
 ```{r, echo=FALSE}
 # Mood swing
 ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
@@ -495,9 +498,8 @@ ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
 Violin plots show substantial inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), while Luteal phase shows lower values with a wider base (more individuals with low mood swing).
 
 
-###Average Mood Swing Across Phases
-
-Topic: Summarize average mood swing intensity across phases to visualize general trends.
+Average Mood Swing Across Phases
+To visualize general trends, we should summarize the average mood swing intensity across phases.
 ```{r, echo=FALSE}
 symptom_means <- hormone_symptoms |>
   group_by(phase) |>
@@ -531,27 +533,11 @@ Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase 
 
 
 
+### Flow Volume
 
+Flow Volume Distribution Across Phases
 
-
-###Mood Swing & Fatigue Linear Mixed Models
-
-Topic: Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
-```{r, echo=FALSE}
-mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
-fatigue_mixed_model <- lmer(fatigue_score ~ phase + (1 | id), data = hormone_symptoms)
-
-
-mood_mixed_model
-fatigue_mixed_model
-```
-
-Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
-
-
-###Flow Volume Distribution Across Phases
-
-Topic: Visualize flow volume variation across phases with violin plots to assess distribution patterns. 
+To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
 ```{r, echo=FALSE}
 #violin
 ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
@@ -564,9 +550,10 @@ ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
 ```
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
-Average Flow Volume and Appetite Across Phases
 
-Topic: Summarize average flow volume and appetite to observe general trends across the menstrual cycle.
+Average Flow Volume Across Phases
+
+Summarize average flow volume to observe general trends across the menstrual cycle.
 ```{r, echo=FALSE}
 cycle_avg <- hormone_symptoms |>
   group_by(phase) |>
@@ -591,9 +578,13 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
   )
 
 ```
-Menstrual phase has the highest average flow (2.38), Luteal is lowest (0.03), Fertility is 0.07, and Follicular is 0.23.
+Menstrual phase has the highest average flow (2.38), luteal is lowest (0.03), fertility is 0.07, and follicular is 0.23.
 
+### Appetite
 
+Average Appetite Across Phases
+
+Summarize average appetite to observe general trends across the menstrual cycle.
 ```{r, echo=FALSE}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
@@ -612,8 +603,27 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
 Appetite is highest in Fertility (2.96), lowest in Follicular (2.85), Luteal 2.95, Menstrual 2.90.
 
 
-###Linear Mixed Model: Appetite vs Estrogen
-Topic: Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
+
+
+# Modelling
+
+
+modeling from yue
+### Mood SwingLinear Mixed Models
+
+Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
+```{r, echo=FALSE}
+mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
+fatigue_mixed_model <- lmer(fatigue_score ~ phase + (1 | id), data = hormone_symptoms)
+
+
+mood_mixed_model
+fatigue_mixed_model
+```
+Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
+
+### Linear Mixed Model: Appetite vs Estrogen
+Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
 ```{r, echo=FALSE}
 appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
 summary(appetite_model)
@@ -621,7 +631,6 @@ summary(appetite_model)
 Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869).
 
 
-# Modelling
 
 # Discussion
 
