@@ -1,0 +1,329 @@
+---
+title: "sleep_stress_EDA"
+output: github_document
+---
+
+```{r setup , include = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(mgcv) # for cross validation
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(lme4)
+library(lmerTest)
+library(rstatix)
+library(ggpubr)
+library(FSA)# for Dunn test
+library(broom.mixed) # for tidy
+
+set.seed(1)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+Load the data 
+```{r, message=FALSE, warning=FALSE}
+all_data_df = 
+  read_csv("clean_data/all_daily_data.csv") |>
+  janitor::clean_names()
+subject_info = 
+  read_csv("clean_data/subject_info.csv") |>
+  janitor::clean_names() |>
+  select(id, ethnicity, education_abrv)
+sleep_stress_df = all_data_df|>
+  filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
+  mutate(
+    phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
+```
+
+**View the sleep time for different participants in each study interval**
+```{r, message=FALSE, warning=FALSE}
+# plot the mean timein bed in hour
+sleep_stress_df |>
+  group_by(id, study_interval)|>
+  summarize(mean_sleep = mean(timeinbed_mean/60),
+            sd_sleep = sd(timeinbed_mean))|>
+  ggplot(aes(x = id, y = mean_sleep, color = id))+
+  geom_point()+
+  facet_grid(study_interval~.)
+```
+
+The average sleep time for each person is different each study interval and varied across participants.  In 2022, some participants slept less than 5 hours and some slept more than 8 hours. In 2024, most participants have better sleep length, 7-8 hours.
+
+```{r,message=FALSE, warning=FALSE}
+sleep_stress_df|>
+  group_by(phase, id) |>
+  summarize(
+    timeinbed = mean(timeinbed_mean/60)
+  )|> 
+  ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.2) +
+  labs(
+    title = "Sleep time Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Time in bed (hrs)"
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
+
+We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
+The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
+
+
+```{r, warning= FALSE, message=FALSE}
+# plot the sleep vs stress score by phases
+plot_1 = 
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "Mean Score", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Score"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# plot the hormone changes
+coeff = 5.5
+plot_2  =
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = "LH",
+                    mean_estrogen     = "Estrogen")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# Plot the time in bed and deep sleep in minutes in phases
+plot_3 = 
+  sleep_stress_df |>
+  group_by(phase)|>
+   summarize(
+     mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
+    mean_deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
+             )|>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_timeinbed             = "Time in bed (hours)",
+                    mean_deep_sleep_in_minutes = "Deep sleep (hours)")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Time in bed (hours)",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name="Deep sleep (hours)")
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
+plot_1 + plot_2 + plot_3
+```
+ 
+**Variation of sleep score across menstrual cycle phases**
+
+We used Kruskal Wallis test to check the differences of the sleep score between different menstrual phases. The post-hoc Dunn Test resulted showed the statistically significant differences in sleep score between Fertility vs Menstrual (adjusted p value = 0.008), Luteal vs Menstrual (adjusted P value = 0.03), and Fertility vs Folicular (adjusted p value = 0.03). There is no significant differences in sleep score between  Fertility vs Luteal or Follicular vs Luteal and Follicular vs Menstrual.
+
+```{r, message=FALSE, warning=FALSE}
+kruskal.test(sleep_score ~ phase, data = sleep_stress_df)
+dunnTest(sleep_score ~ phase, data = sleep_stress_df, method = "bh")
+
+# Dunn test results formatted for ggplot
+stat_test <- sleep_stress_df|>
+  dunn_test(sleep_score ~ phase, p.adjust.method = "BH") %>%
+  mutate(
+    p.adj = round(p.adj, 3),                # format to 3 digits
+    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
+  ) |>
+  add_xy_position(x = "phase")
+
+sleep_stress_df |>
+  ggplot(aes(x = phase, y = sleep_score, fill = phase)) +
+  geom_violin(alpha = 0.5, trim = FALSE) +
+  geom_boxplot(width = 0.15, outlier.size = 0.8) +
+  stat_pvalue_manual(
+    stat_test,
+    label = "p.adj",
+    tip.length = 0.01,
+    hide.ns = TRUE      # hides non-significant comparisons
+  ) +
+  labs(
+    title = "Sleep Score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Sleep Score"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+**Variation of stress score across menstrual cycle phases**
+Similarly we used Kruskal Wallis and post-hoc Dunn Test to check the significant differences of stress score across menstrual phases. The resuls showed that there are statistically significant differences for stress score across menstrual phases with p values < 0.001. 
+
+
+```{r, message=FALSE, warning=FALSE}
+kruskal.test(stress_score ~ phase, data = sleep_stress_df)
+dunnTest(stress_score ~ phase, data = sleep_stress_df, method = "bh")
+
+# Dunn test results formatted for ggplot
+stat_test2 <- sleep_stress_df|>
+  dunn_test(stress_score ~ phase, p.adjust.method = "BH") |>
+  mutate(
+    p.adj = round(p.adj, 3),                # format to 3 digits
+    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
+  ) |>
+  add_xy_position(x = "phase")
+
+sleep_stress_df |>
+  ggplot(aes(x = phase, y = stress_score, fill = phase)) +
+  geom_violin(alpha = 0.5, trim = FALSE) +
+  geom_boxplot(width = 0.15, outlier.size = 0.8) +
+  stat_pvalue_manual(
+    stat_test2,
+    label = "p.adj",
+    tip.length = 0.01,
+    hide.ns = TRUE      # hides non-significant comparisons
+  ) +
+  labs(
+    title = "Sleep Score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Sleep Score"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+
+View the stress and sleep score across menstrual cycle phases for each ethnicity 
+
+```{r, message=FALSE, warning=FALSE}
+sleep_stress_df |>
+  group_by(phase, ethnicity) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  drop_na()|>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_grid(~ metric) +
+    labs(color = "Ethnicity", y = "Mean Score", x = "Phase") +
+    labs(
+    title = "stress and sleep score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "score"
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+**Variation of sleep score and stress score across different ethnicity**
+ 
+We have 
+`stress score`, `sleep score`, `phase`, `excersise time`, `estrogen`, `lh`
+
+We can try to predict the stress score based on phase, time in bed, deep sleep time?
+
+```{r, message=FALSE, warning=FALSE}
+#  model
+m1 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m1, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  knitr::kable(digits = 3)
+# etracting coefficient
+intercept_values = random.effects(m1)
+fitted_stress_score = fitted.values(m1)
+# check the residuals
+qqnorm(residuals(m1)) 
+```
+

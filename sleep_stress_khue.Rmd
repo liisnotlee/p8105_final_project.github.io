@@ -7,7 +7,7 @@ output: github_document
 library(tidyverse)
 library(ggplot2)
 library(modelr)
-library(mgcv)
+library(mgcv) # for cross validation
 library(dplyr)
 library(tidyr)
 library(patchwork)
@@ -18,8 +18,7 @@ library(ggpubr)
 library(FSA) # for Dunn test
 
 set.seed(1)
-#library(readxl)
-#library(haven)
+
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 options(
@@ -238,7 +237,7 @@ stat_test <- sleep_stress_hormone %>%
   mutate(
     p.adj = round(p.adj, 3),                # format to 3 digits
     p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
-  ) %>%
+  ) |>
   add_xy_position(x = "phase")
 
 sleep_stress_hormone |>
@@ -280,7 +279,7 @@ stat_test2 <- sleep_stress_hormone %>%
   mutate(
     p.adj = round(p.adj, 3),                # format to 3 digits
     p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
-  ) %>%
+  ) |>
   add_xy_position(x = "phase")
 
 sleep_stress_hormone |>
@@ -310,15 +309,12 @@ sleep_stress_hormone |>
 
 
 
-
-
 Explore the variation among different participants. adding the id, ethnicity and birthyear of the subjects.
 
 ```{r}
 
 sleep_stress_hormone2 = subject |>
   select(id, birth_year, ethnicity) |>
-  mutate(age = 2025- birth_year) |>
   full_join(sleep_stress_hormone, join_by(id)) 
 
 ```
@@ -327,7 +323,7 @@ View the stress and sleep score across menstrual cycle phases for each
 
 ```{r}
 sleep_stress_hormone2 |>
-  group_by(phase, study_interval, ethnicity) |>
+  group_by(phase, ethnicity) |>
   summarize(
     mean_sleep_score = mean(overall_score, na.rm = TRUE),
     mean_stress_score = mean(stress_score, na.rm = TRUE),
@@ -348,7 +344,7 @@ sleep_stress_hormone2 |>
   ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
     geom_line(size = 1) +
     geom_point(size = 3) +
-    facet_grid(study_interval ~ metric) +
+    facet_grid(~ metric) +
     labs(color = "Ethnicity", y = "Mean Score", x = "Phase") +
     labs(
     title = "stress and sleep score Across Menstrual Cycle Phases",
@@ -359,7 +355,8 @@ sleep_stress_hormone2 |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
- variation of sleep score and stress score across different ethnicity
+
+**Variation of sleep score and stress score across different ethnicity**
  
 
 ```{r}
@@ -381,7 +378,8 @@ sleep_stress_hormone2 |>
   ggplot(aes(x = ethnicity, y = value, fill = metric)) +
   geom_violin(position = dodge,alpha = 0.5, trim = TRUE) +
   geom_boxplot(width = 0.5, alpha= 0.1)+
-    labs(y = "Score", fill = "Metric")
+    labs(y = "Score", fill = "Metric") +
+  facet_grid(~metric)
 
 ```
 
@@ -405,6 +403,8 @@ sleep_stress_hormone_add |>
               values_from = timeinbed) |>
   knitr::kable(title = "average time in bed", digits = 1)
 ```
+
+**Time in bed variation across menstrual phases**
 
 
 ```{r}
@@ -512,14 +512,15 @@ plot_3 = sleep_stress_hormone_add |>
   ) +
   theme(
     axis.title.y = element_text(color = timeinbed_color, size=13),
-    axis.title.y.right = element_text(color = deep_sleep_color, size=13)
+    axis.title.y.right = element_text(color = deep_sleep_color, size=13),
+    axis.text = element_text(angle = 45, hjust = 1)
   )
 plot_3
 plot_1 + plot_2 + plot_3
 ```
  
 Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
-It will be good to link with exercising activities. 
+
 
 ```{r}
 coeff = 1 # 5 is the best overlap
@@ -566,3 +567,21 @@ fitted_stress_score = fitted.values(m1)
 qqnorm(residuals(m1)) 
 
 ```
+
+
+**look at the sleep dataset**
+```{r}
+sleep1 |>
+  filter(id==1) |>
+  group_by(day_in_study) |>
+  summarise(
+    total_sleep_hr = sum(timeinbed/60), .groups = "drop")
+```
+
+```{r}
+sleep1|>
+  filter(id == 1) |>
+  distinct(day_in_study)
+```
+ 
+
