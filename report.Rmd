@@ -17,6 +17,7 @@ library(patchwork)
 library(lme4)
 library(lmerTest)
 library(ggsci)
+library(broom.mixed) # for tidy
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -30,18 +31,21 @@ options(
 ```
 
 # Motivation
-Half of the world's population has experineced or will experience menstruation; for many, this physiologic function occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstration can be a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids or endometriosis. However, abnormal symptoms such as heavy bleeding or extreme pain can also be attributed to lifestyle characteristics. By leveraging a cohort of young adult menstruators, we hope to better understand the relationship between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise. Understanding how day-to-day factors influence menstrual health can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern. 
+
+Half of the world's population has experineced or will experience menstruation; for many, this physiologic function occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstration can be a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids or endometriosis. However, abnormal symptoms such as heavy bleeding or extreme pain can also be attributed to lifestyle characteristics. By leveraging a cohort of young adult menstruators, we hope to better understand the relationship between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise. Understanding how day-to-day factors influence menstrual health can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern.
 
 # Related Work
 
 # Questions
-1. What are background characteristics of people who participated in this study?
-2. How does the menstrual cycle and hormones affect sleep and stress?
-3. How does exercise and caloric consumption affect menstrual symptoms and hormonal levels? 
-4. How do hormonal levels affect menstrual symptoms? 
-5. What is the significance of menstruation on self-reported symptoms of participants in this study? 
+
+1.  What are background characteristics of people who participated in this study?
+2.  How does the menstrual cycle and hormones affect sleep and stress?
+3.  How does exercise and caloric consumption affect menstrual symptoms and hormonal levels?
+4.  How do hormonal levels affect menstrual symptoms?
+5.  What is the significance of menstruation on self-reported symptoms of participants in this study?
 
 # Data
+
 ## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
@@ -62,23 +66,23 @@ The original dataset contains 23 structured tables organized by signal category.
 
 ------------------------------------------------------------------------
 
-**In total, we have 5 tidy dataframes: **
+**In total, we have 5 tidy dataframes:**
 
-1.  `subject_info` 
-    - Contains demographics and background survey responses data where each row represents a participant
-    - A total of 62 observations of 18 variables
-2.  `hormone_symptoms` 
-    - Contains daily hormone and self-reported symptom-related data
-    - A total of 5659 observations of 36 variables
+1.  `subject_info`
+    -   Contains demographics and background survey responses data where each row represents a participant
+    -   A total of 62 observations of 18 variables
+2.  `hormone_symptoms`
+    -   Contains daily hormone and self-reported symptom-related data
+    -   A total of 5659 observations of 36 variables
 3.  `sleep_stress_daily`
-    - Contains daily sleep and stress related data
-    - A total of 5400 observations of 7 variables 
-4.  `exercise_daily` 
-    - Contains daily exercise related data
-    - A total of 1744 observations of 12 variables 
-5.  `all_daily_data` 
-    - The multimodal merged version of dataframes 2,3,4, where each row represents a **daily** data for a person in a specific study year, including hormone and self-reported symptoms, sleep score, stress score, daily exercise data.
-    - A total of 5659 observations of 50 variables 
+    -   Contains daily sleep and stress related data
+    -   A total of 5400 observations of 7 variables
+4.  `exercise_daily`
+    -   Contains daily exercise related data
+    -   A total of 1744 observations of 12 variables
+5.  `all_daily_data`
+    -   The multimodal merged version of dataframes 2,3,4, where each row represents a **daily** data for a person in a specific study year, including hormone and self-reported symptoms, sleep score, stress score, daily exercise data.
+    -   A total of 5659 observations of 50 variables
 
 All dataframes can be linked by participant's `id`. Besides `subejct_info`, other dataframes can be further linked by `day_in_study` and `study_interval`.
 
@@ -306,7 +310,7 @@ It contains a total of 5400 observations of 7 variables. Some key variables are 
 -   `day_in_study`: normalized day index starting from day 1 of each participant’s study interval
 -   Sleep session logs data like `timeinbed_mean` (average minutes in bed) and `deep_sleep_in_minutes` (minutes spent in deep sleep)
 -   `sleep_score`: overall sleep score out of 100, the higher the better
-- `stress_score`: overall sleep score out of 100, the higher the better
+-   `stress_score`: overall sleep score out of 100, the higher the better
 
 ```{r, load-sleep-stress-scores-data, message=FALSE, results='hide'}
 # load raw data from csv files
@@ -369,9 +373,9 @@ It contains a total of 1744 observations of 12 variables. Some key variables are
 -   `study_interval`: the year of study that participant enrolled in 2022 or 2024)
 -   `day_in_study`: normalized day index starting from day 1 of each participant’s study interval
 -   Exercise session logs data:
-    - Numeric data like `total_duration_min` (amount of time spent in active movement during the session in minutes), `total_steps` (total number of steps recorded), `total_calores` (total calories burned), heart rate data (`avg_heartrate` and `max_heartrate`)
-    - Categorical data like `activity_types` (e.g. sport, walk)
-- `n_sessions`: numeric indicator of how many exercise sessions a participant had per day
+    -   Numeric data like `total_duration_min` (amount of time spent in active movement during the session in minutes), `total_steps` (total number of steps recorded), `total_calores` (total calories burned), heart rate data (`avg_heartrate` and `max_heartrate`)
+    -   Categorical data like `activity_types` (e.g. sport, walk)
+-   `n_sessions`: numeric indicator of how many exercise sessions a participant had per day
 
 ```{r, message = FALSE}
 # Read data
@@ -397,13 +401,12 @@ exercise_daily <- exercise_raw |>
   rename(day_in_study = start_day_in_study) 
 ```
 
-
-
 ### `all_daily_data` - Merged Multimodal Daily Data
 
 The `all_daily_data` is a merged multimodal dataframe that contains all **daily-level** data from `hormone_symptoms`, `exercise_daily`, and `sleep_stress_daily` dataframes, and used `hormone_symptoms` as the anchor dataframe. Each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
 
 It contains a total of 5659 observations of 50 variables, with unique combination of key identifiers (`id`, `study_interval`, and `day_in_study`). Additional flag variables that are not in 3 multimodal dataframes are `exercise_flag` and `sleep_stress_flag` to indicate if the observation day had at least one recorded exercise session or if both stress and sleep scores are present.
+
 ```{r, message=FALSE}
 all_daily_data <- hormone_symptoms |> 
   # MERGE exercise & hormone
@@ -428,13 +431,14 @@ all_daily_data <- hormone_symptoms |>
   # left_join(subject_info, by = c("id", "study_interval")) 
 ```
 
-
-
 # Exploratory Data Analysis
 
 ## Participant Characteristics
+
 ### Age distribution
-- View mean age in total (2022 & 2024)
+
+-   View mean age in total (2022 & 2024)
+
 ```{r}
 overall_n <- subject_info |> 
   distinct(id) |> 
@@ -463,9 +467,11 @@ age_boxplot_all <- subject_info |>
   )
 age_boxplot_all
 ```
-The cohort includes 42 participants with a median age of ~21 years and a small number of older outliers (ages 27 and 29). This relatively narrow, young age range reduces age-related heterogeneity in reproductive hormones and symptomatic expression, helping to isolate phase-related effects. 
+
+The cohort includes 42 participants with a median age of \~21 years and a small number of older outliers (ages 27 and 29). This relatively narrow, young age range reduces age-related heterogeneity in reproductive hormones and symptomatic expression, helping to isolate phase-related effects.
 
 ### Age of first menarche
+
 ```{r}
 menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
   geom_boxplot(fill = "cornflowerblue") +
@@ -478,6 +484,7 @@ menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
 
 menarche_plot
 ```
+
 Age of first menarche ranges roughly from 10 to 15 years with a median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche distribution suggests a relatively standard reproductive development history across participants; because very early or very late menarche can influence cycle regularity and hormonal profiles, the lack of extreme variability here supports attributing observed hormone–symptom patterns primarily to current cycle phase rather than developmental differences.
 
 ### BMI
@@ -511,8 +518,8 @@ bmi_all <- subject_info |>
 
 bmi_all
 ```
-Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation. 
 
+Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
 
 ## Hormone
 
@@ -553,11 +560,12 @@ ggplot(hormone_avg, aes(x = phase)) +
 Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
 
 ## Life factors
+
 ### Mood Swing
 
 Moodswing Distribution Across Phases
 
-Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
+Using violin plots to assess whether menstrual cycle hases influence mood swing intensity.
 
 ```{r, echo=FALSE}
 # Mood swing
@@ -581,9 +589,7 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score)) +
 
 Violin plots show substantial inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), while Luteal phase shows lower values with a wider base (more individuals with low mood swing).
 
-
-Average Mood Swing Across Phases
-To visualize general trends, we should summarize the average mood swing intensity across phases.
+Average Mood Swing Across Phases To visualize general trends, we should summarize the average mood swing intensity across phases.
 
 ```{r, echo=FALSE}
 symptom_means <- hormone_symptoms_eda |>
@@ -616,13 +622,12 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
 
 Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase (1.41), with intermediate levels in follicular and fertility phases.
 
-
-
 ### Flow Volume
 
 Flow Volume Distribution Across Phases
 
 To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
+
 ```{r, echo=FALSE}
 #violin
 ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score)) +
@@ -636,10 +641,10 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score)) +
 
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
-
 Average Flow Volume Across Phases
 
 Summarize average flow volume to observe general trends across the menstrual cycle.
+
 ```{r, echo=FALSE}
 cycle_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
@@ -672,6 +677,7 @@ Menstrual phase has the highest average flow (2.38), luteal is lowest (0.03), fe
 Average Appetite Across Phases
 
 Summarize average appetite to observe general trends across the menstrual cycle.
+
 ```{r, echo=FALSE}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
@@ -689,43 +695,261 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
 ```
 
 Appetite is highest in Fertility (2.96), lowest in Follicular (2.85), Luteal 2.95, Menstrual 2.90.
+## Sleep and stress
 
+```{r, echo=FALSE}
+sleep_stress_df = all_daily_data|>
+  filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
+  mutate(
+    phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
+```
+
+Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
+
+We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
+The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
+
+
+```{r, warning= FALSE, message=FALSE}
+# plot the sleep vs stress score by phases
+plot_1 = 
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "Mean Score", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Score"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# plot the hormone changes
+coeff = 5.5
+plot_2  =
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = "LH",
+                    mean_estrogen     = "Estrogen")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# Plot the time in bed and deep sleep in minutes in phases
+plot_3 = 
+  sleep_stress_df |>
+  group_by(phase)|>
+   summarize(
+     mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
+    mean_deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
+             )|>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_timeinbed             = "Time in bed (hours)",
+                    mean_deep_sleep_in_minutes = "Deep sleep (hours)")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Time in bed (hours)",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name="Deep sleep (hours)")
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+plot_1 + plot_2 + plot_3
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+sleep_stress_df|>
+  group_by(phase, id) |>
+  summarize(
+    timeinbed = mean(timeinbed_mean/60)
+  )|> 
+  ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.2) +
+  labs(
+    title = "Sleep time Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "Time in bed (hrs)"
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+**View the stress and sleep score across menstrual cycle phases for each ethnicity** 
+
+```{r, message=FALSE, warning=FALSE}
+sleep_stress_df |>
+  group_by(phase, ethnicity) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  drop_na()|>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_grid(~ metric) +
+    labs(color = "Ethnicity", y = "Mean Score", x = "Phase") +
+    labs(
+    title = "stress and sleep score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "score"
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+We used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
+
+```{r,message=FALSE, warning=FALSE}
+m1 <- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m1, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+m2 <- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
 
 
 
 # Modelling
 
-
-modeling from yue
-### Mood SwingLinear Mixed Models
+modeling from yue \### Mood SwingLinear Mixed Models
 
 Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
+
 ```{r, echo=FALSE}
 mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
 
 
 mood_mixed_model
 ```
+
 Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 ### Linear Mixed Model: Appetite vs Estrogen
+
 Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
+
 ```{r, echo=FALSE}
 appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms_eda)
 summary(appetite_model)
 ```
+
 Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869).
 
+### Stress score model
+
+```{r, message=FALSE, warning=FALSE}
+#  model
+m3 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+# etracting coefficient
+intercept_values = random.effects(m1)
+fitted_stress_score = fitted.values(m1)
+# check the residuals
+qqnorm(residuals(m3)) 
+```
 
 
 # Discussion
 
 ### Data Handling
-- data quality issues - take hormones & self-reported as an example
 
-regardless the most common missing data (due to self-report), 1) integer values in categorical variables; 2) inconsistent likert scale ('very low/little' vs. 'very low') >> give us the tip when we run a study to collect different likert scale data, collect them at the same scale for easy and consistent future data analyses.
+-   data quality issues - take hormones & self-reported as an example
 
-- data entry issues - take sleep.csv as an example
+regardless the most common missing data (due to self-report), 1) integer values in categorical variables; 2) inconsistent likert scale ('very low/little' vs. 'very low') \>\> give us the tip when we run a study to collect different likert scale data, collect them at the same scale for easy and consistent future data analyses.
+
+-   data entry issues - take sleep.csv as an example
 
 Yue (The observed hormonal, emotional, and physiological patterns across the menstrual cycle are highly consistent with established reproductive endocrinology. Estrogen gradually increases through the follicular phase, peaks during the fertility (ovulatory) phase, and remains at moderate levels in the luteal phase, while luteinizing hormone (LH) exhibits a sharp surge at ovulation to trigger follicle rupture and ovum release. Both hormones reach their lowest levels during menstruation, reflecting the endocrine “reset” following corpus luteum regression. Corresponding to these hormonal dynamics, mood swings show clear phase-dependent variation. The distribution of mood swing severity is most pronounced during menstruation, with average intensity highest in the menstrual phase (1.85) and lowest in the luteal phase (1.41), with intermediate levels in the follicular and fertility phases. This elevated emotional symptom burden during menstruation is biologically plausible, as the abrupt withdrawal of both estrogen and progesterone is known to disrupt serotonergic signaling and emotional regulation. Linear mixed-effects models further confirm significant phase-dependent effects on both mood swings and fatigue, with the largest increases occurring during menstruation and more moderate elevations during the luteal phase. The substantial random intercept variance indicates strong inter-individual differences in baseline symptom severity, reinforcing the necessity of accounting for repeated measures within participants.
 
@@ -733,8 +957,6 @@ Flow volume patterns also followed classic physiological expectations. The menst
 
 Appetite demonstrated more subtle cycle-related variation, with the highest average levels occurring during the fertility phase (2.96), when estrogen is maximized, and the lowest during the follicular phase (2.85), with relatively stable values during luteal (2.95) and menstrual (2.90) phases. This suggests that appetite may be modestly influenced by hormonal elevation near ovulation. However, linear mixed-effects modeling revealed that estrogen alone was not a statistically significant predictor of appetite after accounting for repeated measures, with a very small effect size and a non-significant t-value (0.869). The random intercept variance indicates that baseline individual differences in appetite explain more variability than short-term hormonal fluctuations. Together, these findings suggest that while appetite may exhibit weak phase-related trends, it is regulated by a complex interplay of hormonal, behavioral, and individual-specific factors, and may be better modeled using multiple hormonal predictors such as LHalongside phase.)
 
-
 ## Limitation
 
 Yue(Several limitations should be considered when interpreting these findings. First, the dataset relies on self-reported symptom scores, which may be subject to recall bias or subjective interpretation. Second, while repeated measures are accounted for using linear mixed models, the sample size for some phases may be limited, reducing statistical power to detect subtle effects. Finally, other biological and lifestyle factors—such as stress, sleep, diet, and physical activity—were not controlled for, which could influence mood, appetite, and fatigue. Therefore, the results should be interpreted as suggestive of phase-related trends rather than definitive causal effects.)
-

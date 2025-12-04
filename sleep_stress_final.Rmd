@@ -188,89 +188,9 @@ plot_3 =
     axis.text.x = element_text(angle = 45, hjust = 1))
 plot_1 + plot_2 + plot_3
 ```
- 
-**Variation of sleep score across menstrual cycle phases**
-
-We used Kruskal Wallis test to check the differences of the sleep score between different menstrual phases. The post-hoc Dunn Test resulted showed the statistically significant differences in sleep score between Fertility vs Menstrual (adjusted p value = 0.008), Luteal vs Menstrual (adjusted P value = 0.03), and Fertility vs Folicular (adjusted p value = 0.03). There is no significant differences in sleep score between  Fertility vs Luteal or Follicular vs Luteal and Follicular vs Menstrual.
-
-```{r, message=FALSE, warning=FALSE}
-kruskal.test(sleep_score ~ phase, data = sleep_stress_df)
-dunnTest(sleep_score ~ phase, data = sleep_stress_df, method = "bh")
-
-# Dunn test results formatted for ggplot
-stat_test <- sleep_stress_df|>
-  dunn_test(sleep_score ~ phase, p.adjust.method = "BH") %>%
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
-  ) |>
-  add_xy_position(x = "phase")
-
-sleep_stress_df |>
-  ggplot(aes(x = phase, y = sleep_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test,
-    label = "p.adj",
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
-    title = "Sleep Score Across Menstrual Cycle Phases",
-    x = "Menstrual Cycle Phase",
-    y = "Sleep Score"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
-```
-
-**Variation of stress score across menstrual cycle phases**
-Similarly we used Kruskal Wallis and post-hoc Dunn Test to check the significant differences of stress score across menstrual phases. The resuls showed that there are statistically significant differences for stress score across menstrual phases with p values < 0.001. 
 
 
-```{r, message=FALSE, warning=FALSE}
-kruskal.test(stress_score ~ phase, data = sleep_stress_df)
-dunnTest(stress_score ~ phase, data = sleep_stress_df, method = "bh")
-
-# Dunn test results formatted for ggplot
-stat_test2 <- sleep_stress_df|>
-  dunn_test(stress_score ~ phase, p.adjust.method = "BH") |>
-  mutate(
-    p.adj = round(p.adj, 3),                # format to 3 digits
-    p.adj = ifelse(p.adj < 0.001, "<0.001", p.adj)  # clean LT threshold
-  ) |>
-  add_xy_position(x = "phase")
-
-sleep_stress_df |>
-  ggplot(aes(x = phase, y = stress_score, fill = phase)) +
-  geom_violin(alpha = 0.5, trim = FALSE) +
-  geom_boxplot(width = 0.15, outlier.size = 0.8) +
-  stat_pvalue_manual(
-    stat_test2,
-    label = "p.adj",
-    tip.length = 0.01,
-    hide.ns = TRUE      # hides non-significant comparisons
-  ) +
-  labs(
-    title = "Sleep Score Across Menstrual Cycle Phases",
-    x = "Menstrual Cycle Phase",
-    y = "Sleep Score"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
-```
-
-
-View the stress and sleep score across menstrual cycle phases for each ethnicity 
+**View the stress and sleep score across menstrual cycle phases for each ethnicity** 
 
 ```{r, message=FALSE, warning=FALSE}
 sleep_stress_df |>
@@ -306,24 +226,41 @@ sleep_stress_df |>
 
 ```
 
-**Variation of sleep score and stress score across different ethnicity**
- 
-We have 
-`stress score`, `sleep score`, `phase`, `excersise time`, `estrogen`, `lh`
+We used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
 
-We can try to predict the stress score based on phase, time in bed, deep sleep time?
+```{r,message=FALSE, warning=FALSE}
+m1 <- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m1, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+m2 <- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = "fixed")|>
+  select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
+
 
 ```{r, message=FALSE, warning=FALSE}
 #  model
-m1 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+m3 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
            timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
-tidy(m1, effects = "fixed")|>
+tidy(m3, effects = "fixed")|>
   select(term, estimate, std.error,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
 # etracting coefficient
 intercept_values = random.effects(m1)
 fitted_stress_score = fitted.values(m1)
 # check the residuals
-qqnorm(residuals(m1)) 
+qqnorm(residuals(m3)) 
 ```
 

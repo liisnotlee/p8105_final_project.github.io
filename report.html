@@ -399,10 +399,12 @@ library(dplyr)
 library(tidyr)
 library(patchwork)
 library(lme4)
-library(lmerTest)
-library(ggsci)
-
-# Set plot theme
+library(lmerTest)</code></pre>
+<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(ggsci)
+library(broom.mixed) # for tidy</code></pre>
+<pre><code>## Warning: package &#39;broom.mixed&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code># Set plot theme
 theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
 options(
   ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
@@ -494,7 +496,7 @@ contributing factors</li>
 </ul></li>
 </ul>
 <hr />
-<p><strong>In total, we have 5 tidy dataframes: </strong></p>
+<p><strong>In total, we have 5 tidy dataframes:</strong></p>
 <ol style="list-style-type: decimal">
 <li><code>subject_info</code>
 <ul>
@@ -962,12 +964,12 @@ age_boxplot_all &lt;- subject_info |&gt;
     plot.title  = element_text(hjust = 0.5)
   )
 age_boxplot_all</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-6-1.png" width="672" />
-The cohort includes 42 participants with a median age of ~21 years and a
-small number of older outliers (ages 27 and 29). This relatively narrow,
-young age range reduces age-related heterogeneity in reproductive
-hormones and symptomatic expression, helping to isolate phase-related
-effects.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>The cohort includes 42 participants with a median age of ~21 years
+and a small number of older outliers (ages 27 and 29). This relatively
+narrow, young age range reduces age-related heterogeneity in
+reproductive hormones and symptomatic expression, helping to isolate
+phase-related effects.</p>
 </div>
 <div id="age-of-first-menarche" class="section level3">
 <h3>Age of first menarche</h3>
@@ -981,9 +983,9 @@ effects.</p>
     axis.ticks.x = element_blank())
 
 menarche_plot</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-7-1.png" width="672" />
-Age of first menarche ranges roughly from 10 to 15 years with a median
-around 12 and a tight IQR (≈11–12.75). This homogeneous menarche
+<p><img src="report_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Age of first menarche ranges roughly from 10 to 15 years with a
+median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche
 distribution suggests a relatively standard reproductive development
 history across participants; because very early or very late menarche
 can influence cycle regularity and hormonal profiles, the lack of
@@ -1020,8 +1022,8 @@ bmi_all &lt;- subject_info |&gt;
   )
 
 bmi_all</code></pre>
-<p><img src="report_files/figure-html/bmi-boxplot-1.png" width="672" />
-Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m²
+<p><img src="report_files/figure-html/bmi-boxplot-1.png" width="672" /></p>
+<p>Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m²
 (IQR ≈ 20–26) with one high outlier (~39). Overall, most participants
 fall in the normal-to-overweight range. Because adiposity influences sex
 steroid metabolism and inflammation, it is important to note that BMI
@@ -1033,19 +1035,21 @@ variation.</p>
 </div>
 <div id="hormone" class="section level2">
 <h2>Hormone</h2>
-<p>LH &amp; Estrogen We want to examine average estrogen and LH levels
-across menstrual cycle phases to see if hormonal patterns match
-biological expectations</p>
+<p>LH &amp; Estrogen</p>
+<p>We want to examine average estrogen and LH levels across menstrual
+cycle phases to see if hormonal patterns match biological
+expectations</p>
 <pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 ## generated.</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-9-1.png" width="672" />
-Estrogen levels are highest in the Fertility (ovulatory) phase, second
-highest in Luteal, and relatively low in Menstrual, gradually rising
-from Follicular to Luteal. LH is much lower than estrogen overall,
-peaking sharply in Fertility and remaining low in the other phases.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Estrogen levels are highest in the Fertility (ovulatory) phase,
+second highest in Luteal, and relatively low in Menstrual, gradually
+rising from Follicular to Luteal. LH is much lower than estrogen
+overall, peaking sharply in Fertility and remaining low in the other
+phases.</p>
 </div>
 <div id="life-factors" class="section level2">
 <h2>Life factors</h2>
@@ -1054,16 +1058,16 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 475 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 492 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" />
-Violin plots show substantial inter-individual variability. Menstrual
+<p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Violin plots show substantial inter-individual variability. Menstrual
 phase has the highest mood swing intensity (right-skewed distribution,
 peak around 1.85), while Luteal phase shows lower values with a wider
 base (more individuals with low mood swing).</p>
 <p>Average Mood Swing Across Phases To visualize general trends, we
-should summarize the average mood swing intensity across phases.
-<img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+should summarize the average mood swing intensity across phases.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Average mood swing is highest in Menstrual phase (1.85), lowest in
 Luteal phase (1.41), with intermediate levels in follicular and
 fertility phases.</p>
@@ -1072,26 +1076,293 @@ fertility phases.</p>
 <h3>Flow Volume</h3>
 <p>Flow Volume Distribution Across Phases</p>
 <p>To assess flow volume distribution patterns, we visualize flow volume
-variation across phases with violin plots.
-<img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" />
-Luteal phase shows a right-skewed distribution, indicating most low-flow
-observations but a few high-flow days. Menstrual phase is narrow and
-tall, indicating consistently higher flow intensity.</p>
+variation across phases with violin plots.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Luteal phase shows a right-skewed distribution, indicating most
+low-flow observations but a few high-flow days. Menstrual phase is
+narrow and tall, indicating consistently higher flow intensity.</p>
 <p>Average Flow Volume Across Phases</p>
 <p>Summarize average flow volume to observe general trends across the
-menstrual cycle.
-<img src="report_files/figure-html/unnamed-chunk-13-1.png" width="672" />
-Menstrual phase has the highest average flow (2.38), luteal is lowest
+menstrual cycle.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Menstrual phase has the highest average flow (2.38), luteal is lowest
 (0.03), fertility is 0.07, and follicular is 0.23.</p>
 </div>
 <div id="appetite" class="section level3">
 <h3>Appetite</h3>
 <p>Average Appetite Across Phases</p>
 <p>Summarize average appetite to observe general trends across the
-menstrual cycle.
-<img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" />
-Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
-Luteal 2.95, Menstrual 2.90.</p>
+menstrual cycle.</p>
+<p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
+Luteal 2.95, Menstrual 2.90. ## Sleep and stress</p>
+<pre><code>## Warning in full_join(subject_info, sleep_stress_df, join_by(id)): Detected an unexpected many-to-many relationship between `x` and `y`.
+## ℹ Row 1 of `x` matches multiple rows in `y`.
+## ℹ Row 275 of `y` matches multiple rows in `x`.
+## ℹ If a many-to-many relationship is expected, set `relationship =
+##   &quot;many-to-many&quot;` to silence this warning.</code></pre>
+<p>Mesntruators spent more time in bed during menstrual time but their
+deep sleep hours were lowest. This showed that the physical exhaustion
+during menstrual days requiring them to rest but preventing them from
+having a restorative sleep quality. Follicular time is the when
+menstruators feel most energetic and spent less time in bed but having
+much better deep sleep.</p>
+<p>We explore the changes of the stress score with the menstrual cycle.
+The participants slept best during the menstrual time, probably a good
+sign to rest well during this time. The lowest sleep score were recorded
+during ovulation/ fertility time in which the increased estrogen and lh
+levels may contribute to this low sleep quality. The higher stress score
+the less stressful people experience. In this study, the participants
+showed the least stressful during folicular period , as the bodies are
+full of energy. The most stressful time is during luteal period.</p>
+<pre class="r"><code># plot the sleep vs stress score by phases
+plot_1 = 
+  sleep_stress_df |&gt;
+  group_by(phase) |&gt;
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = &quot;Sleep Score&quot;,
+                    mean_stress_score = &quot;Stress Score&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Score&quot;
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# plot the hormone changes
+coeff = 5.5
+plot_2  =
+  sleep_stress_df |&gt;
+  group_by(phase) |&gt;
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = &quot;LH&quot;,
+                    mean_estrogen     = &quot;Estrogen&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Level&quot;
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# Plot the time in bed and deep sleep in minutes in phases
+plot_3 = 
+  sleep_stress_df |&gt;
+  group_by(phase)|&gt;
+   summarize(
+     mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
+    mean_deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
+             )|&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_timeinbed             = &quot;Time in bed (hours)&quot;,
+                    mean_deep_sleep_in_minutes = &quot;Deep sleep (hours)&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Level&quot;
+  ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = &quot;Time in bed (hours)&quot;,
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name=&quot;Deep sleep (hours)&quot;)
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+plot_1 + plot_2 + plot_3</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>sleep_stress_df|&gt;
+  group_by(phase, id) |&gt;
+  summarize(
+    timeinbed = mean(timeinbed_mean/60)
+  )|&gt; 
+  ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.2) +
+  labs(
+    title = &quot;Sleep time Across Menstrual Cycle Phases&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Time in bed (hrs)&quot;
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><strong>View the stress and sleep score across menstrual cycle phases
+for each ethnicity</strong></p>
+<pre class="r"><code>sleep_stress_df |&gt;
+  group_by(phase, ethnicity) |&gt;
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  drop_na()|&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = &quot;Sleep Score&quot;,
+                    mean_stress_score = &quot;Stress Score&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_grid(~ metric) +
+    labs(color = &quot;Ethnicity&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
+    labs(
+    title = &quot;stress and sleep score Across Menstrual Cycle Phases&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;score&quot;
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>We used generalized linear mixed effects model to evaluate the
+significant different of stress score and sleep score between menstrual
+phases.</p>
+<pre class="r"><code>m1 &lt;- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m1, effects = &quot;fixed&quot;)|&gt;
+  select(term, estimate, std.error,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">76.775</td>
+<td align="right">0.637</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">0.137</td>
+<td align="right">0.249</td>
+<td align="right">0.583</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.703</td>
+<td align="right">0.248</td>
+<td align="right">0.005</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.862</td>
+<td align="right">0.232</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>m2 &lt;- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = &quot;fixed&quot;)|&gt;
+  select(term, estimate, std.error,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">77.436</td>
+<td align="right">0.707</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.021</td>
+<td align="right">0.282</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-1.336</td>
+<td align="right">0.280</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-1.108</td>
+<td align="right">0.262</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -1153,6 +1424,92 @@ accounting for repeated measures.</p>
 <p>Random intercept variance (0.1746) indicates participant-specific
 baseline appetite differences. The fixed effect of estrogen is small
 (0.00013 per unit) and not significant (t = 0.869).</p>
+</div>
+<div id="stress-score-model" class="section level3">
+<h3>Stress score model</h3>
+<pre class="r"><code>#  model
+m3 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = &quot;fixed&quot;)|&gt;
+  select(term, estimate, std.error,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">73.254</td>
+<td align="right">1.848</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.166</td>
+<td align="right">0.866</td>
+<td align="right">0.179</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.964</td>
+<td align="right">0.854</td>
+<td align="right">0.259</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.840</td>
+<td align="right">0.753</td>
+<td align="right">0.265</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">deep_sleep_in_minutes</td>
+<td align="right">0.032</td>
+<td align="right">0.016</td>
+<td align="right">0.043</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">timeinbed_mean</td>
+<td align="right">0.009</td>
+<td align="right">0.004</td>
+<td align="right">0.013</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">total_active_min</td>
+<td align="right">-0.009</td>
+<td align="right">0.008</td>
+<td align="right">0.232</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">moodswing_score</td>
+<td align="right">-0.199</td>
+<td align="right">0.255</td>
+<td align="right">0.436</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># etracting coefficient
+intercept_values = random.effects(m1)
+fitted_stress_score = fitted.values(m1)
+# check the residuals
+qqnorm(residuals(m3)) </code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 </div>
 </div>
 <div id="discussion" class="section level1">
