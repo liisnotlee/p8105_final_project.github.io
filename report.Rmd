@@ -695,11 +695,13 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
 ```
 
 Appetite is highest in Fertility (2.96), lowest in Follicular (2.85), Luteal 2.95, Menstrual 2.90.
+
 ## Sleep and stress
 
-```{r, echo=FALSE}
+```{r, message=FALSE, warning= FALSE}
 sleep_stress_df = all_daily_data|>
   filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
+  filter(stress_score != 0)|>
   select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
   mutate(
     phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
@@ -707,8 +709,7 @@ sleep_stress_df = all_daily_data|>
 sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
 ```
 
-Mesntruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
-
+Menstruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
 We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
 The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
 
@@ -819,21 +820,66 @@ plot_1 + plot_2 + plot_3
 
 
 ```{r,message=FALSE, warning=FALSE}
-sleep_stress_df|>
+# plot the variation of time in bed by menstrual phases
+timeinbed_plot =
+  sleep_stress_df|>
+  #filter(!is.na(study_interval) & !is.na(phase)) |>
   group_by(phase, id) |>
   summarize(
     timeinbed = mean(timeinbed_mean/60)
   )|> 
   ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
-  geom_violin(alpha = 0.5) +
-  geom_boxplot(width = 0.2) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
   labs(
-    title = "Sleep time Across Menstrual Cycle Phases",
-    x = "Menstrual Cycle Phase",
+    x = " ",
     y = "Time in bed (hrs)"
   ) +
-    theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme(legend.position = "none") 
+# plot the variation of deep sleep score by menstrual phases
+deep_sleep_plot =
+   sleep_stress_df|>
+  #filter(!is.na(study_interval) & !is.na(phase)) |>
+  group_by(phase, id) |>
+  summarize(
+    mean_deep_sleep = mean(deep_sleep_in_minutes/60)
+  )|> 
+  ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Deep sleep (hrs)"
+  ) +
+    theme(legend.position = "none") 
+# plot the variation of sleep score by menstrual phases
+sleep_score_boxplot =
+  sleep_stress_df |>
+  #filter(!is.na(study_interval) & !is.na(phase)) |>
+  ggplot(aes(x = phase, y = sleep_score, fill = phase))+
+ geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Sleep score"
+  ) +
+  theme(legend.position = "none")
+# plot the variation of stress score by menstrual phases
+stress_score_boxplot =
+  sleep_stress_df |>
+  #filter(!is.na(study_interval) & !is.na(phase)) |>
+  filter(stress_score != 0)|>
+    ggplot(aes(x = phase, y = stress_score, fill = phase))+
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Stress score"
+  ) +
+  theme(legend.position = "none")
+
+(timeinbed_plot|deep_sleep_plot)/
+(sleep_score_boxplot |stress_score_boxplot)
 ```
 
 
@@ -873,7 +919,8 @@ sleep_stress_df |>
 
 ```
 
-We used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
+Our dataset are from two studies in two different times, year 2022 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts. Therefore the assumptions of independence is violated so we cannot use statistical tests that required independence assumptions. 
+Instead, we used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
 
 ```{r,message=FALSE, warning=FALSE}
 m1 <- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
@@ -926,18 +973,13 @@ Random intercept variance (0.1746) indicates participant-specific baseline appet
 
 ```{r, message=FALSE, warning=FALSE}
 #  model
-m3 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+m4 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
            timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
-tidy(m3, effects = "fixed")|>
-  select(term, estimate, std.error,p.value) |>
+tidy(m4, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |>
   mutate(
   significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
-# etracting coefficient
-intercept_values = random.effects(m1)
-fitted_stress_score = fitted.values(m1)
-# check the residuals
-qqnorm(residuals(m3)) 
 ```
 
 

@@ -1058,7 +1058,7 @@ phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 492 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 481 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>Violin plots show substantial inter-individual variability. Menstrual
@@ -1095,26 +1095,33 @@ menstrual cycle.</p>
 menstrual cycle.</p>
 <p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
-Luteal 2.95, Menstrual 2.90. ## Sleep and stress</p>
-<pre><code>## Warning in full_join(subject_info, sleep_stress_df, join_by(id)): Detected an unexpected many-to-many relationship between `x` and `y`.
-## ℹ Row 1 of `x` matches multiple rows in `y`.
-## ℹ Row 275 of `y` matches multiple rows in `x`.
-## ℹ If a many-to-many relationship is expected, set `relationship =
-##   &quot;many-to-many&quot;` to silence this warning.</code></pre>
-<p>Mesntruators spent more time in bed during menstrual time but their
+Luteal 2.95, Menstrual 2.90.</p>
+</div>
+</div>
+<div id="sleep-and-stress" class="section level2">
+<h2>Sleep and stress</h2>
+<pre class="r"><code>sleep_stress_df = all_daily_data|&gt;
+  filter(!is.na(stress_score) &amp; !is.na(sleep_score) &amp; !is.na(timeinbed_mean)) |&gt;
+  filter(stress_score != 0)|&gt;
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |&gt;
+  mutate(
+    phase = fct_relevel(phase,&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))</code></pre>
+<p>Menstruators spent more time in bed during menstrual time but their
 deep sleep hours were lowest. This showed that the physical exhaustion
 during menstrual days requiring them to rest but preventing them from
 having a restorative sleep quality. Follicular time is the when
 menstruators feel most energetic and spent less time in bed but having
-much better deep sleep.</p>
-<p>We explore the changes of the stress score with the menstrual cycle.
-The participants slept best during the menstrual time, probably a good
-sign to rest well during this time. The lowest sleep score were recorded
-during ovulation/ fertility time in which the increased estrogen and lh
-levels may contribute to this low sleep quality. The higher stress score
-the less stressful people experience. In this study, the participants
-showed the least stressful during folicular period , as the bodies are
-full of energy. The most stressful time is during luteal period.</p>
+much better deep sleep. We explore the changes of the stress score with
+the menstrual cycle. The participants slept best during the menstrual
+time, probably a good sign to rest well during this time. The lowest
+sleep score were recorded during ovulation/ fertility time in which the
+increased estrogen and lh levels may contribute to this low sleep
+quality. The higher stress score the less stressful people experience.
+In this study, the participants showed the least stressful during
+folicular period , as the bodies are full of energy. The most stressful
+time is during luteal period.</p>
 <pre class="r"><code># plot the sleep vs stress score by phases
 plot_1 = 
   sleep_stress_df |&gt;
@@ -1217,21 +1224,66 @@ plot_3 =
     axis.text.x = element_text(angle = 45, hjust = 1))
 plot_1 + plot_2 + plot_3</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<pre class="r"><code>sleep_stress_df|&gt;
+<pre class="r"><code># plot the variation of time in bed by menstrual phases
+timeinbed_plot =
+  sleep_stress_df|&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
   group_by(phase, id) |&gt;
   summarize(
     timeinbed = mean(timeinbed_mean/60)
   )|&gt; 
   ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
-  geom_violin(alpha = 0.5) +
-  geom_boxplot(width = 0.2) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
   labs(
-    title = &quot;Sleep time Across Menstrual Cycle Phases&quot;,
-    x = &quot;Menstrual Cycle Phase&quot;,
+    x = &quot; &quot;,
     y = &quot;Time in bed (hrs)&quot;
   ) +
-    theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+    theme(legend.position = &quot;none&quot;) 
+# plot the variation of deep sleep score by menstrual phases
+deep_sleep_plot =
+   sleep_stress_df|&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  group_by(phase, id) |&gt;
+  summarize(
+    mean_deep_sleep = mean(deep_sleep_in_minutes/60)
+  )|&gt; 
+  ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Deep sleep (hrs)&quot;
+  ) +
+    theme(legend.position = &quot;none&quot;) 
+# plot the variation of sleep score by menstrual phases
+sleep_score_boxplot =
+  sleep_stress_df |&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  ggplot(aes(x = phase, y = sleep_score, fill = phase))+
+ geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Sleep score&quot;
+  ) +
+  theme(legend.position = &quot;none&quot;)
+# plot the variation of stress score by menstrual phases
+stress_score_boxplot =
+  sleep_stress_df |&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  filter(stress_score != 0)|&gt;
+    ggplot(aes(x = phase, y = stress_score, fill = phase))+
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Stress score&quot;
+  ) +
+  theme(legend.position = &quot;none&quot;)
+
+(timeinbed_plot|deep_sleep_plot)/
+(sleep_score_boxplot |stress_score_boxplot)</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <p><strong>View the stress and sleep score across menstrual cycle phases
 for each ethnicity</strong></p>
@@ -1266,9 +1318,12 @@ for each ethnicity</strong></p>
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<p>We used generalized linear mixed effects model to evaluate the
-significant different of stress score and sleep score between menstrual
-phases.</p>
+<p>Our dataset are from two studies in two different times, year 2022
+and year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
+Therefore the assumptions of independence is violated so we cannot use
+statistical tests that required independence assumptions. Instead, we
+used generalized linear mixed effects model to evaluate the significant
+different of stress score and sleep score between menstrual phases.</p>
 <pre class="r"><code>m1 &lt;- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m1, effects = &quot;fixed&quot;)|&gt;
   select(term, estimate, std.error,p.value) |&gt;
@@ -1288,30 +1343,30 @@ tidy(m1, effects = &quot;fixed&quot;)|&gt;
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">76.775</td>
-<td align="right">0.637</td>
+<td align="right">76.762</td>
+<td align="right">0.614</td>
 <td align="right">0.000</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">0.137</td>
-<td align="right">0.249</td>
-<td align="right">0.583</td>
+<td align="right">0.291</td>
+<td align="right">0.213</td>
+<td align="right">0.172</td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-0.703</td>
-<td align="right">0.248</td>
+<td align="right">-0.594</td>
+<td align="right">0.211</td>
 <td align="right">0.005</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-0.862</td>
-<td align="right">0.232</td>
-<td align="right">0.000</td>
+<td align="right">-0.525</td>
+<td align="right">0.198</td>
+<td align="right">0.008</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
@@ -1336,34 +1391,33 @@ tidy(m2, effects = &quot;fixed&quot;)|&gt;
 <tr class="odd">
 <td align="left">(Intercept)</td>
 <td align="right">77.436</td>
-<td align="right">0.707</td>
+<td align="right">0.709</td>
 <td align="right">0</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">-1.021</td>
-<td align="right">0.282</td>
+<td align="right">-1.037</td>
+<td align="right">0.283</td>
 <td align="right">0</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-1.336</td>
-<td align="right">0.280</td>
+<td align="right">-1.342</td>
+<td align="right">0.281</td>
 <td align="right">0</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-1.108</td>
-<td align="right">0.262</td>
+<td align="right">-1.126</td>
+<td align="right">0.263</td>
 <td align="right">0</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <div id="modelling" class="section level1">
@@ -1428,19 +1482,30 @@ baseline appetite differences. The fixed effect of estrogen is small
 <div id="stress-score-model" class="section level3">
 <h3>Stress score model</h3>
 <pre class="r"><code>#  model
-m3 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+m4 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
            timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
-tidy(m3, effects = &quot;fixed&quot;)|&gt;
-  select(term, estimate, std.error,p.value) |&gt;
+tidy(m4, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |&gt;
   mutate(
   significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
   knitr::kable(digits = 3)</code></pre>
 <table>
+<colgroup>
+<col width="27%" />
+<col width="11%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="10%" />
+<col width="15%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">term</th>
 <th align="right">estimate</th>
 <th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
 <th align="right">p.value</th>
 <th align="left">significant</th>
 </tr>
@@ -1450,6 +1515,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">(Intercept)</td>
 <td align="right">73.254</td>
 <td align="right">1.848</td>
+<td align="right">69.591</td>
+<td align="right">76.917</td>
 <td align="right">0.000</td>
 <td align="left">Yes</td>
 </tr>
@@ -1457,6 +1524,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">phasefollicular</td>
 <td align="right">-1.166</td>
 <td align="right">0.866</td>
+<td align="right">-2.869</td>
+<td align="right">0.536</td>
 <td align="right">0.179</td>
 <td align="left">No</td>
 </tr>
@@ -1464,6 +1533,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">phasefertility</td>
 <td align="right">-0.964</td>
 <td align="right">0.854</td>
+<td align="right">-2.643</td>
+<td align="right">0.714</td>
 <td align="right">0.259</td>
 <td align="left">No</td>
 </tr>
@@ -1471,6 +1542,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">phaseluteal</td>
 <td align="right">-0.840</td>
 <td align="right">0.753</td>
+<td align="right">-2.321</td>
+<td align="right">0.641</td>
 <td align="right">0.265</td>
 <td align="left">No</td>
 </tr>
@@ -1478,6 +1551,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">deep_sleep_in_minutes</td>
 <td align="right">0.032</td>
 <td align="right">0.016</td>
+<td align="right">0.001</td>
+<td align="right">0.063</td>
 <td align="right">0.043</td>
 <td align="left">Yes</td>
 </tr>
@@ -1485,6 +1560,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">timeinbed_mean</td>
 <td align="right">0.009</td>
 <td align="right">0.004</td>
+<td align="right">0.002</td>
+<td align="right">0.016</td>
 <td align="right">0.013</td>
 <td align="left">Yes</td>
 </tr>
@@ -1492,6 +1569,8 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">total_active_min</td>
 <td align="right">-0.009</td>
 <td align="right">0.008</td>
+<td align="right">-0.024</td>
+<td align="right">0.006</td>
 <td align="right">0.232</td>
 <td align="left">No</td>
 </tr>
@@ -1499,17 +1578,13 @@ tidy(m3, effects = &quot;fixed&quot;)|&gt;
 <td align="left">moodswing_score</td>
 <td align="right">-0.199</td>
 <td align="right">0.255</td>
+<td align="right">-0.701</td>
+<td align="right">0.303</td>
 <td align="right">0.436</td>
 <td align="left">No</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code># etracting coefficient
-intercept_values = random.effects(m1)
-fitted_stress_score = fitted.values(m1)
-# check the residuals
-qqnorm(residuals(m3)) </code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 </div>
 </div>
 <div id="discussion" class="section level1">
