@@ -115,7 +115,7 @@ We found sore breasts to be only positively associated with older age (p < 0.01)
 Discussion: 
 We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. Interestingly, lifestyle characteristics were consistently among the most significant results in our models. 
 
-```{r, }
+
 
 Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality.  
 
