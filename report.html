@@ -1043,9 +1043,10 @@ later models may help separate phase effects from adiposity-driven
 variation.</p>
 </div>
 </div>
-<div id="hormone" class="section level2">
-<h2>Hormone</h2>
-<p>LH &amp; Estrogen</p>
+<div id="hormone-and-symptoms" class="section level2">
+<h2>Hormone and Symptoms</h2>
+<div id="lh-estrogen" class="section level3">
+<h3>LH &amp; Estrogen</h3>
 <p>We want to examine average estrogen and LH levels across menstrual
 cycle phases to see if hormonal patterns match biological
 expectations</p>
@@ -1061,14 +1062,16 @@ rising from Follicular to Luteal. LH is much lower than estrogen
 overall, peaking sharply in Fertility and remaining low in the other
 phases.</p>
 </div>
-<div id="life-factors" class="section level2">
-<h2>Life factors</h2>
 <div id="mood-swing" class="section level3">
 <h3>Mood Swing</h3>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 473 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 2339 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<pre><code>## Warning: Removed 2882 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>Violin plots show substantial inter-individual variability. Menstrual
@@ -1087,14 +1090,20 @@ fertility phases.</p>
 <p>Flow Volume Distribution Across Phases</p>
 <p>To assess flow volume distribution patterns, we visualize flow volume
 variation across phases with violin plots.</p>
+<pre><code>## Warning: Removed 2592 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<pre><code>## Warning: Removed 3873 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Luteal phase shows a right-skewed distribution, indicating most
 low-flow observations but a few high-flow days. Menstrual phase is
 narrow and tall, indicating consistently higher flow intensity.</p>
 <p>Average Flow Volume Across Phases</p>
 <p>Summarize average flow volume to observe general trends across the
-menstrual cycle.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+menstrual cycle.
+<img src="report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>Menstrual phase has the highest average flow (2.38), luteal is lowest
 (0.03), fertility is 0.07, and follicular is 0.23.</p>
 </div>
@@ -1102,8 +1111,8 @@ menstrual cycle.</p>
 <h3>Appetite</h3>
 <p>Average Appetite Across Phases</p>
 <p>Summarize average appetite to observe general trends across the
-menstrual cycle.</p>
-<p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+menstrual cycle.
+<img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
 Luteal 2.95, Menstrual 2.90.</p>
 </div>
@@ -1432,59 +1441,52 @@ tidy(m2, effects = &quot;fixed&quot;)|&gt;
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
-<p>modeling from yue ### Mood SwingLinear Mixed Models</p>
-<p>Test whether mood swing and fatigue differ by menstrual phase,
-accounting for repeated measures.</p>
-<pre><code>## Linear mixed model fit by REML [&#39;lmerModLmerTest&#39;]
-## Formula: moodswing_score ~ phase + (1 | id)
-##    Data: hormone_symptoms_eda
-## REML criterion at convergence: 8006.314
-## Random effects:
-##  Groups   Name        Std.Dev.
-##  id       (Intercept) 0.9781  
-##  Residual             1.0035  
-## Number of obs: 2751, groups:  id, 42
-## Fixed Effects:
-##     (Intercept)  phasefollicular   phasefertility      phaseluteal  
-##          1.7723          -0.3691          -0.3447          -0.2402</code></pre>
-<p>Mood swings are lowest near ovulation, slightly higher in Luteal, and
-peak during Menstrual phase. Fatigue shows a similar pattern: lowest
-near ovulation, increasing through Luteal, highest during Menstrual
-phase. Random effects indicate that some individuals are chronically
-more fatigued or mood-sensitive than others, while residual variance
-captures day-to-day variability.</p>
-<div id="linear-mixed-model-appetite-vs-estrogen"
-class="section level3">
-<h3>Linear Mixed Model: Appetite vs Estrogen</h3>
+<div id="hormone-and-symtoms-model" class="section level2">
+<h2>Hormone and symtoms model</h2>
+<div id="flow-volume-distribution-across-phases" class="section level3">
+<h3>Flow Volume Distribution Across Phases</h3>
+<p>To assess flow volume distribution patterns, we visualize flow volume
+variation across phases with violin plots.</p>
+<pre><code>## Warning: Removed 2567 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Luteal phase shows a right-skewed distribution, indicating most
+low-flow observations but a few high-flow days. Menstrual phase is
+narrow and tall, indicating consistently higher flow intensity.</p>
+</div>
+<div id="appetite-vs-estrogen" class="section level3">
+<h3>Appetite vs Estrogen</h3>
 <p>Explore the relationship between estrogen levels and appetite scores,
 accounting for repeated measures.</p>
 <pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
 ## lmerModLmerTest]
 ## Formula: appetite_score ~ estrogen + (1 | id)
-##    Data: hormone_symptoms_eda
+##    Data: hormone_symptoms
 ## 
-## REML criterion at convergence: 6107.7
+## REML criterion at convergence: 7218.3
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -5.0464 -0.5701  0.0334  0.5181  3.9022 
+## -5.0223 -0.5805  0.0292  0.5269  3.8879 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance Std.Dev.
-##  id       (Intercept) 0.1746   0.4178  
-##  Residual             0.5223   0.7227  
-## Number of obs: 2725, groups:  id, 42
+##  id       (Intercept) 0.1722   0.4150  
+##  Residual             0.5272   0.7261  
+## Number of obs: 3215, groups:  id, 42
 ## 
 ## Fixed effects:
 ##              Estimate Std. Error        df t value Pr(&gt;|t|)    
-## (Intercept) 2.894e+00  6.943e-02 4.854e+01  41.677   &lt;2e-16 ***
-## estrogen    1.294e-04  1.489e-04 2.721e+03   0.869    0.385    
+## (Intercept) 2.897e+00  6.809e-02 4.769e+01  42.539   &lt;2e-16 ***
+## estrogen    1.137e-04  1.357e-04 3.212e+03   0.838    0.402    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##          (Intr)
-## estrogen -0.291</code></pre>
+## estrogen -0.276</code></pre>
 <p>Random intercept variance (0.1746) indicates participant-specific
 baseline appetite differences. The fixed effect of estrogen is small
 (0.00013 per unit) and not significant (t = 0.869).</p>
@@ -1750,6 +1752,7 @@ menstruation was positively associated with <code>fatigue</code>,
 association between menstruation and reported <code>sleep issues</code>
 and <code>sore breasts</code> as well as measured <code>estrogen</code>
 and <code>luteinizing hormone (lh)</code>.</p>
+</div>
 </div>
 <div id="demographic-and-lifestyle-factors-and-symptoms"
 class="section level2">
@@ -2399,6 +2402,29 @@ cramps_model_table</code></pre>
 </tr>
 </tbody>
 </table>
+<p>We found that self-reported fatigue was positively associated with
+having the educational attainment of High School (p &lt; 0.001) or Some
+College (p &lt; 0.001) compared to Bachelor’s degree or higher. We found
+fatigue was negatively associated with being in the “Other” racial
+category, which was a broad category comprising of hispanic, african,
+and middle eastern participants. (p &lt; 0.001) There was also a
+correlation between higher BMI and fatigue (p &lt; 0.05), as well as
+stress_score and fatigue (p &lt; 0.05).</p>
+<p>We found that bloating was negatively associated with Race being
+white (p &lt; 0.001) or other (p &lt; 0.001). We also found that
+bloating was positively associated with educational attainment of high
+school (p &lt; 0.01) or college (p &lt; 0.001). Furthermore, we found
+bloating was positively associated with BMI (p &lt; 0.001) and
+negatively associated with estrogen (p &lt; 0.05).</p>
+<p>We found sleep issues to be positively associated with an educational
+attainment of high school (p &lt; 0.001) or college (p &lt; 0.001).
+Furthermore, we found that there was a positive association between
+higher BMI and reported sleep issues (p &lt; 0.001). We found sleep
+issues to be negatively associated with being categorized in the “other”
+race category (p &lt; 0.001).</p>
+<p>We found sore breasts to be only positively associated with older age
+(p &lt; 0.01). We did not find cramping symptoms to be associated with
+any biometric or demographic characteristic.</p>
 </div>
 </div>
 </div>
@@ -2480,6 +2506,26 @@ and lifestyle factors—such as stress, sleep, diet, and physical
 activity—were not controlled for, which could influence mood, appetite,
 and fatigue. Therefore, the results should be interpreted as suggestive
 of phase-related trends rather than definitive causal effects.)</p>
+<p>Emily - Multimodal analysis discussion We found several associations
+between menstrual symptoms and lifestyle factors, biometric
+measurements, and demographic characteristics. Interestingly, lifestyle
+characteristics were consistently among the most significant results in
+our models, particularly race, education, and BMI.</p>
+<p>Interestingly, some self-reported that might be expected to be linked
+with related quantitative variables were not positively associated. For
+example, self-reported fatigue and self-reported sleep issues were not
+significantly associated with the quantitative variable sleep score that
+aggregated bio metric data on sleep quality. This could suggest that
+menstruation creates feelings of fatigue that do not reflect true sleep
+quality. Relatedly, minutes of acvitity was not positively associated
+with the reduction of any symtpoms in our mixed-modal results.</p>
+<p>Limitations to this data set as a whole also apply to the
+significance and generalization of this regression analysis. Namely, the
+small sample size is a limitation and could be exaggerating the
+influence of some demographic factors on symptoms. Furthermore, with the
+population being largely comprised of young, white or Asian
+participants, these results may not be generalizable to a more diverse
+population.</p>
 </div>
 </div>
 
