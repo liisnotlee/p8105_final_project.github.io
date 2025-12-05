@@ -10,7 +10,7 @@ library(broom)
 library(lme4)
 ```
 
-## hormone
+## Hormone and Symptoms
 
 ```{r, include=FALSE}
 hormone_symptoms=
@@ -19,7 +19,7 @@ hormone_symptoms=
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
-LH & Estrogen
+### LH & Estrogen
 We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 ```{r, echo=FALSE}
 hormone_avg <- hormone_symptoms |>
