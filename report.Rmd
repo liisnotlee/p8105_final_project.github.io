@@ -16,6 +16,7 @@ library(tidyr)
 library(patchwork)
 library(lme4)
 library(lmerTest)
+library(gt)
 library(ggsci)
 library(knitr)
 library(broom.mixed) # for tidy
@@ -186,7 +187,7 @@ subject_info <- subject_info_raw  |>
       education == "High school degree or equivalent (e.g. GED)" ~ "High School",
       education == "Some university/ post-secondary, no degree" ~ "Some College",
       education == "Bachelor's degree (e.g. BA, BS)" ~ "Bachelors",
-      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree or Higher",
+      education %in% c("Master's degree (e.g. MA, MS, MEd)", "Doctorate or professional degree") ~ "Graduate Degree",
       TRUE ~ "Other"),
     education_abrv = factor(
       education_abrv,
@@ -444,44 +445,104 @@ all_daily_data <- hormone_symptoms |>
 
 ## Participant Characteristics
 
-### Age distribution
+```{r, include = FALSE}
+#This is setup to make a clean table with simplified variables, count, percent count, except for menarche which is mean and (range)
+#Menarche
+menarche_row = subject_info %>%
+  summarise(variable = "Age at Menarche",
+    subgroup = "",
+    value = sprintf("%.1f (%d–%d)",
+      mean(age_of_first_menarche, na.rm = TRUE),
+      min(age_of_first_menarche, na.rm = TRUE),
+      max(age_of_first_menarche, na.rm = TRUE)))
 
--   View mean age in total (2022 & 2024)
+age_row = subject_info %>%
+  summarise(variable = "Age",
+    subgroup = "",
+    value = sprintf("%.1f (%d–%d)",
+      mean(mean_age, na.rm = TRUE),
+      min(mean_age, na.rm = TRUE),
+      max(mean_age, na.rm = TRUE)))
 
-```{r}
-overall_n <- subject_info |> 
-  distinct(id) |> 
-  count(name = "n")
+#bmi
+bmi_row = subject_info %>%
+  summarise(variable = "BMI",
+    subgroup = "",
+    value = sprintf("%.1f (%.1f-%.1f)",
+      mean(bmi, na.rm = TRUE),
+      min(bmi, na.rm = TRUE),
+      max(bmi, na.rm = TRUE)))
 
-age_boxplot_all <- subject_info |> 
-  ggplot(aes(x="All participants", y = mean_age)) +
-  geom_boxplot(fill = "#bcbddc")+
-  geom_text(
-    data = overall_n,
-    aes(
-      x = "All participants", 
-      y = max(subject_info$age, na.rm = TRUE) + 3,
-      label = paste0("n = ", n)
-    )
-  ) +
-  labs(
-    x = NULL,
-    y = "Mean age (years)",
-    title = "Mean age of all participants"
-  ) +
-  ylim(15, NA) +
-  theme(
-    axis.text.x = element_text(size = 10),
-    plot.title  = element_text(hjust = 0.5)
-  )
-age_boxplot_all
+#Race
+ethnicity_rows = subject_info %>%
+  count(ethnicity) %>%
+  mutate(variable = "Ethnicity",
+    subgroup = ethnicity,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Gender
+gender_rows = subject_info %>%
+  count(gender_abrv) %>%
+  mutate(variable = "Gender",
+    subgroup = gender_abrv,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Sexually Active 
+sex_rows = subject_info %>%
+  count(sexually_active) %>%
+  mutate(variable = "Sexually Active",
+    subgroup = sexually_active,
+    value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Education 
+education_rows = subject_info %>%
+  count(education_abrv) %>%
+  mutate(variable = "Education", 
+         subgroup = education_abrv,
+         value = sprintf("%d (%.1f%%)", n, 100 * n / sum(n))) %>%
+  select(variable, subgroup, value)
+
+#Combined
+summary_table = bind_rows(
+  age_row,
+  bmi_row,
+  menarche_row,
+  ethnicity_rows,
+  gender_rows,
+  education_rows,
+  sex_rows)
+
+summary_table_clean <- summary_table %>%
+  group_by(variable) %>%
+  mutate(variable = ifelse(row_number() == 1, variable, "")) %>%
+  ungroup()
+
+summary_table_gt = summary_table_clean %>%
+  gt() %>%
+  cols_label(variable = "",
+    subgroup = "",
+    value = "Mean (Max-Min) or Count (%)") %>%
+  tab_options(table.font.size = px(14),
+    data_row.padding = px(6)) %>%
+  tab_style(style = cell_text(weight = "bold"),
+    locations = cells_body(columns = variable)) %>%
+cols_align(align = "right",
+    columns = value) 
 ```
 
+```{r}
+summary_table_gt
+```
 The cohort includes 42 participants with a median age of \~21 years and a small number of older outliers (ages 27 and 29). This relatively narrow, young age range reduces age-related heterogeneity in reproductive hormones and symptomatic expression, helping to isolate phase-related effects.
+
+The average age of menarche was 11.9, though some participants reported first menstruating as late as age 15. Our participants largely identified as women (88.7%) and as Asian (59.7%) or white (22.6%). More than 4 in 5 participants had completed at least some college, with 25.8% having a college degree and 8.1% having a graduate degree. 
 
 ### Age of first menarche
 
-```{r}
+```{r, include=FALSE}
 menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
   geom_boxplot(fill = "cornflowerblue") +
   labs(title = "Age of Menarche",
@@ -490,7 +551,8 @@ menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
   theme_minimal(base_size = 14) +
   theme(axis.text.x = element_blank(),
     axis.ticks.x = element_blank())
-
+```
+```{r}
 menarche_plot
 ```
 
