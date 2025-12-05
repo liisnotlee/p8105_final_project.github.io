@@ -606,7 +606,7 @@ hormone_symptoms_eda=
 We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 
 ```{r, echo=FALSE}
-hormone_avg <- hormone_symptoms |>
+hormone_avg <- hormone_symptoms_eda|>
   group_by(phase) |>
   summarise(
     estrogen_mean = mean(estrogen, na.rm = TRUE),
@@ -1222,7 +1222,7 @@ mood_table <- tidy(mood_model, effects = "fixed", conf.int = TRUE) %>%
     model = "Mood Swing ~ Phase",
     significant = ifelse(p.value < 0.05, "Yes", "No")
   )
-
+mood_table
 
 ```
 
@@ -1241,6 +1241,7 @@ flow_table <- tidy(flow_volume_model, effects = "fixed", conf.int = TRUE) %>%
     model = "Flow Volume ~ LH",
     significant = ifelse(p.value < 0.05, "Yes", "No")
   )
+flow_table
 ```
 Based on the linear mixed model, a significant but modest relationship exists between luteinizing hormone (LH) levels and perceived menstrual flow volume. For every one-unit increase in LH, the flow volume score is estimated to decrease by -0.01138 points (p = 0.00129). While statistically significant, this effect is small in magnitude. The model indicates substantial individual differences, as the variation in scores within a single person over time (residual SD = 1.19) is much greater than the average differences between individuals' baselines (intercept SD = 0.45). Therefore, while LH shows a significant inverse association with flow volume, within-person biological and measurement variability remains the dominant feature of the data.
 
@@ -1256,7 +1257,7 @@ appetite_table <- tidy(appetite_model, effects = "fixed", conf.int = TRUE) %>%
     model = "Appetite ~ Estrogen",
     significant = ifelse(p.value < 0.05, "Yes", "No")
   )
-
+appetite_table
 ```
 
 Based on the linear mixed-effects model, the analysis finds no statistically significant relationship between measured estrogen levels and self-reported appetite scores in this dataset. The model estimates that for every one-unit increase in estrogen, the appetite score increases by a mere 0.0001137 points, an effect size so small as to be negligible. This relationship is not reliable, as indicated by a p-value of 0.402, which is far above the conventional threshold for significance. The model estimates the average appetite score when estrogen is zero to be 2.897 points. More notably, the random effects structure reveals that differences between individuals account for meaningful variation; the standard deviation of individual baseline scores is 0.415, while the standard deviation of the within-person residuals is 0.726. This indicates that while people have different typical appetite levels, the unexplained variation within a person's own measurements over time is nearly twice as large as the differences between individuals, and estrogen, as modeled here, does not explain a significant portion of that within-person fluctuation.
