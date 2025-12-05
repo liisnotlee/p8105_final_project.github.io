@@ -191,11 +191,11 @@ subject_info <- subject_info_raw  |>
       TRUE ~ "Other"),
     education_abrv = factor(
       education_abrv,
-      levels = c("High School", "Some College", "Bachelors", "Graduate Degree or Higher", "Other"),
+      levels = c("High School", "Some College", "Bachelors", "Graduate Degree", "Other"),
       ordered = TRUE),
      self_report_menstrual_health_literacy = factor(
       self_report_menstrual_health_literacy,
-      levels = c("Non-existant", "Low", "Medium", "High"),
+      levels = c("Non-existent", "Low", "Medium", "High", "Expert"),
       ordered = TRUE),
     gender_abrv = case_when(
       gender %in% c("Gender Fluid", "Non-binary") ~ "Gender Fluid or Non-binary", 
@@ -211,7 +211,7 @@ subject_info <- subject_info_raw  |>
       race_category, levels = c("Asian", "White", "Other"))) |> 
   # only need 1 study_interval flag to indicate the study year
   mutate(study_interval = year) |> 
-  select(-study_2022, -study_2024, -year, -study) |> 
+  select(-study_2022, -study_2024, year, -study) |> 
   # rearrange the column order
   select(
     id,     
@@ -560,7 +560,7 @@ Age of first menarche ranges roughly from 10 to 15 years with a median around 12
 
 ### BMI
 
-```{r bmi-boxplot}
+```{r, include=FALSE}
 overall_bmi_n <- subject_info |> 
   filter(!is.na(bmi)) |> 
   summarize(n = n())
@@ -586,11 +586,60 @@ bmi_all <- subject_info |>
     plot.title = element_text(hjust = 0.5),
     axis.text.x = element_text(size = 10)
   )
+bmi_study_n <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  count(year, name = "n")
 
-bmi_all
+bmi_by_study <- subject_info |> 
+  filter(!is.na(bmi)) |> 
+  ggplot(aes(x = factor(year), y = bmi, fill = factor(year))) +
+  geom_boxplot() +
+  geom_text(
+    data = bmi_study_n,
+    aes(
+      x = factor(year),
+      y = 45,
+      label = paste0("n = ", n)
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "BMI (kg/m^2)",
+    fill = "Year",
+    title = "BMI Distribution by Study Year"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = "none" 
+  )
+
+bmi_boxplots <- bmi_all + bmi_by_study
+```
+```{r}
+bmi_boxplots
+```
+Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
+
+### Menstrual Health Literacy by Education
+```{r, include = FALSE}
+education_health_lit = subject_info %>%
+  filter(!is.na(education_abrv),
+    !is.na(self_report_menstrual_health_literacy)) %>%
+  ggplot(aes(x = education_abrv, fill = self_report_menstrual_health_literacy)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_brewer(palette = "Pastel2") + 
+  labs(
+    title = "Self-Reported Menstrual Health Literacy by Education Level",
+    x = "Education Level",
+    y = "Percentage",
+    fill = "Menstrual Health Literacy")
 ```
 
-Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
+```{r}
+education_health_lit
+```
+This figure shows self-reported participant menstrual health literacy by educational attainment. While most participants report medium to high menstrual health literacy,some reported non-existent, low, or expert level knowledge. Generally, educational attainment was not clearly visually correlated with greater knowledge about menstrual health. 
 
 ## Hormone and Symptoms
 
@@ -1024,22 +1073,21 @@ tidy(m2, effects = "fixed")|>
 
 
 # Modelling
-## Hormone
-### Mood Swing Linear Mixed Models
 
+## Hormone and symtoms model
+### Flow Volume Distribution Across Phases
 
-Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
-
-```{r, include=FALSE}
-mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
-
-
-
-mood_mixed_model
-
+To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
+```{r, echo=FALSE}
+#violin
+ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
+  geom_violin(fill = "skyblue", alpha = 0.5) +  
+  labs(
+    title = "Distribution of Flow Volume Across Phases",
+    x = "Phase", y = "Flow Volume (0–6)"
+  ) +
+  theme_minimal()
 ```
-
-Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
@@ -1048,7 +1096,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
 summary(appetite_model)
 ```
@@ -1107,7 +1155,7 @@ We ran a binomial regression between menstruation and self-reported symptoms. Th
 ```{r, include=FALSE}
 #Fatigue and Demographic/Lifestyle Factors
 fatigue_model = lmer( 
-  fatigue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  fatigue_score ~ total_active_min + sleep_score + stress_score + factor(education_abrv, ordered = FALSE) + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
 
 summary(fatigue_model)
 fatigue_model_table = tidy(fatigue_model) %>%
@@ -1116,7 +1164,7 @@ fatigue_model_table = tidy(fatigue_model) %>%
 
 #Cramps and Demographic/Lifestyle Factors
 cramps_model = lmer( 
-  cramps_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  cramps_score ~ total_active_min + sleep_score + stress_score + factor(education_abrv, ordered = FALSE) + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
 
 summary(cramps_model)
 cramps_model_table = tidy(cramps_model) %>%
@@ -1125,7 +1173,7 @@ cramps_model_table = tidy(cramps_model) %>%
 
 #Bloating and Demographic/Lifestyle Factors
 bloating_model = lmer( 
-  bloating_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  bloating_score ~ total_active_min + sleep_score + stress_score + factor(education_abrv, ordered = FALSE) + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
 
 summary(bloating_model)
 bloating_model_table = tidy(bloating_model) %>%
@@ -1134,7 +1182,7 @@ bloating_model_table = tidy(bloating_model) %>%
 
 #Sleep Issues and Demographic/Lifestyle Factors 
 sleepissues_model = lmer( 
-  sleepissue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  sleepissue_score ~ total_active_min + sleep_score + stress_score + factor(education_abrv, ordered = FALSE) + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
 
 summary(sleepissues_model)
 sleepissues_model_table = tidy(sleepissues_model) %>%
@@ -1143,7 +1191,7 @@ sleepissues_model_table = tidy(sleepissues_model) %>%
 
 #Sore Breasts and Demographic/Lifestyle factors 
 sorebreasts_model = lmer( 
-  sorebreasts_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  sorebreasts_score ~ total_active_min + sleep_score + stress_score + factor(education_abrv, ordered = FALSE) + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
 
 summary(sorebreasts_model)
 sorebreasts_model_table = tidy(sorebreasts_model) %>%
@@ -1167,13 +1215,13 @@ sorebreasts_model_table
 #Cramps Model Table
 cramps_model_table
 ```
-We found that self-reported fatigue was positively associated with having the educational attainment of High School (p < 0.001) or Some College (p < 0.001) compared to Bachelor's degree or higher. We found fatigue was negatively associated with being in the "Other" racial category, which was a broad category comprising of hispanic, african, and middle eastern participants. (p < 0.001) There was also a correlation between higher BMI and fatigue (p < 0.05), as well as stress_score and fatigue (p < 0.05). 
+We found that self-reported fatigue was negatively associated (less tired) with having the educational attainment of a Bachelor's degree. We also found fatigue was negatively associated with being in the "Other" racial category, which was a broad category comprising of hispanic, african, and middle eastern participants. (p < 0.001) There was also a correlation between higher BMI and greater fatigue (p < 0.05), as well as higher stress_score and less fatigue (p < 0.05). 
 
-We found that bloating was negatively associated with Race being white (p < 0.001) or other (p < 0.001). We also found that bloating was positively associated with educational attainment of high school (p < 0.01) or college (p < 0.001). Furthermore, we found bloating was positively associated with BMI (p < 0.001) and negatively associated with estrogen (p < 0.05). 
+We found that bloating was negatively associated (less bloated) with Race being white (p < 0.001) or other (p < 0.001). We also found that bloating was positively associated (more bloated) with educational attainment of high school (p < 0.01) or college (p < 0.001). Furthermore, we found bloating was positively associated with BMI (p < 0.001) and negatively associated with estrogen (p < 0.05). 
 
-We found sleep issues to be positively associated with an educational attainment of high school (p < 0.001) or college (p < 0.001). Furthermore, we found that there was a positive association between higher BMI and reported sleep issues (p < 0.001). We found sleep issues to be negatively associated with being categorized in the "other" race category (p < 0.001). 
+We found sleep issues to be negatively associated (fewer sleep issues) with an educational attainment of a bachelor's degree (p < 0.001). Furthermore, we found that there was a positive association between higher BMI and reported sleep issues (p < 0.001). We found sleep issues to be negatively associated with being categorized in the "other" race category (p < 0.001). 
 
-We found sore breasts to be only positively associated with older age (p < 0.01). We did not find cramping symptoms to be associated with any biometric or demographic characteristic. 
+We found sore breasts to be only positively associated (increased sore breasts severity) with older age (p < 0.01). We found cramps to be negatively associated (decreased cramp severity) with the educational attainment of some college (p < 0.01). 
 
 
 # Discussion

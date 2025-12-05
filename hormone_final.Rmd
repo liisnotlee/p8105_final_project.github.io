@@ -1,5 +1,5 @@
 ---
-title: "hormone_final"
+title: "Hormone and Symptoms Analysis"
 output: html_document
 date: "2025-12-03"
 ---
@@ -54,8 +54,8 @@ Moodswing Distribution Across Phases
 Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
 ```{r, echo=FALSE}
 # Mood swing
-ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
-  geom_violin(trim = TRUE, fill = "orchid", alpha = 0.5) +
+ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score, fill = phase)) +
+  geom_violin(trim = TRUE, alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   scale_y_continuous(limits = c(0,5), breaks = 0:5) +
   labs(
@@ -63,7 +63,6 @@ ggplot(hormone_symptoms, aes(x = phase, y = moodswing_score)) +
     x = "Phase",
     y = "Mood Swing (0–5)"
   ) + 
-  theme_minimal()+
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
     plot.title = element_text(face = "bold"),
@@ -86,17 +85,22 @@ symptom_means <- hormone_symptoms |>
 
 # Mood swing single line plot
 ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
-  geom_line(color = "purple", size = 1.5, alpha = 0.7) +
-  geom_point(color = "purple", size = 3) +
-  geom_text(aes(label = round(avg_moodswing, 2)), vjust = -1, size = 4, fontface = "bold") +
+  geom_line(aes(color = "Mood Swing"),size = 1.5, alpha = 0.7) +
+  geom_point(aes(color = "Mood Swing"),size = 3) +
+  geom_text(
+    aes(label = round(avg_moodswing, 2)), 
+    vjust = -1, 
+    size = 4, 
+    fontface = "bold"
+  ) +
   labs(
     title = "Average Mood Swing Intensity Across Menstrual Cycle Phases",
-    subtitle = "Higher values indicate more severe mood swings (Scale: 1-4)",
+    subtitle = "Higher values indicate more severe mood swings (Scale: 1–4)",
     x = "Phase",
     y = "Average Mood Swing Intensity"
   ) +
-  ylim(0, 4) +
-  theme_minimal() +
+  ylim(0, 4)+
+  theme_minimal()+
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
     plot.title = element_text(face = "bold"),
@@ -110,14 +114,15 @@ Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase 
 Mood SwingLinear Mixed Models
 
 Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
-```{r, echo=FALSE}
+```{r, include=FALSE}
 mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
-fatigue_mixed_model <- lmer(fatigue_score ~ phase + (1 | id), data = hormone_symptoms)
+
 
 
 mood_mixed_model
-fatigue_mixed_model
+
 ```
+
 Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 
@@ -128,12 +133,14 @@ Flow Volume Distribution Across Phases
 To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
 ```{r, echo=FALSE}
 #violin
-ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
-  geom_violin(fill = "skyblue", alpha = 0.5) +  
+ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score, fill = phase)) +
+  geom_violin( alpha = 0.5) +  
+  geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   labs(
     title = "Distribution of Flow Volume Across Phases",
     x = "Phase", y = "Flow Volume (0–6)"
   ) +
+  scale_y_continuous(limits = c(0,5), breaks = 0:5) +
   theme_minimal()
 ```
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
@@ -152,9 +159,9 @@ cycle_avg <- hormone_symptoms |>
   )
 
 # Flow Volume
-ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
-  geom_line(size = 1.2, color = "blue") +
-  geom_point(size = 3, color = "red") +
+ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1) )+
+  geom_line(aes(color = "Flow Volume"),size = 1.2) +
+  geom_point(aes(color = "Flow Volume"),size = 3) +
   geom_text(aes(label = round(avg_flow_volume, 2)), vjust = -1, size = 4, fontface = "bold") +
   labs(title = "Average Flow Volume Across Phases",
        x = "Phase", y = "Flow Volume Score") +
@@ -176,8 +183,8 @@ Summarize average appetite to observe general trends across the menstrual cycle.
 ```{r, echo=FALSE}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
-  geom_line(size = 1.2, color = "purple") +
-  geom_point(size = 3, color = "red") +
+  geom_line(aes(color = "Appetite"),size = 1.2) +
+  geom_point(aes(color = "Appetite"),size = 3) +
   geom_text(aes(label = round(avg_appetite, 2)), vjust = -1, size = 4, fontface = "bold") +
   labs(title = "Average Appetite Across Phases",
        x = "Phase", y = "Appetite Score") +

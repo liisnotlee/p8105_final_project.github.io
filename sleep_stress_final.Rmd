@@ -1,0 +1,340 @@
+---
+title: "Sleep & stress"
+output: github_document
+---
+
+```{r setup , include = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(mgcv) # for cross validation
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(lme4)
+library(lmerTest)
+library(rstatix)
+library(ggpubr)
+library(FSA)# for Dunn test
+library(broom.mixed) # for tidy
+
+set.seed(1)
+
+# Set plot theme
+theme_set(theme_minimal() + 
+            theme(legend.position = "bottom",
+                  axis.title = element_text(size = 14),
+                  axis.text = element_text(size = 12)))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
+)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+all_data_df = 
+  read_csv("clean_data/all_daily_data.csv") |>
+  janitor::clean_names()
+subject_info = 
+  read_csv("clean_data/subject_info.csv") |>
+  janitor::clean_names() |>
+  select(id, ethnicity, education_abrv)
+sleep_stress_df = all_data_df|>
+  filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
+  mutate(
+    phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
+```
+
+**View the sleep time for different participants in each study interval**
+The average sleep time for each person is different each study interval and varied across participants.  In 2022, some participants slept less than 5 hours and some slept more than 8 hours. In 2024, most participants have better sleep length, 7-8 hours. 
+```{r, message=FALSE, warning=FALSE}
+# plot the mean timein bed in hour
+  sleep_stress_df |>
+  filter(!is.na(study_interval)) |>
+  ggplot(aes(x = id, y = timeinbed_mean/60, group = id, color = id))+
+  geom_boxplot()+
+  facet_grid(study_interval ~.) +
+  labs(
+    x = "Participant",
+    y = "Average time in bed (hours)"
+  ) 
+
+```
+
+The dataset has some stress score values equal zero which could be from an input error. This skewed the stress score histogram. We then remove the zero value for further analysis. Other continuous variables of our interest are normally distributed. 
+```{r}
+sleep_stress_df |> 
+  select(stress_score,sleep_score, timeinbed_mean, deep_sleep_in_minutes) |> 
+  pivot_longer(everything()) |> 
+  ggplot(aes(value)) + 
+  geom_histogram(bins = 30, fill = "lightblue") +
+  facet_wrap(~ name, scales = "free")
+# remove zero value in stress score
+sleep_stress_df = 
+  sleep_stress_df |>
+  filter(stress_score != 0)
+  
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+# plot the variation of time in bed by menstrual phases
+timeinbed_plot =
+  sleep_stress_df|>
+  filter(!is.na(study_interval) & !is.na(phase)) |>
+  group_by(phase, id) |>
+  summarize(
+    timeinbed = mean(timeinbed_mean/60)
+  )|> 
+  ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Time in bed (hrs)"
+  ) +
+    theme(legend.position = "none") 
+# plot the variation of deep sleep score by menstrual phases
+deep_sleep_plot =
+   sleep_stress_df|>
+  filter(!is.na(study_interval) & !is.na(phase)) |>
+  group_by(phase, id) |>
+  summarize(
+    mean_deep_sleep = mean(deep_sleep_in_minutes/60)
+  )|> 
+  ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Deep sleep (hrs)"
+  ) +
+    theme(legend.position = "none") 
+# plot the variation of sleep score by menstrual phases
+sleep_score_boxplot =
+  sleep_stress_df |>
+  filter(!is.na(study_interval) & !is.na(phase)) |>
+  ggplot(aes(x = phase, y = sleep_score, fill = phase))+
+ geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Sleep score"
+  ) +
+  theme(legend.position = "none")
+# plot the variation of stress score by menstrual phases
+stress_score_boxplot =
+  sleep_stress_df |>
+  filter(!is.na(study_interval) & !is.na(phase)) |>
+  filter(stress_score != 0)|>
+    ggplot(aes(x = phase, y = stress_score, fill = phase))+
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = " ",
+    y = "Stress score"
+  ) +
+  theme(legend.position = "none")
+
+(timeinbed_plot|deep_sleep_plot)/
+(sleep_score_boxplot |stress_score_boxplot)
+```
+
+
+Menstruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
+
+We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
+The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
+
+
+```{r, warning= FALSE, message=FALSE}
+# plot the sleep vs stress score by phases
+plot_1 = 
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "Mean Score", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Score"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# plot the hormone changes
+coeff = 5.5
+plot_2  =
+  sleep_stress_df |>
+  group_by(phase) |>
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = "LH",
+                    mean_estrogen     = "Estrogen")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# Plot the time in bed and deep sleep in minutes in phases
+plot_3 = 
+  sleep_stress_df |>
+  group_by(phase)|>
+   summarize(
+     mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
+    mean_deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
+             )|>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  mutate(
+    metric = recode(metric,
+                    mean_timeinbed             = "Time in bed (hours)",
+                    mean_deep_sleep_in_minutes = "Deep sleep (hours)")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = "Metric", y = "level", x = "Phase") +
+    labs(
+    x = "Menstrual Cycle Phase",
+    y = "Level"
+  ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Time in bed (hours)",
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name="Deep sleep (hours)")
+  ) +
+    theme_minimal() +
+  theme(legend.position = "bottom",
+         legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+plot_1 + plot_2 + plot_3
+```
+
+
+**View the stress and sleep score across menstrual cycle phases for each ethnicity** 
+
+```{r, message=FALSE, warning=FALSE}
+sleep_stress_df |>
+  group_by(phase, ethnicity) |>
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "metric",
+    values_to = "value"
+  ) |>
+  drop_na()|>
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = "Sleep Score",
+                    mean_stress_score = "Stress Score")
+  ) |>
+  ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_grid(~ metric) +
+    labs(color = "Ethnicity", y = "Mean Score", x = "Phase") +
+    labs(
+    title = "Stress and Sleep Score Across Menstrual Cycle Phases",
+    x = "Menstrual Cycle Phase",
+    y = "score"
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+Our dataset are from two studies in two different times, year 2022 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts. Therefore the assumptions of independence is violated so we cannot use statistical tests that required independence assumptions. 
+Instead, we used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
+
+```{r,message=FALSE, warning=FALSE}
+m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+tidy(m1, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(
+    title = "Linear mixed effect models for stress score variation by menstrual phases",
+    digits = 3)
+```
+
+
+```{r,message=FALSE, warning=FALSE}
+m2 = lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
+
+```{r}
+m3 = lmer(timeinbed_mean ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+```
+
+```{r, message=FALSE, warning=FALSE}
+#  model
+m4 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m4, effects = "fixed", conf.int = TRUE)|>
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |>
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |>
+  knitr::kable(digits = 3)
+# check the residuals
+qqnorm(residuals(m4)) 
+```

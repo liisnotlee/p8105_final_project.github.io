@@ -110,13 +110,10 @@ We found that bloating was negatively associated with Race being white (p < 0.00
 We found sleep issues to be positively associated with an educational attainment of high school (p < 0.001) or college (p < 0.001). Furthermore, we found that there was a positive association between higher BMI and reported sleep issues (p < 0.001). We found sleep issues to be negatively associated with being categorized in the "other" race category (p < 0.001). 
 
 We found sore breasts to be only positively associated with older age (p < 0.01). We did not find cramping symptoms to be associated with any biometric or demographic characteristic. 
- 
 
 Discussion: 
-We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. Interestingly, lifestyle characteristics were consistently among the most significant results in our models. 
+We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. Interestingly, lifestyle characteristics were consistently among the most significant results in our models, particularly race, education, and BMI. 
 
-```{r, }
-
-Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality.  
+Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Relatedly, minutes of acvitity was not positively associated with the reduction of any symtpoms in our mixed-modal results. 
 
 Limitations to this data set as a whole also apply to the significance and generalization of this regression analysis. Namely, the small sample size is a limitation and could be exaggerating the influence of some demographic factors on symptoms. Furthermore, with the population being largely comprised of young, white or Asian participants, these results may not be generalizable to a more diverse population. 

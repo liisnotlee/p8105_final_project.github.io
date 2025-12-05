@@ -433,14 +433,16 @@ focusing on solely menstrual symptoms, a binary variable reporting
 daily data through a regression model.</p>
 </div>
 </div>
-<div id="running-basic-model-to-identify-significant-symptoms"
-class="section level2">
-<h2>Running basic model to identify significant symptoms</h2>
 <div
-id="identified-symptoms-that-were-significant-with-mensturation-at-p0.05-or-less"
+id="running-basic-model-to-identify-significant-symptoms-and-hormones-associated-with-menstruation"
+class="section level2">
+<h2>Running basic model to identify significant symptoms and hormones
+associated with menstruation</h2>
+<div
+id="identified-symptomshormones-that-were-significant-with-mensturation-at-p0.05-or-less"
 class="section level4">
-<h4>Identified symptoms that were significant with mensturation at
-p&lt;0.05 or less</h4>
+<h4>Identified symptoms/hormones that were significant with mensturation
+at p&lt;0.05 or less</h4>
 <pre class="r"><code>symptom_model = glmer(
   menstruation ~ fatigue_score + cramps_score + sleepissue_score + exerciselevel_score + appetite_score + bloating_score + moodswing_score + indigestion_score + sorebreasts_score + (1 | id), data = merged_df, family = binomial)
 
@@ -495,7 +497,6 @@ summary(symptom_model)</code></pre>
   kable()
 
 
-#This section does physiology model - do we still need it? Removing if so 
 physiology_model = glmer(
   menstruation ~ estrogen + lh + (1 | id), data = merged_df, family=binomial())</code></pre>
 <pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue
@@ -540,8 +541,9 @@ physiology_model = glmer(
 symptoms. The results of our preliminary regression analysis show that
 menstruation was positively associated with <code>fatigue</code>,
 <code>cramps</code>, and <code>bloating</code>. There was a negative
-association with reported between menstruation and
-<code>sleep issues</code> and <code>sore breasts</code>.</p>
+association between menstruation and reported <code>sleep issues</code>
+and <code>sore breasts</code> as well as measured <code>estrogen</code>
+and <code>luteinizing hormone (lh)</code>.</p>
 </div>
 </div>
 <div id="demographic-and-lifestyle-factors-and-symptoms"
@@ -931,6 +933,10 @@ sorebreasts_model = lmer(
 ## estrogen     0.092 -0.292
 ## optimizer (nloptwrap) convergence code: 0 (OK)
 ## boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
+</div>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
 <p>In this analysis, we took the self-reported symptoms that were
 significantly association with menstruation at p &lt; 0.05 and ran a
 regression to determine the association between these symptoms and
@@ -940,28 +946,48 @@ the amount of active minutes per participant by day,
 <code>sleep_score</code> which utilized multiple bio metric data
 endpoints to assess the quality of sleep, and <code>stress_score</code>
 which utilized multiple bio metric data endpoints to assess the degree
-to which a participant showed symptoms of stress. For demographic
-characteristics, we selected <code>education</code>, <code>BMI</code>,
-<code>education</code>, <code>age</code>, and <code>race</code>. For
-categorical demographic variables, we used a cleaned version of the data
-to collapse specific responses into broader categories for simplified
-analysis when there were &lt;= 3 responses for a single category.</p>
-<p>We found that self-reported fatigue was positively associated with
-having the educational attainment of High School (p&lt;0.001) or Some
-College (p&lt;0.001) compared to Bachelor’s degree or higher. We found
-fatigue was negatively associated with being in the “Other” racial
+to which a participant showed symptoms of stress. We also relied on
+recorded <code>lh</code> and <code>estrogen</code> levels for a biologic
+component of this analysis. For demographic characteristics, we selected
+<code>education</code>, <code>BMI</code>, <code>education</code>,
+<code>age</code>, and <code>race</code>. For categorical demographic
+variables, we used a cleaned version of the data to collapse specific
+responses into broader categories for simplified analysis when there
+were &lt;= 3 responses for a single category.</p>
+<p>RESULTS We found that self-reported fatigue was positively associated
+with having the educational attainment of High School (p &lt; 0.001) or
+Some College (p &lt; 0.001) compared to Bachelor’s degree or higher. We
+found fatigue was negatively associated with being in the “Other” racial
 category, which was a broad category comprising of hispanic, african,
-and middle eastern participants. (p&lt;0.001) There was also a
-correlation between higher BMI and fatigue. (p&lt;0.05)</p>
-<p>Interestingly, we found that there were not any significant
-associations between demographic or lifestyle factors and self-reported
-cramp severity.</p>
-<p>We found that bloating was positively associated with</p>
+and middle eastern participants. (p &lt; 0.001) There was also a
+correlation between higher BMI and fatigue (p &lt; 0.05), as well as
+stress_score and fatigue (p &lt; 0.05).</p>
+<p>We found that bloating was negatively associated with Race being
+white (p &lt; 0.001) or other (p &lt; 0.001). We also found that
+bloating was positively associated with educational attainment of high
+school (p &lt; 0.01) or college (p &lt; 0.001). Furthermore, we found
+bloating was positively associated with BMI (p &lt; 0.001) and
+negatively associated with estrogen (p &lt; 0.05).</p>
+<p>We found sleep issues to be positively associated with an educational
+attainment of high school (p &lt; 0.001) or college (p &lt; 0.001).
+Furthermore, we found that there was a positive association between
+higher BMI and reported sleep issues (p &lt; 0.001). We found sleep
+issues to be negatively associated with being categorized in the “other”
+race category (p &lt; 0.001).</p>
+<p>We found sore breasts to be only positively associated with older age
+(p &lt; 0.01). We did not find cramping symptoms to be associated with
+any biometric or demographic characteristic.</p>
+<p>Discussion: We found several associations between menstrual symptoms
+and lifestyle factors, biometric measurements, and demographic
+characteristics. Interestingly, lifestyle characteristics were
+consistently among the most significant results in our models.</p>
 <p>Interestingly, some self-reported that might be expected to be linked
 with related quantitative variables were not positively associated. For
 example, self-reported fatigue and self-reported sleep issues were not
 significantly associated with the quantitative variable sleep score that
-aggregated bio metric data on sleep quality.</p>
+aggregated bio metric data on sleep quality. This could suggest that
+menstruation creates feelings of fatigue that do not reflect true sleep
+quality.</p>
 <p>Limitations to this data set as a whole also apply to the
 significance and generalization of this regression analysis. Namely, the
 small sample size is a limitation and could be exaggerating the
@@ -969,7 +995,6 @@ influence of some demographic factors on symptoms. Furthermore, with the
 population being largely comprised of young, white or Asian
 participants, these results may not be generalizable to a more diverse
 population.</p>
-</div>
 </div>
 
 
