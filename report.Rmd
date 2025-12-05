@@ -1024,20 +1024,16 @@ tidy(m2, effects = "fixed")|>
 
 
 # Modelling
+## Hormone
+### Moodswing across phase
 
-## Hormone and symtoms model
-### Flow Volume Distribution Across Phases
+Explore the relationship among and moodswing score.
+```{r, include=FALSE}
+Moodswing_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
+summary(m1)
+```
 
-To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
-```{r, echo=FALSE}
-#violin
-ggplot(hormone_symptoms, aes(x = phase, y = flow_volume_score)) +
-  geom_violin(fill = "skyblue", alpha = 0.5) +  
-  labs(
-    title = "Distribution of Flow Volume Across Phases",
-    x = "Phase", y = "Flow Volume (0–6)"
-  ) +
-  theme_minimal()
+Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 ```
 
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
