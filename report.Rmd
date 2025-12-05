@@ -1199,9 +1199,13 @@ We found several associations between menstrual symptoms and lifestyle factors, 
 
 Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Similarly, minutes of activity was not positively associated with the reduction of any symptoms in our mixed-modal results. 
 
+### Exercise discussion
+Anu: 
 ## Limitation
 
 Yue(Several limitations should be considered when interpreting these findings. First, the dataset relies on self-reported symptom scores, which may be subject to recall bias or subjective interpretation. Second, while repeated measures are accounted for using linear mixed models, the sample size for some phases may be limited, reducing statistical power to detect subtle effects. Finally, other biological and lifestyle factors—such as stress, sleep, diet, and physical activity—were not controlled for, which could influence mood, appetite, and fatigue. Therefore, the results should be interpreted as suggestive of phase-related trends rather than definitive causal effects.)
 
 
 Emily(Limitations to this data set as a whole also apply to the significance and generalization of this regression analysis. Namely, the small sample size is a limitation and could be exaggerating the influence of some demographic factors on symptoms. Furthermore, with the population being largely comprised of young, white or Asian participants, these results may not be generalizable to a more diverse population.)
+
+Anu: 
