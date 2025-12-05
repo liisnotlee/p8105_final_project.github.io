@@ -1,9 +1,143 @@
 ---
-title: "EXERCISE: FINAL ANALYSIS"
+title: "EXERCISE: "
 output: html_document
 ---
+```{r}
+# Load and prepare data
+raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
-# Libraries required and global settings
+# Identify outliers
+outliers_removed <- sum(raw_data$total_steps >= 50000, na.rm = TRUE)
+
+# Apply cleaning
+exercise_analysis <- raw_data %>%
+  filter(total_steps < 50000)
+
+# Sample characteristics
+sample_chars <- data.frame(
+  Characteristic = c("Unique participants", 
+                     "Total observations",
+                     "Observations removed",
+                     "Study years",
+                     "Participants in both years"),
+  Value = c(
+    n_distinct(exercise_analysis$id),
+    nrow(exercise_analysis),
+    paste0(outliers_removed, " (", 
+           round(outliers_removed/nrow(raw_data)*100, 1), "%)"),
+    paste(unique(exercise_analysis$study_interval), collapse = ", "),
+    paste0(sum(exercise_analysis %>% 
+               group_by(id) %>% 
+               summarise(n_years = n_distinct(study_interval)) %>% 
+               pull(n_years) == 2),
+           " (", 
+           round(mean(exercise_analysis %>% 
+                      group_by(id) %>% 
+                      summarise(n_years = n_distinct(study_interval)) %>% 
+                      pull(n_years) == 2) * 100, 1), 
+           "%)")
+  )
+)
+
+kable(sample_chars, 
+      col.names = c("", ""),
+      caption = "Sample Characteristics") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
+
+
+# Overall descriptives
+overall_desc <- exercise_analysis %>%
+  summarise(
+    Variable = c("Daily Steps", "Active Minutes/Day", "Calories Burned", 
+                 "Exercise Sessions/Day", "Days with Activity (%)"),
+    Mean = c(mean(total_steps, na.rm = TRUE),
+             mean(total_active_min, na.rm = TRUE),
+             mean(total_calories, na.rm = TRUE),
+             mean(n_sessions, na.rm = TRUE),
+             NA),
+    SD = c(sd(total_steps, na.rm = TRUE),
+           sd(total_active_min, na.rm = TRUE),
+           sd(total_calories, na.rm = TRUE),
+           sd(n_sessions, na.rm = TRUE),
+           NA),
+    Median = c(median(total_steps, na.rm = TRUE),
+               median(total_active_min, na.rm = TRUE),
+               median(total_calories, na.rm = TRUE),
+               median(n_sessions, na.rm = TRUE),
+               NA),
+    IQR = c(IQR(total_steps, na.rm = TRUE),
+            IQR(total_active_min, na.rm = TRUE),
+            IQR(total_calories, na.rm = TRUE),
+            IQR(n_sessions, na.rm = TRUE),
+            NA),
+    Percent = c(NA, NA, NA, NA,
+                mean(total_steps > 0, na.rm = TRUE) * 100)
+  ) %>%
+  mutate(
+    Mean = ifelse(!is.na(Mean), sprintf("%.1f", Mean), ""),
+    SD = ifelse(!is.na(SD), sprintf("%.1f", SD), ""),
+    Median = ifelse(!is.na(Median), sprintf("%.1f", Median), ""),
+    IQR = ifelse(!is.na(IQR), sprintf("%.1f", IQR), ""),
+    Percent = ifelse(!is.na(Percent), sprintf("%.1f%%", Percent), "")
+  )
+
+kable(overall_desc,
+      caption = "Descriptive Statistics: Exercise Metrics",
+      align = c("l", "r", "r", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+### Descriptive Statistics: Symptom Severity
+
+```{r symptom-descriptives}
+# Symptom descriptives
+symptom_desc <- exercise_analysis %>%
+  summarise(
+    across(c(cramps_score, fatigue_score, stress_score, moodswing_score,
+             sleepissue_score, bloating_score, appetite_score, 
+             sorebreasts_score, foodcravings_score, indigestion_score),
+           list(mean = ~mean(.x, na.rm = TRUE),
+                sd = ~sd(.x, na.rm = TRUE),
+                median = ~median(.x, na.rm = TRUE)),
+           .names = "{.col}_{.fn}")
+  ) %>%
+  pivot_longer(everything(),
+               names_to = c("symptom", ".value"),
+               names_pattern = "(.+)_score_(.+)") %>%
+  mutate(
+    symptom = str_to_title(str_replace_all(symptom, "_", " ")),
+    across(where(is.numeric), ~round(.x, 2))
+  )
+
+kable(symptom_desc,
+      col.names = c("Symptom", "Mean", "SD", "Median"),
+      caption = "Descriptive Statistics: Symptom Severity (0-5 scale)",
+      align = c("l", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+### Comparison by Study Year
+
+```{r year-comparison}
+year_comp <- exercise_analysis %>%
+  group_by(study_interval) %>%
+  summarise(
+    `N Days` = n(),
+    `N Participants` = n_distinct(id),
+    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 0),
+    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 0),
+    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 1),
+    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 1),
+    `% Days Active` = round(mean(total_steps > 0, na.rm = TRUE) * 100, 1)
+  ) %>%
+  rename(Year = study_interval)
+
+kable(year_comp,
+      caption = "Exercise Metrics by Study Year",
+      align = c("c", rep("r", 7))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
 
 This analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) and self-reported menstrual symptoms across different cycle phases. We use data from two study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
 
@@ -61,7 +195,6 @@ extreme_obs %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-
 ## Data Summary and Quality Checks
 
 ```{r data-preparation, message=FALSE}
@@ -87,10 +220,9 @@ exercise_analysis <- raw_data %>%
   )
 ```
 
-
 ### Distribution of key exercise metrics
 
-```{r, fig.width = 13, fig.height = 15}
+```{r, fig.width = 13, fig.height = 12}
 
 # Filtering realistic values
 
@@ -105,7 +237,7 @@ exercise_analysis = read.csv("./clean_data/all_daily_data.csv")
    # total_calories < 10000
  # )
 
-p1 = ggplot(exercise_analysis |> filter(total_steps > 0), 
+p1 = ggplot(exercise_analysis |> filter(total_steps > 0, total_steps < 50000), 
              aes(x = total_steps, fill = factor(study_interval))) +
   geom_histogram(bins = 50, alpha = 0.7, position = "dodge") +
   geom_vline(xintercept = median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE),
@@ -171,8 +303,8 @@ p4 <- ggplot(exercise_analysis |> filter(n_sessions > 0),
 -   **Central Tendency**: Median steps around `r scales::comma(round(median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE)))` steps/day, suggesting moderate activity levels overall
 -   **Between-Year Comparison**: The side-by-side histograms reveal whether activity patterns changed between 2022 and 2024 study intervals
 
-
 ### Activity type
+
 ```{r, fig.width = 10, fig.height = 17}
 # Prepare activity types data
 activities_long <- exercise_analysis |> 
@@ -201,8 +333,19 @@ activity_counts <- activities_long %>%
   mutate(pct = n_days / sum(n_days) * 100) %>%
   ungroup()
 
+# Get top 10 activities
+top_activities <- activity_counts %>%
+  group_by(activity_types) %>%
+  summarise(total = sum(n_days)) %>%
+  arrange(desc(total)) %>%
+  slice(1:10) %>%
+  pull(activity_types)
+
+activity_counts_top <- activity_counts %>%
+  filter(activity_types %in% top_activities)
+
 # Plot 1: Activity type frequency by year
-p1 <- ggplot(activity_counts, 
+p1 <- ggplot(activity_counts_top, 
              aes(x = reorder(activity_types, pct), y = pct, 
                  fill = factor(study_interval))) +
   geom_col(position = "dodge", alpha = 0.8) +
@@ -217,12 +360,11 @@ p1 <- ggplot(activity_counts,
 p1
 ```
 
-
 ### Exercise patterns across menstrual cycle phases
 
 ```{r, fig.width = 10, fig.height = 10}
 
-p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0), 
+p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0, total_steps < 50000), 
              aes(x = phase, y = total_steps, fill = phase)) +
   geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
   geom_jitter(width = 0.2, alpha = 0.1, size = 0.5) +
@@ -312,18 +454,14 @@ p4
 
 # Modelling and inferential analysis
 
-We used linear mixed-effects models to test associations between daily physical activity 
-and menstrual symptom severity. For each of 10 symptoms, we fit models with:
+We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. For each of 10 symptoms, we fit models with:
 
-- **Outcome**: Symptom severity (0-5 scale)
-- **Predictor**: Total active exercise minutes per day  
-- **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
-- **Random effects**: Random intercepts for participants (1|id)
+-   **Outcome**: Symptom severity (0-5 scale)
+-   **Predictor**: Total active exercise minutes per day\
+-   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+-   **Random effects**: Random intercepts for participants (1\|id)
 
-The random intercept structure accounts for repeated measures within individuals, 
-including the 20 participants (47.6%) who contributed data in both 2022 and 2024 
-study intervals. Models were fit using the lme4 package in R with REML = FALSE. 
-Statistical significance was assessed at α = 0.05.
+The random intercept structure accounts for repeated measures within individuals, including the 20 participants (47.6%) who contributed data in both 2022 and 2024 study intervals. Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
 
 ```{r}
 
@@ -423,3 +561,45 @@ Our analysis examined the relationship between objectively measured physical act
 2.  **Exercise Effects Are Complex**: The relationship between exercise and symptoms is not uniformly beneficial or harmful. Some symptoms may respond to exercise while others do not.
 
 3.  **Reverse Causation Concerns**: Positive associations (exercise → worse symptoms) likely reflect reverse causation. Symptoms prevent exercise rather than exercise causing symptoms.
+
+
+### Model Diagnostics
+```{r model-diagnostics, fig.width=10, fig.height=4}
+
+# Three essential plots
+par(mfrow = c(1, 3))
+
+# 1. Residuals vs Fitted (linearity + homoscedasticity)
+plot(fitted(model_fatigue), resid(model_fatigue),
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted",
+     pch = 16, col = rgb(0, 0, 0, 0.3))
+abline(h = 0, col = "red", lty = 2, lwd = 2)
+
+# 2. Q-Q Plot (normality of residuals)
+qqnorm(resid(model_cramps), main = "Q-Q Plot: Residuals",
+       pch = 16, col = rgb(0, 0, 0, 0.3))
+qqline(resid(model_cramps), col = "red", lwd = 2)
+
+# 3. Q-Q Plot (normality of random effects)
+qqnorm(ranef(model_cramps)$id[,1], main = "Q-Q Plot: Random Effects",
+       pch = 16, col = rgb(0, 0, 0, 0.5))
+qqline(ranef(model_cramps)$id[,1], col = "red", lwd = 2)
+
+par(mfrow = c(1, 1))
+```
+
+**Interpretation:**
+
+- **Residuals vs Fitted:** Should show random scatter around 0 (no pattern)
+- **Q-Q Plots:** Points should follow the red line (approximately normal)
+
+The diagnostic plots show that model assumptions are reasonably met: residuals show random scatter with no clear pattern, and both residuals and random effects are approximately normally distributed.
+
+**Assessment:** 
+
+The residual vs fitted plot shows diagonal banding typical of ordinal outcome data 
+(symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying 
+linear models to Likert-scale data. The Q-Q plots indicate that residuals and random 
+effects are approximately normally distributed, supporting the use of mixed-effects 
+models. 

@@ -11,7 +11,7 @@
 
 
 
-<title>EXERCISE: FINAL ANALYSIS</title>
+<title>EXERCISE:</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -387,13 +387,11 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EXERCISE: FINAL ANALYSIS</h1>
+<h1 class="title toc-ignore">EXERCISE:</h1>
 
 </div>
 
 
-<div id="libraries-required-and-global-settings" class="section level1">
-<h1>Libraries required and global settings</h1>
 <p>This analysis investigates the relationship between objectively
 measured exercise (steps, active minutes, calories) and self-reported
 menstrual symptoms across different cycle phases. We use data from two
@@ -415,7 +413,6 @@ options(
   ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
   ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
 )</code></pre>
-</div>
 <div id="eda" class="section level1">
 <h1>EDA</h1>
 <div id="data-summaries" class="section level3">
@@ -669,7 +666,7 @@ exercise_analysis = read.csv(&quot;./clean_data/all_daily_data.csv&quot;)
    # total_calories &lt; 10000
  # )
 
-p1 = ggplot(exercise_analysis |&gt; filter(total_steps &gt; 0), 
+p1 = ggplot(exercise_analysis |&gt; filter(total_steps &gt; 0, total_steps &lt; 50000), 
              aes(x = total_steps, fill = factor(study_interval))) +
   geom_histogram(bins = 50, alpha = 0.7, position = &quot;dodge&quot;) +
   geom_vline(xintercept = median(exercise_analysis$total_steps[exercise_analysis$total_steps &gt; 0], na.rm = TRUE),
@@ -784,8 +781,19 @@ activity_counts &lt;- activities_long %&gt;%
   mutate(pct = n_days / sum(n_days) * 100) %&gt;%
   ungroup()
 
+# Get top 10 activities
+top_activities &lt;- activity_counts %&gt;%
+  group_by(activity_types) %&gt;%
+  summarise(total = sum(n_days)) %&gt;%
+  arrange(desc(total)) %&gt;%
+  slice(1:10) %&gt;%
+  pull(activity_types)
+
+activity_counts_top &lt;- activity_counts %&gt;%
+  filter(activity_types %in% top_activities)
+
 # Plot 1: Activity type frequency by year
-p1 &lt;- ggplot(activity_counts, 
+p1 &lt;- ggplot(activity_counts_top, 
              aes(x = reorder(activity_types, pct), y = pct, 
                  fill = factor(study_interval))) +
   geom_col(position = &quot;dodge&quot;, alpha = 0.8) +
@@ -803,7 +811,7 @@ p1</code></pre>
 <div id="exercise-patterns-across-menstrual-cycle-phases"
 class="section level3">
 <h3>Exercise patterns across menstrual cycle phases</h3>
-<pre class="r"><code>p1 = ggplot(exercise_analysis |&gt; filter(!is.na(phase), total_steps &gt; 0), 
+<pre class="r"><code>p1 = ggplot(exercise_analysis |&gt; filter(!is.na(phase), total_steps &gt; 0, total_steps &lt; 50000), 
              aes(x = phase, y = total_steps, fill = phase)) +
   geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
   geom_jitter(width = 0.2, alpha = 0.1, size = 0.5) +
