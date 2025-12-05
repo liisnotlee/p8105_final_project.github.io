@@ -20,6 +20,7 @@ library(gt)
 library(ggsci)
 library(knitr)
 library(broom.mixed) # for tidy
+library(scales)
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -1021,6 +1022,186 @@ tidy(m2, effects = "fixed")|>
   knitr::kable(digits = 3)
 ```
 
+### ANU: STRESS
+### Distribution of Key Exercise Metrics
+```{r, fig.width = 13, fig.height = 12}
+
+exercise_analysis = all_daily_data
+
+# Distribution of daily step count
+p1 = ggplot(exercise_analysis |> filter(total_steps > 0, total_steps < 50000), 
+             aes(x = total_steps, fill = factor(study_interval))) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "dodge") +
+  geom_vline(xintercept = median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE),
+             linetype = "dashed", color = "black", linewidth = 1) +
+  labs(title = "Daily Step Count Distribution",
+       subtitle = paste("Median:", 
+                       scales::comma(round(median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE))), 
+                       "steps"),
+       x = "Total Daily Steps",
+       y = "Count",
+       fill = "Study Year") +
+  scale_x_continuous(labels = scales::comma)
+
+# Active minutes distribution
+p2 = ggplot(exercise_analysis |> filter(total_active_min > 0), 
+             aes(x = total_active_min, fill = factor(study_interval))) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "dodge") +
+  geom_vline(xintercept = median(exercise_analysis$total_active_min[exercise_analysis$total_active_min > 0], na.rm = TRUE),
+             linetype = "dashed", color = "black", linewidth = 1) +
+  labs(title = "Active Minutes Distribution",
+       subtitle = paste("Median:", 
+                       round(median(exercise_analysis$total_active_min[exercise_analysis$total_active_min > 0], na.rm = TRUE), 1), 
+                       "minutes"),
+       x = "Total Active Minutes",
+       y = "Count",
+       fill = "Study Year")
+
+# Calories Burned Distribution
+p3 = ggplot(exercise_analysis |> filter(total_calories > 0), 
+             aes(x = total_calories, fill = factor(study_interval))) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "dodge") +
+  geom_vline(xintercept = median(exercise_analysis$total_calories[exercise_analysis$total_calories > 0], na.rm = TRUE),
+             linetype = "dashed", color = "black", linewidth = 1) +
+  labs(title = "Calories Burned Distribution",
+       subtitle = paste("Median:", 
+                       scales::comma(round(median(exercise_analysis$total_calories[exercise_analysis$total_calories > 0], na.rm = TRUE))), 
+                       "calories"),
+       x = "Total Calories Burned",
+       y = "Count",
+       fill = "Study Year") +
+  scale_x_continuous(labels = scales::comma)
+
+# Exercise Sessions Per Day
+p4 = ggplot(exercise_analysis |> filter(n_sessions > 0), 
+             aes(x = n_sessions, fill = factor(study_interval))) +
+  geom_bar(alpha = 0.7, position = "dodge") +
+  labs(title = "Exercise Sessions Per Day",
+       x = "Number of Sessions",
+       y = "Count",
+       fill = "Study Year")
+
+(p1 + p2) / (p3 + p4) + 
+  plot_layout(guides = "collect")
+
+```
+**Step Count Distribution:** Daily steps on active days showed pronounced right-skew 
+with a median of 4,455 steps. The bulk of 
+observations fell between 2,000-8,000 steps, with a long tail extending beyond 20,000 steps. 
+The 2024 distribution (orange) shifted notably rightward compared to 2022 (teal), indicating 
+higher step counts. Five extreme observations (≥50,000 steps) were excluded from this 
+visualization only, as they distorted the scale and were obvious data errors.
+
+**Active Minutes Distribution:** Exercise duration exhibited similar right-skew 
+(52 minutes), with most sessions lasting 20-80 minutes. 
+The 2024 cohort showed longer session durations, with the distribution peak occurring at 
+higher values than 2022. This pattern suggests not only more frequent exercise in 2024, 
+but also longer duration per session.
+
+**Calories Burned Distribution:** Energy expenditure followed the expected pattern given 
+step and duration data (Median = 153 calories). The heavy concentration near zero with gradual right tail indicates predominantly 
+light-to-moderate intensity exercise, with occasional high-intensity sessions. The 2024-2022 
+difference parallels that observed in steps and active minutes duration.
+
+**Exercise Sessions:** Most active days included 1-3 discrete exercise sessions, with a 
+clear mode at 2 sessions. The 2024 cohort showed higher frequencies of 2+ sessions compared 
+to 2022, suggesting either improved activity tracking or genuinely more structured exercise 
+routines.
+
+These distributions collectively demonstrate substantial right-skew, high between-person 
+variability.
+
+### Exercise patterns across menstrual cycle phases
+```{r, fig.width = 10, fig.height = 10}
+
+p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0, total_steps < 50000), 
+             aes(x = phase, y = total_steps, fill = phase)) +
+  geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
+  geom_jitter(width = 0.2, alpha = 0.1, size = 0.5) +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "white") +
+  facet_wrap(~study_interval, ncol = 2) +  # Side by side
+  labs(title = "Daily Steps by Menstrual Cycle Phase",
+       subtitle = "White diamonds represent mean values | Comparing study years",
+       x = "Cycle Phase",
+       y = "Total Daily Steps") +
+  scale_y_continuous(labels = comma) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+p2 = ggplot(exercise_analysis |> filter(!is.na(phase), total_active_min > 0), 
+             aes(x = phase, y = total_active_min, fill = phase)) +
+  geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
+  geom_jitter(width = 0.2, alpha = 0.1, size = 0.5) +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "white") +
+  facet_wrap(~study_interval, ncol = 2) +
+  labs(title = "Active Minutes by Menstrual Cycle Phase",
+       x = "Cycle Phase",
+       y = "Total Active Minutes") +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+p1 / p2 + plot_layout(guides = "collect")
+```
+
+Physical activity varied across menstrual cycle phases, with patterns differing by year. In 2022, activity levels remained relatively stable across phases, with only slight differences between fertility, follicular, luteal, and menstrual phases. In contrast, 2024 showed more pronounced phase-related patterns, with the fertility phase demonstrating highest activity levels, followed by the follicular phase, and lower activity during luteal and menstrual phases. Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns. The 2024 cohort showed consistently higher activity across all phases compared to 2022, confirming the year differences observed in overall descriptive statistics. 
+
+### Exercise vs. menstrual symptoms
+
+```{r, fig.width = 10, fig.height = 10, warning = FALSE, message = FALSE}
+symptoms_long = exercise_analysis |> 
+  filter(total_active_min > 0) |> 
+  select(id, total_active_min, appetite_score, headaches_score, sorebreasts_score, sleepissue_score, cramps_score, fatigue_score, 
+         headaches_score, moodswing_score, foodcravings_score, indigestion_score, bloating_score) |> 
+  pivot_longer(cols = ends_with("_score"), 
+               names_to = "symptom", 
+               values_to = "severity") |> 
+  filter(!is.na(severity)) |> 
+  mutate(symptom = case_when(
+    symptom == "appetite_score" ~ "Appetite",
+    symptom == "headaches_score" ~"Head Aches",
+    symptom == "sorebreasts_score" ~ "Sore Breasts",
+    symptom == "sleepissue_score" ~ "Sleep Issue",
+    symptom == "cramps_score" ~ "Cramps",
+    symptom == "fatigue_score" ~ "Fatigue",
+    symptom == "headaches_score" ~ "Headaches",
+    symptom == "moodswing_score" ~ "Mood Swings",
+    symptom == "foodcravings_score" ~ "Food Cravings",
+    symptom == "indigestion_score" ~ "Indigestion",
+    symptom == "bloating_score" ~ "Bloating"
+  ))
+
+p4 = ggplot(symptoms_long, 
+             aes(x = total_active_min, y = severity, color = symptom)) +
+  geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.5, alpha = 0.2) +
+  facet_wrap(~symptom, ncol = 2) +
+  labs(title = "Daily Activity vs Individual Symptoms",
+       x = "Total Daily Activity (mins)",
+       y = "Symptom Severity (0-5)") +
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(breaks = 0:5) +
+  theme(legend.position = "none")
+
+p4
+```
+The scatterplots examine crude associations between daily  activity (exercise) and each symptom:
+
+**Negative slopes (potential benefits):**
+- **Bloating**: Modest downward trend suggests higher activity associates with reduced bloating
+- **Food cravings**: Slight negative association, though relationship appears weak
+- **Indigestion**: Minimal negative slope with high variability
+
+**Flat relationships (no clear association):**
+- **Cramps**: Near-horizontal line despite being primary outcome
+- **Appetite, headaches, sleep issues, sore breasts**: Essentially flat with wide confidence bands
+- **Mood swings**: Slight positive but nearly flat, high uncertainty
+
+**Positive slope (likely reverse causation):**
+- **Fatigue**: Higher fatigue appears to reduce exercise, not vice versa
+
+**Sleep issues** and **sore breasts** exhibited insufficient data spread to estimate reliable trends
+
+Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, the considerable scatter reveals that individual-level associations vary widely, i.e., some participants show strong exercise-symptom relationships while others show none. Third, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Fourth, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.
 
 
 # Modelling
@@ -1175,6 +1356,117 @@ We found sleep issues to be positively associated with an educational attainment
 
 We found sore breasts to be only positively associated with older age (p < 0.01). We did not find cramping symptoms to be associated with any biometric or demographic characteristic. 
 
+### STRESS: ANU
+
+We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. Mixed-effects models explicitly account for this hierarchical data structure through random effects.
+
+For each of 11 symptoms, we fit models with:
+
+-   **Outcome**: Symptom severity (0-5 scale)
+-   **Predictor**: Total active exercise minutes per day
+-   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+-   **Random effects**: Random intercepts for participants (1|id)
+
+The random intercept structure accounts for repeated measures within individuals, including the 20 participants (47.6%) who contributed data in both 2022 and 2024 study intervals. Each participant's random intercept captures their baseline symptom tendency, allowing the model to distinguish between-person effects (do people who exercise more generally have fewer symptoms?) from within-person effects (on days when a person exercises more, do they experience fewer symptoms?). 
+
+Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
+```{r}
+
+# Model 1: Exercise → cramps
+model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_cramps)
+
+# Model 2: Exercise → fatigue
+model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_fatigue)
+
+# Model 3: Exercise → headaches
+model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_headaches)
+
+# Model 4: Exercise → mood swings
+model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_mood)
+
+# Model 5: Exercise → sleep issues
+model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sleep)
+
+# Model 6: Exercise → bloating
+model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_bloating)
+
+# Model 7: Exercise → appetite
+model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_appetite)
+
+# Model 8: Exercise → sore breasts
+model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sorebreasts)
+
+# Model 9: Exercise → food cravings
+model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_foodcravings)
+
+# Model 10: Exercise → indigestion
+model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_indigestion)
+
+```
+
+
+```{r}
+# Cleaning results:
+# Extracting coefficients for exercise effect
+results_summary = bind_rows(
+  tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
+  tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
+  tidy(model_headaches, effects = "fixed") %>% mutate(outcome = "Head Aches"),
+  tidy(model_mood, effects = "fixed") %>% mutate(outcome = "Mood Swings"),
+  tidy(model_sleep, effects = "fixed") %>% mutate(outcome = "Sleep Issues"),
+  tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
+  tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite"),
+  tidy(model_indigestion, effects = "fixed") %>% mutate(outcome = "Indigestion"),
+  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore breasts"),
+  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food cravings")
+) %>%
+  filter(term == "total_active_min") %>%
+  select(outcome, estimate, std.error, statistic, p.value) %>%
+  mutate(
+    significant = ifelse(p.value < 0.05, "Yes", "No"),
+    p.value = format.pval(p.value, digits = 3, eps = 0.001)
+  )
+
+knitr::kable(results_summary)
+```
+Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 11 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0026819	, SE = 0.0013608, p = 0.0493).
+
+For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
+
+The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were near-zero with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
+
+Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = -0.00005, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
+
 
 # Discussion
 
@@ -1200,7 +1492,9 @@ We found several associations between menstrual symptoms and lifestyle factors, 
 Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Similarly, minutes of activity was not positively associated with the reduction of any symptoms in our mixed-modal results. 
 
 ### Exercise discussion
+
 Anu: 
+
 ## Limitation
 
 Yue(Several limitations should be considered when interpreting these findings. First, the dataset relies on self-reported symptom scores, which may be subject to recall bias or subjective interpretation. Second, while repeated measures are accounted for using linear mixed models, the sample size for some phases may be limited, reducing statistical power to detect subtle effects. Finally, other biological and lifestyle factors—such as stress, sleep, diet, and physical activity—were not controlled for, which could influence mood, appetite, and fatigue. Therefore, the results should be interpreted as suggestive of phase-related trends rather than definitive causal effects.)

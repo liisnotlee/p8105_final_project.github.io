@@ -213,11 +213,6 @@ p4 = ggplot(exercise_analysis |> filter(n_sessions > 0),
   plot_layout(guides = "collect")
 
 ```
-**Key Findings:**
-
--   **Distribution Shape**: Exercise metrics show right-skewed distributions, typical of activity data where some days have very high activity
--   **Central Tendency**: Median steps around `r scales::comma(round(median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE)))` steps/day, suggesting moderate activity levels overall
--   **Between-Year Comparison**: The side-by-side histograms reveal whether activity patterns changed between 2022 and 2024 study intervals
 
 **Step Count Distribution:** Daily steps on active days showed pronounced right-skew 
 with a median of 4,455 steps. The bulk of 
@@ -475,7 +470,7 @@ summary(model_indigestion)
 
 ```{r}
 # Cleaning results:
-# Extract coefficients for exercise effect
+# Extracting coefficients for exercise effect
 results_summary = bind_rows(
   tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
   tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
@@ -498,9 +493,9 @@ results_summary = bind_rows(
 knitr::kable(results_summary)
 ```
 
-Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 11 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: **fatigue** (β = -0.0026819	, SE = 0.0013608, p = 0.0493).
+Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 11 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0026819	, SE = 0.0013608, p = 0.0493).
 
-For **fatigue**, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
+For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
 
 The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were near-zero with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
 
