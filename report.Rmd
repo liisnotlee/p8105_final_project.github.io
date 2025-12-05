@@ -1025,16 +1025,21 @@ tidy(m2, effects = "fixed")|>
 
 # Modelling
 ## Hormone
-### Moodswing across phase
+### Mood Swing Linear Mixed Models
 
-Explore the relationship among and moodswing score.
+
+Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
+
 ```{r, include=FALSE}
-Moodswing_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
-summary(m1)
+mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
+
+
+
+mood_mixed_model
+
 ```
 
-Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
-```
+Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
@@ -1043,7 +1048,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 Explore the relationship between estrogen levels and appetite scores, accounting for repeated measures.
 
-```{r, echo=FALSE}
+```{r, include=FALSE}
 appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
 summary(appetite_model)
 ```
