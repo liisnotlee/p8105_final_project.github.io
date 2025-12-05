@@ -398,18 +398,13 @@ library(mgcv)
 library(dplyr)
 library(tidyr)
 library(patchwork)
-library(lme4)</code></pre>
-<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(lmerTest)</code></pre>
-<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(gt)</code></pre>
-<pre><code>## Warning: package &#39;gt&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(ggsci)</code></pre>
-<pre><code>## Warning: package &#39;ggsci&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(knitr)
-library(broom.mixed) # for tidy</code></pre>
-<pre><code>## Warning: package &#39;broom.mixed&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(scales)
+library(lme4)
+library(lmerTest)
+library(gt)
+library(ggsci)
+library(knitr)
+library(broom.mixed) # for tidy
+library(scales)
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
@@ -950,23 +945,23 @@ session or if both stress and sleep scores are present.</p>
 <div id="participant-characteristics" class="section level2">
 <h2>Participant Characteristics</h2>
 <pre class="r"><code>summary_table_gt</code></pre>
-<div id="yqioucbckq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#yqioucbckq table {
+<div id="nlamyoxsaf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nlamyoxsaf table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#yqioucbckq thead, #yqioucbckq tbody, #yqioucbckq tfoot, #yqioucbckq tr, #yqioucbckq td, #yqioucbckq th {
+#nlamyoxsaf thead, #nlamyoxsaf tbody, #nlamyoxsaf tfoot, #nlamyoxsaf tr, #nlamyoxsaf td, #nlamyoxsaf th {
   border-style: none;
 }
 
-#yqioucbckq p {
+#nlamyoxsaf p {
   margin: 0;
   padding: 0;
 }
 
-#yqioucbckq .gt_table {
+#nlamyoxsaf .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -992,12 +987,12 @@ session or if both stress and sleep scores are present.</p>
   border-left-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_caption {
+#nlamyoxsaf .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#yqioucbckq .gt_title {
+#nlamyoxsaf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1009,7 +1004,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-width: 0;
 }
 
-#yqioucbckq .gt_subtitle {
+#nlamyoxsaf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1021,7 +1016,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-width: 0;
 }
 
-#yqioucbckq .gt_heading {
+#nlamyoxsaf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1033,13 +1028,13 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_bottom_border {
+#nlamyoxsaf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_col_headings {
+#nlamyoxsaf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1054,7 +1049,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_col_heading {
+#nlamyoxsaf .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1074,7 +1069,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#yqioucbckq .gt_column_spanner_outer {
+#nlamyoxsaf .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1086,15 +1081,15 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 4px;
 }
 
-#yqioucbckq .gt_column_spanner_outer:first-child {
+#nlamyoxsaf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yqioucbckq .gt_column_spanner_outer:last-child {
+#nlamyoxsaf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yqioucbckq .gt_column_spanner {
+#nlamyoxsaf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1106,11 +1101,11 @@ session or if both stress and sleep scores are present.</p>
   width: 100%;
 }
 
-#yqioucbckq .gt_spanner_row {
+#nlamyoxsaf .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#yqioucbckq .gt_group_heading {
+#nlamyoxsaf .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1136,7 +1131,7 @@ session or if both stress and sleep scores are present.</p>
   text-align: left;
 }
 
-#yqioucbckq .gt_empty_group_heading {
+#nlamyoxsaf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1151,15 +1146,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: middle;
 }
 
-#yqioucbckq .gt_from_md > :first-child {
+#nlamyoxsaf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yqioucbckq .gt_from_md > :last-child {
+#nlamyoxsaf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yqioucbckq .gt_row {
+#nlamyoxsaf .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -1178,7 +1173,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#yqioucbckq .gt_stub {
+#nlamyoxsaf .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1191,7 +1186,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#yqioucbckq .gt_stub_row_group {
+#nlamyoxsaf .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1205,15 +1200,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: top;
 }
 
-#yqioucbckq .gt_row_group_first td {
+#nlamyoxsaf .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#yqioucbckq .gt_row_group_first th {
+#nlamyoxsaf .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#yqioucbckq .gt_summary_row {
+#nlamyoxsaf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1223,16 +1218,16 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#yqioucbckq .gt_first_summary_row {
+#nlamyoxsaf .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_first_summary_row.thick {
+#nlamyoxsaf .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#yqioucbckq .gt_last_summary_row {
+#nlamyoxsaf .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1242,7 +1237,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_grand_summary_row {
+#nlamyoxsaf .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1252,7 +1247,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#yqioucbckq .gt_first_grand_summary_row {
+#nlamyoxsaf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1262,7 +1257,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_last_grand_summary_row_top {
+#nlamyoxsaf .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1272,11 +1267,11 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_striped {
+#nlamyoxsaf .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yqioucbckq .gt_table_body {
+#nlamyoxsaf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1285,7 +1280,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_footnotes {
+#nlamyoxsaf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1299,7 +1294,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_footnote {
+#nlamyoxsaf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1308,7 +1303,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#yqioucbckq .gt_sourcenotes {
+#nlamyoxsaf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1322,7 +1317,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#yqioucbckq .gt_sourcenote {
+#nlamyoxsaf .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1330,72 +1325,72 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#yqioucbckq .gt_left {
+#nlamyoxsaf .gt_left {
   text-align: left;
 }
 
-#yqioucbckq .gt_center {
+#nlamyoxsaf .gt_center {
   text-align: center;
 }
 
-#yqioucbckq .gt_right {
+#nlamyoxsaf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yqioucbckq .gt_font_normal {
+#nlamyoxsaf .gt_font_normal {
   font-weight: normal;
 }
 
-#yqioucbckq .gt_font_bold {
+#nlamyoxsaf .gt_font_bold {
   font-weight: bold;
 }
 
-#yqioucbckq .gt_font_italic {
+#nlamyoxsaf .gt_font_italic {
   font-style: italic;
 }
 
-#yqioucbckq .gt_super {
+#nlamyoxsaf .gt_super {
   font-size: 65%;
 }
 
-#yqioucbckq .gt_footnote_marks {
+#nlamyoxsaf .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#yqioucbckq .gt_asterisk {
+#nlamyoxsaf .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#yqioucbckq .gt_indent_1 {
+#nlamyoxsaf .gt_indent_1 {
   text-indent: 5px;
 }
 
-#yqioucbckq .gt_indent_2 {
+#nlamyoxsaf .gt_indent_2 {
   text-indent: 10px;
 }
 
-#yqioucbckq .gt_indent_3 {
+#nlamyoxsaf .gt_indent_3 {
   text-indent: 15px;
 }
 
-#yqioucbckq .gt_indent_4 {
+#nlamyoxsaf .gt_indent_4 {
   text-indent: 20px;
 }
 
-#yqioucbckq .gt_indent_5 {
+#nlamyoxsaf .gt_indent_5 {
   text-indent: 25px;
 }
 
-#yqioucbckq .katex-display {
+#nlamyoxsaf .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#yqioucbckq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#nlamyoxsaf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1566,7 +1561,7 @@ mood swing intensity.</p>
 ## (`stat_ydensity()`).</code></pre>
 <pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
 ## ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
-<pre><code>## Warning: Removed 2921 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 2886 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Violin plots show substantial inter-individual variability. Menstrual
@@ -1589,7 +1584,7 @@ variation across phases with violin plots.</p>
 ## (`stat_ydensity()`).</code></pre>
 <pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
 ## ℹ Set `drop = FALSE` to consider such groups for position adjustment purposes.</code></pre>
-<pre><code>## Warning: Removed 3833 rows containing missing values or values outside the scale range
+<pre><code>## Warning: Removed 3876 rows containing missing values or values outside the scale range
 ## (`geom_point()`).</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>Luteal phase shows a right-skewed distribution, indicating most
@@ -2140,29 +2135,101 @@ high severity, consistent with the descriptive statistics.</p>
 </div>
 <div id="modelling" class="section level1">
 <h1>Modelling</h1>
-<div id="hormone" class="section level2">
-<h2>Hormone</h2>
+<div id="hormone-and-symptoms-1" class="section level2">
+<h2>Hormone and Symptoms</h2>
 <div id="mood-swing-linear-mixed-models" class="section level3">
 <h3>Mood Swing Linear Mixed Models</h3>
-<p>Test whether mood swing and fatigue differ by menstrual phase,
-accounting for repeated measures.</p>
-<p>Mood swings are lowest near ovulation, slightly higher in Luteal, and
-peak during Menstrual phase. Fatigue shows a similar pattern: lowest
-near ovulation, increasing through Luteal, highest during Menstrual
-phase. Random effects indicate that some individuals are chronically
-more fatigued or mood-sensitive than others, while residual variance
-captures day-to-day variability.</p>
-<p>Luteal phase shows a right-skewed distribution, indicating most
-low-flow observations but a few high-flow days. Menstrual phase is
-narrow and tall, indicating consistently higher flow intensity.</p>
+<p>Test whether mood swing differ by menstrual phase, accounting for
+repeated measures.</p>
+<p>Based on the model results, the average mood swing score during the
+menstrual phase (the model intercept) is 1.77. Compared to this,
+symptoms are modestly lower in other phases, with the follicular phase
+showing the largest reduction of 0.37 points, followed by the fertility
+window at 0.34 points lower, and the luteal phase at 0.24 points lower.
+However, the analysis reveals that individual differences between
+participants are substantial; the random effects standard deviation of
+0.98 for participant baselines is nearly identical to the residual
+standard deviation of 1.00, indicating that the unique baseline score of
+an individual accounts for as much variance in the data as all other
+unmeasured factors and the cycle phases combined. Therefore, while a
+statistically significant pattern links the menstrual phase to higher
+symptom reports, the predominant finding is the extensive variability
+from person to person, underscoring that the experience of cycle-related
+mood swings is highly individual.</p>
+</div>
+<div id="flow-volume-vs-lh" class="section level3">
+<h3>Flow volume vs LH</h3>
+<p>Observing in exploratory scatter plots that self-reported flow volume
+scores appeared to follow an inverse pattern relative to luteinizing
+hormone (LH) levels, I conducted a linear mixed model analysis to
+formally test this visual hypothesis. The model was used to determine if
+this apparent inverse relationship was statistically significant when
+rigorously accounting for the repeated measures within each individual
+participant.</p>
+<pre class="r"><code>flow_volume_model &lt;- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms_eda)
+summary(flow_volume_model)</code></pre>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
+## Formula: flow_volume_score ~ lh + (1 | id)
+##    Data: hormone_symptoms_eda
+## 
+## REML criterion at convergence: 8788.8
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.3246 -0.4620 -0.3335 -0.2010  4.6921 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.2053   0.4531  
+##  Residual             1.4152   1.1896  
+## Number of obs: 2726, groups:  id, 42
+## 
+## Fixed effects:
+##               Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)  6.415e-01  7.664e-02  3.459e+01   8.369 7.88e-10 ***
+## lh          -1.138e-02  3.533e-03  2.701e+03  -3.221  0.00129 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##    (Intr)
+## lh -0.237</code></pre>
+<p>Based on the linear mixed model, a significant but modest
+relationship exists between luteinizing hormone (LH) levels and
+perceived menstrual flow volume. For every one-unit increase in LH, the
+flow volume score is estimated to decrease by -0.01138 points (p =
+0.00129). While statistically significant, this effect is small in
+magnitude. The model indicates substantial individual differences, as
+the variation in scores within a single person over time (residual SD =
+1.19) is much greater than the average differences between individuals’
+baselines (intercept SD = 0.45). Therefore, while LH shows a significant
+inverse association with flow volume, within-person biological and
+measurement variability remains the dominant feature of the data.</p>
 </div>
 <div id="appetite-vs-estrogen" class="section level3">
 <h3>Appetite vs Estrogen</h3>
-<p>Explore the relationship between estrogen levels and appetite scores,
-accounting for repeated measures.</p>
-<p>Random intercept variance (0.1746) indicates participant-specific
-baseline appetite differences. The fixed effect of estrogen is small
-(0.00013 per unit) and not significant (t = 0.869).</p>
+<p>After observing in a scatter plot that average moodswing scores
+appeared to follow estrogen patterns, I applied a linear mixed model to
+appetite to formally test whether estrogen levels directly predict its
+changes within individuals.</p>
+<p>Based on the linear mixed-effects model, the analysis finds no
+statistically significant relationship between measured estrogen levels
+and self-reported appetite scores in this dataset. The model estimates
+that for every one-unit increase in estrogen, the appetite score
+increases by a mere 0.0001137 points, an effect size so small as to be
+negligible. This relationship is not reliable, as indicated by a p-value
+of 0.402, which is far above the conventional threshold for
+significance. The model estimates the average appetite score when
+estrogen is zero to be 2.897 points. More notably, the random effects
+structure reveals that differences between individuals account for
+meaningful variation; the standard deviation of individual baseline
+scores is 0.415, while the standard deviation of the within-person
+residuals is 0.726. This indicates that while people have different
+typical appetite levels, the unexplained variation within a person’s own
+measurements over time is nearly twice as large as the differences
+between individuals, and estrogen, as modeled here, does not explain a
+significant portion of that within-person fluctuation.</p>
 </div>
 <div id="stress-score-model" class="section level3">
 <h3>Stress score model</h3>
@@ -2298,77 +2365,77 @@ symptom_model_table</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">-2.8740063</td>
-<td align="right">0.2617214</td>
-<td align="right">-10.9811667</td>
+<td align="right">-2.8740211</td>
+<td align="right">0.2617355</td>
+<td align="right">-10.9806335</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">fatigue_score</td>
-<td align="right">0.0828337</td>
-<td align="right">0.0393637</td>
-<td align="right">2.1043197</td>
-<td align="right">0.0353506</td>
+<td align="right">0.0828352</td>
+<td align="right">0.0393638</td>
+<td align="right">2.1043502</td>
+<td align="right">0.0353479</td>
 </tr>
 <tr class="odd">
 <td align="left">cramps_score</td>
-<td align="right">0.6793591</td>
-<td align="right">0.0390455</td>
-<td align="right">17.3991514</td>
+<td align="right">0.6793600</td>
+<td align="right">0.0390456</td>
+<td align="right">17.3991598</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">sleepissue_score</td>
-<td align="right">-0.0988167</td>
+<td align="right">-0.0988157</td>
 <td align="right">0.0408318</td>
-<td align="right">-2.4200929</td>
-<td align="right">0.0155165</td>
+<td align="right">-2.4200679</td>
+<td align="right">0.0155176</td>
 </tr>
 <tr class="odd">
 <td align="left">exerciselevel_score</td>
-<td align="right">-0.0361530</td>
-<td align="right">0.0448746</td>
-<td align="right">-0.8056439</td>
-<td align="right">0.4204482</td>
+<td align="right">-0.0361540</td>
+<td align="right">0.0448749</td>
+<td align="right">-0.8056622</td>
+<td align="right">0.4204377</td>
 </tr>
 <tr class="even">
 <td align="left">appetite_score</td>
-<td align="right">0.0213400</td>
-<td align="right">0.0543029</td>
-<td align="right">0.3929812</td>
-<td align="right">0.6943334</td>
+<td align="right">0.0213428</td>
+<td align="right">0.0543040</td>
+<td align="right">0.3930237</td>
+<td align="right">0.6943020</td>
 </tr>
 <tr class="odd">
 <td align="left">bloating_score</td>
-<td align="right">0.1999499</td>
+<td align="right">0.1999467</td>
 <td align="right">0.0455794</td>
-<td align="right">4.3868442</td>
+<td align="right">4.3867754</td>
 <td align="right">0.0000115</td>
 </tr>
 <tr class="even">
 <td align="left">moodswing_score</td>
-<td align="right">0.0239383</td>
-<td align="right">0.0396493</td>
-<td align="right">0.6037511</td>
-<td align="right">0.5460091</td>
+<td align="right">0.0239386</td>
+<td align="right">0.0396494</td>
+<td align="right">0.6037568</td>
+<td align="right">0.5460054</td>
 </tr>
 <tr class="odd">
 <td align="left">indigestion_score</td>
-<td align="right">0.0004675</td>
+<td align="right">0.0004684</td>
 <td align="right">0.0460566</td>
-<td align="right">0.0101495</td>
-<td align="right">0.9919020</td>
+<td align="right">0.0101706</td>
+<td align="right">0.9918851</td>
 </tr>
 <tr class="even">
 <td align="left">sorebreasts_score</td>
-<td align="right">0.1716200</td>
-<td align="right">0.0473757</td>
-<td align="right">3.6225284</td>
-<td align="right">0.0002917</td>
+<td align="right">0.1716188</td>
+<td align="right">0.0473759</td>
+<td align="right">3.6224898</td>
+<td align="right">0.0002918</td>
 </tr>
 <tr class="odd">
 <td align="left">sd__(Intercept)</td>
-<td align="right">0.7640276</td>
+<td align="right">0.7640288</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -2390,28 +2457,28 @@ physiology_model_table</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">-0.0847353</td>
-<td align="right">0.1118287</td>
-<td align="right">-0.7577244</td>
-<td align="right">0.4486160</td>
+<td align="right">-0.0847347</td>
+<td align="right">0.1118339</td>
+<td align="right">-0.7576829</td>
+<td align="right">0.4486408</td>
 </tr>
 <tr class="even">
 <td align="left">estrogen</td>
 <td align="right">-0.0107894</td>
 <td align="right">0.0006200</td>
-<td align="right">-17.4031601</td>
+<td align="right">-17.4029663</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="odd">
 <td align="left">lh</td>
-<td align="right">-0.0399829</td>
+<td align="right">-0.0399827</td>
 <td align="right">0.0076412</td>
-<td align="right">-5.2325559</td>
+<td align="right">-5.2325334</td>
 <td align="right">0.0000002</td>
 </tr>
 <tr class="even">
 <td align="left">sd__(Intercept)</td>
-<td align="right">0.5473760</td>
+<td align="right">0.5473770</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -3502,7 +3569,7 @@ summary(model_indigestion)</code></pre>
 ## 
 ## Fixed effects:
 ##                    Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)        1.769395   0.244309  32.741430   7.242 2.75e-08 ***
+## (Intercept)        1.769395   0.244309  32.741431   7.242 2.75e-08 ***
 ## total_active_min  -0.001599   0.001182 467.608774  -1.353   0.1766    
 ## phasefollicular   -0.186153   0.135431 469.771507  -1.375   0.1699    
 ## phasefertility    -0.312394   0.136794 469.868346  -2.284   0.0228 *  
@@ -3676,57 +3743,29 @@ integer values in categorical variables; 2) inconsistent likert scale
 a study to collect different likert scale data, collect them at the same
 scale for easy and consistent future data analyses.</p>
 <ul>
-<li>data entry issues - take sleep.csv as an example</li>
+<li>data entry issues - take sleep.csv as an example ### Hormone and
+symptoms discussion Yue This analysis explored the relationships between
+menstrual cycle phases, key hormones, and self-reported symptoms. The
+hormone profiles followed expected physiological patterns, with estrogen
+peaking during the fertility phase and luteinizing hormone (LH) spiking
+sharply at ovulation. Symptom patterns also aligned with common clinical
+observations: mood swing intensity and flow volume were highest during
+the menstrual phase, while appetite showed minimal fluctuation.</li>
 </ul>
-<p>Yue (The observed hormonal, emotional, and physiological patterns
-across the menstrual cycle are highly consistent with established
-reproductive endocrinology. Estrogen gradually increases through the
-follicular phase, peaks during the fertility (ovulatory) phase, and
-remains at moderate levels in the luteal phase, while luteinizing
-hormone (LH) exhibits a sharp surge at ovulation to trigger follicle
-rupture and ovum release. Both hormones reach their lowest levels during
-menstruation, reflecting the endocrine “reset” following corpus luteum
-regression. Corresponding to these hormonal dynamics, mood swings show
-clear phase-dependent variation. The distribution of mood swing severity
-is most pronounced during menstruation, with average intensity highest
-in the menstrual phase (1.85) and lowest in the luteal phase (1.41),
-with intermediate levels in the follicular and fertility phases. This
-elevated emotional symptom burden during menstruation is biologically
-plausible, as the abrupt withdrawal of both estrogen and progesterone is
-known to disrupt serotonergic signaling and emotional regulation. Linear
-mixed-effects models further confirm significant phase-dependent effects
-on both mood swings and fatigue, with the largest increases occurring
-during menstruation and more moderate elevations during the luteal
-phase. The substantial random intercept variance indicates strong
-inter-individual differences in baseline symptom severity, reinforcing
-the necessity of accounting for repeated measures within
-participants.</p>
-<p>Flow volume patterns also followed classic physiological
-expectations. The menstrual phase exhibited the highest and most
-consistent flow intensity (mean = 2.38), reflecting active endometrial
-shedding. In contrast, the luteal phase showed minimal flow (mean =
-0.03) with a right-skewed distribution, indicating that most
-observations reflect very low flow with only occasional spotting.
-Fertility and follicular phases also remained low (0.07 and 0.23,
-respectively), consistent with the uterine lining being preserved
-outside of menstruation. These results strongly support the biological
-validity of the flow measurements.</p>
-<p>Appetite demonstrated more subtle cycle-related variation, with the
-highest average levels occurring during the fertility phase (2.96), when
-estrogen is maximized, and the lowest during the follicular phase
-(2.85), with relatively stable values during luteal (2.95) and menstrual
-(2.90) phases. This suggests that appetite may be modestly influenced by
-hormonal elevation near ovulation. However, linear mixed-effects
-modeling revealed that estrogen alone was not a statistically
-significant predictor of appetite after accounting for repeated
-measures, with a very small effect size and a non-significant t-value
-(0.869). The random intercept variance indicates that baseline
-individual differences in appetite explain more variability than
-short-term hormonal fluctuations. Together, these findings suggest that
-while appetite may exhibit weak phase-related trends, it is regulated by
-a complex interplay of hormonal, behavioral, and individual-specific
-factors, and may be better modeled using multiple hormonal predictors
-such as LHalongside phase.)</p>
+<p>The linear mixed model for mood swings confirmed a statistically
+significant association with cycle phase but revealed that the
+individual differences between participants (random intercept SD = 0.98)
+accounted for variation comparable to the model’s residual error. This
+underscores that baseline predisposition is a critical factor in symptom
+experience, often outweighing the phase effect itself. Similarly, the
+model testing the observed inverse relationship between LH and flow
+volume found a statistically significant result (β = -0.011, p = 0.001),
+but the effect size was very small. The substantial residual variation
+(SD = 1.19) indicates that LH levels alone explain only a minor portion
+of the daily variation in perceived flow. Contrary to the initial visual
+hypothesis, the model found no significant relationship between estrogen
+levels and appetite scores (p = 0.402), suggesting other factors drive
+appetite changes across the cycle.</p>
 </div>
 <div id="multimodal-discussion" class="section level3">
 <h3>Multimodal discussion</h3>
