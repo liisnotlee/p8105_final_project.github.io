@@ -4,6 +4,7 @@ output: html_document
 ---
 
 # Libraries required and global settings
+
 This analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) and self-reported menstrual symptoms across different cycle phases. We use data from two study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
 
 ```{r, message = FALSE, warning = FALSE}
@@ -27,18 +28,82 @@ options(
 
 # EDA
 
+### Data summaries
+
+```{r}
+# View observations with extreme values
+
+# Load raw data
+raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
+# Identify and view extreme observations
+extreme_obs <- raw_data %>%
+  filter(total_steps >= 50000 | 
+         total_active_min >= 1440 | 
+         total_calories >= 10000) %>%
+  select(id, study_interval, day_in_study, 
+         total_steps, total_active_min, total_calories,
+         n_sessions, total_duration_min) %>%
+  arrange(desc(total_steps))
+
+# Display the observations
+print(extreme_obs)
+
+# Or view in a nice table
+library(knitr)
+library(kableExtra)
+
+extreme_obs %>%
+  kable(caption = "Observations with Extreme Values",
+        col.names = c("ID", "Year", "Day", "Steps", "Active Min", 
+                     "Calories", "Sessions", "Duration")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+## Data Summary and Quality Checks
+
+```{r data-preparation, message=FALSE}
+# Load and check raw data
+raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
+# Identify extreme values
+outliers <- raw_data %>%
+  summarise(
+    extreme_steps = sum(total_steps >= 50000, na.rm = TRUE),
+    extreme_active = sum(total_active_min >= 1440, na.rm = TRUE),
+    extreme_calories = sum(total_calories >= 10000, na.rm = TRUE)
+  )
+
+outliers
+# Apply cleaning filters
+exercise_analysis <- raw_data %>%
+  filter(
+    total_steps < 50000,        # Realistic daily maximum
+    total_active_min < 1440,     # Cannot exceed 24 hours
+    total_calories < 10000       # Realistic exercise expenditure
+  )
+```
+
+
 ### Distribution of key exercise metrics
-```{r, fig.width = 13, fig.height = 10}
+
+```{r, fig.width = 13, fig.height = 15}
 
 # Filtering realistic values
-exercise_analysis = read.csv("./clean_data/all_daily_data.csv") |> 
-  distinct(id, study_interval, day_in_study, .keep_all = TRUE) |> 
-  filter(
+
+exercise_analysis = read.csv("./clean_data/all_daily_data.csv")
+
+# exercise_analysis = read.csv("./clean_data/all_daily_data.csv") |> 
+ # distinct(id, study_interval, day_in_study, .keep_all = TRUE) |> 
+  #filter(
     # Removing outliers/impossible values
-    total_steps < 50000,
-    total_active_min < 1440,
-    total_calories < 10000
-  )
+   # total_steps < 50000,
+   # total_active_min < 1440,
+   # total_calories < 10000
+ # )
 
 p1 = ggplot(exercise_analysis |> filter(total_steps > 0), 
              aes(x = total_steps, fill = factor(study_interval))) +
@@ -96,18 +161,65 @@ p4 <- ggplot(exercise_analysis |> filter(n_sessions > 0),
 
 **Data Cleaning Notes:**
 
-- Removed duplicate observations based on participant ID, study interval, and day
-- Filtered out physiologically impossible values (>50k steps, >24 hours active)
-- This ensures data quality and prevents aggregation errors from affecting results
+-   Removed duplicate observations based on participant ID, study interval, and day
+-   Filtered out physiologically impossible values (\>50k steps, \>24 hours active)
+-   This ensures data quality and prevents aggregation errors from affecting results
 
 **Key Findings:**
 
-- **Distribution Shape**: Exercise metrics show right-skewed distributions, typical of activity data where some days have very high activity
-- **Central Tendency**: Median steps around `r scales::comma(round(median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE)))` steps/day, suggesting moderate activity levels overall
-- **Between-Year Comparison**: The side-by-side histograms reveal whether activity patterns changed between 2022 and 2024 study intervals
+-   **Distribution Shape**: Exercise metrics show right-skewed distributions, typical of activity data where some days have very high activity
+-   **Central Tendency**: Median steps around `r scales::comma(round(median(exercise_analysis$total_steps[exercise_analysis$total_steps > 0], na.rm = TRUE)))` steps/day, suggesting moderate activity levels overall
+-   **Between-Year Comparison**: The side-by-side histograms reveal whether activity patterns changed between 2022 and 2024 study intervals
+
+
+### Activity type
+```{r, fig.width = 10, fig.height = 17}
+# Prepare activity types data
+activities_long <- exercise_analysis |> 
+  filter(!is.na(activity_types), activity_types != "", activity_types != "NA") |> 
+  select(id, study_interval, day_in_study, activity_types) |> 
+  mutate(
+    # Clean activity types column
+    activity_types = str_replace_all(activity_types, "\\n", ","),
+    activity_types = str_replace_all(activity_types, "\"", "")
+  ) |> 
+  # Split comma-separated activities into rows
+  separate_rows(activity_types, sep = ",") |> 
+  mutate(
+    activity_types = str_trim(activity_types),
+    activity_types = str_to_title(activity_types)
+  ) |> 
+  filter(activity_types != "", activity_types != "Na")
+
+activities_long
+
+# Count activities by year
+activity_counts <- activities_long %>%
+  group_by(study_interval, activity_types) %>%
+  summarise(n_days = n(), .groups = "drop") %>%
+  group_by(study_interval) %>%
+  mutate(pct = n_days / sum(n_days) * 100) %>%
+  ungroup()
+
+# Plot 1: Activity type frequency by year
+p1 <- ggplot(activity_counts, 
+             aes(x = reorder(activity_types, pct), y = pct, 
+                 fill = factor(study_interval))) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  coord_flip() +
+  labs(title = "Most Common Activity Types by Study Year",
+       x = "Activity Type",
+       y = "% of Days with Exercise",
+       fill = "Study Year") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+p1
+```
 
 
 ### Exercise patterns across menstrual cycle phases
+
 ```{r, fig.width = 10, fig.height = 10}
 
 p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0), 
@@ -138,15 +250,17 @@ p2 = ggplot(exercise_analysis |> filter(!is.na(phase), total_active_min > 0),
 
 p1 / p2 + plot_layout(guides = "collect")
 ```
+
 **Key Findings:**
 
-- **Visual Patterns**: The box plots reveal whether activity varies systematically across cycle phases
-- **Menstrual Phase**: Often shows slightly lower activity (if present) due to symptom burden
-- **Follicular/Fertility**: May show higher activity as energy levels typically increase
-- **Luteal Phase**: Activity patterns may decrease as PMS symptoms emerge
-- **Year Consistency**: Faceting by year shows whether these patterns are stable across study intervals
+-   **Visual Patterns**: The box plots reveal whether activity varies systematically across cycle phases
+-   **Menstrual Phase**: Often shows slightly lower activity (if present) due to symptom burden
+-   **Follicular/Fertility**: May show higher activity as energy levels typically increase
+-   **Luteal Phase**: Activity patterns may decrease as PMS symptoms emerge
+-   **Year Consistency**: Faceting by year shows whether these patterns are stable across study intervals
 
 ### Exercise vs. menstrual symptoms
+
 ```{r, fig.width = 10, fig.height = 10, warning = FALSE, message = FALSE}
 symptoms_long = exercise_analysis |> 
   filter(total_active_min > 0) |> 
@@ -183,83 +297,98 @@ p4 = ggplot(symptoms_long,
 
 p4
 ```
+
 **Key Findings:**
 
-- **Slope Direction**: 
-  - Downward slopes (negative correlations) suggest exercise is associated with *reduced* symptom severity
-  - Upward slopes (positive correlations) could indicate either: (a) symptoms prevent exercise, or (b) exercise exacerbates symptoms
-  - Flat lines suggest no relationship
+-   **Slope Direction**:
+    -   Downward slopes (negative correlations) suggest exercise is associated with *reduced* symptom severity
+    -   Upward slopes (positive correlations) could indicate either: (a) symptoms prevent exercise, or (b) exercise exacerbates symptoms
+    -   Flat lines suggest no relationship
+-   **Symptom-Specific Patterns**:
+    -   **Cramps**: Look for negative slope - exercise may reduce cramping
+    -   **Fatigue**: Relationship could go either way - exercise might reduce fatigue OR fatigue prevents exercise
+    -   **Mood/Stress**: Exercise typically shows beneficial (negative) associations
+    -   **Physical symptoms** (bloating, sore breasts): May be less responsive to exercise
 
-- **Symptom-Specific Patterns**:
-  - **Cramps**: Look for negative slope - exercise may reduce cramping
-  - **Fatigue**: Relationship could go either way - exercise might reduce fatigue OR fatigue prevents exercise
-  - **Mood/Stress**: Exercise typically shows beneficial (negative) associations
-  - **Physical symptoms** (bloating, sore breasts): May be less responsive to exercise
-  
 # Modelling and inferential analysis
+
+We used linear mixed-effects models to test associations between daily physical activity 
+and menstrual symptom severity. For each of 10 symptoms, we fit models with:
+
+- **Outcome**: Symptom severity (0-5 scale)
+- **Predictor**: Total active exercise minutes per day  
+- **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+- **Random effects**: Random intercepts for participants (1|id)
+
+The random intercept structure accounts for repeated measures within individuals, 
+including the 20 participants (47.6%) who contributed data in both 2022 and 2024 
+study intervals. Models were fit using the lme4 package in R with REML = FALSE. 
+Statistical significance was assessed at α = 0.05.
+
 ```{r}
 
 # Model 1: Exercise → cramps
-model_cramps = lmer(cramps_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_cramps)
 
 # Model 2: Exercise → fatigue
-model_fatigue = lmer(fatigue_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_fatigue)
 
 # Model 3: Exercise → stress
-model_stress = lmer(stress_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_stress = lmer(stress_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_stress)
 
 # Model 4: Exercise → mood swings
-model_mood = lmer(moodswing_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_mood)
 
 # Model 5: Exercise → sleep issues
-model_sleep = lmer(sleepissue_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_sleep)
 
 # Model 6: Exercise → bloating
-model_bloating = lmer(bloating_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_bloating)
 
 # Model 7: Exercise → appetite
-model_appetite = lmer(appetite_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_appetite)
 
 # Model 8: Exercise → sore breasts
-model_sorebreasts = lmer(sorebreasts_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_sorebreasts)
 
 # Model 9: Exercise → food cravings
-model_foodcravings = lmer(foodcravings_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_foodcravings)
 
 # Model 10: Exercise → indigestion
-model_indigestion = lmer(indigestion_score ~ total_duration_min + phase + (1|id) + study_interval, 
+model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
 summary(model_indigestion)
 
 ```
+
 ```{r}
 # Cleaning results:
 # Extract coefficients for exercise effect
@@ -275,7 +404,7 @@ results_summary = bind_rows(
   tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore breasts"),
   tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food cravings")
 ) %>%
-  filter(term == "total_duration_min") %>%
+  filter(term == "total_active_min") %>%
   select(outcome, estimate, std.error, statistic, p.value) %>%
   mutate(
     significant = ifelse(p.value < 0.05, "Yes", "No"),
@@ -284,12 +413,13 @@ results_summary = bind_rows(
 
 knitr::kable(results_summary)
 ```
+
 Our analysis examined the relationship between objectively measured physical activity and menstrual symptom severity across 10 different symptoms. The mixed-effects modeling approach appropriately accounts for the repeated-measures structure of the data and controls for menstrual cycle phase and study year effects.
 
 **Key Takeaways:**
 
-1. **Individual Variation Dominates**: The high ICC values indicate that most variance in symptoms is between individuals rather than within individuals over time. This suggests symptom experiences are highly personalized.
+1.  **Individual Variation Dominates**: The high ICC values indicate that most variance in symptoms is between individuals rather than within individuals over time. This suggests symptom experiences are highly personalized.
 
-2. **Exercise Effects Are Complex**: The relationship between exercise and symptoms is not uniformly beneficial or harmful. Some symptoms may respond to exercise while others do not.
+2.  **Exercise Effects Are Complex**: The relationship between exercise and symptoms is not uniformly beneficial or harmful. Some symptoms may respond to exercise while others do not.
 
-3. **Reverse Causation Concerns**: Positive associations (exercise → worse symptoms) likely reflect reverse causation. Symptoms prevent exercise rather than exercise causing symptoms.
+3.  **Reverse Causation Concerns**: Positive associations (exercise → worse symptoms) likely reflect reverse causation. Symptoms prevent exercise rather than exercise causing symptoms.
