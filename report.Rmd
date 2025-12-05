@@ -1205,11 +1205,11 @@ Across all panels, several key patterns emerge. First, the wide confidence bands
 
 
 # Modelling
-## Hormone
+## Hormone and Symptoms
 ### Mood Swing Linear Mixed Models
 
 
-Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
+Test whether mood swing differ by menstrual phase, accounting for repeated measures.
 
 ```{r, include=FALSE}
 mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
@@ -1220,9 +1220,7 @@ mood_mixed_model
 
 ```
 
-Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
-
-Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
+Based on the model results, the average mood swing score during the menstrual phase (the model intercept) is 1.77. Compared to this, symptoms are modestly lower in other phases, with the follicular phase showing the largest reduction of 0.37 points, followed by the fertility window at 0.34 points lower, and the luteal phase at 0.24 points lower. However, the analysis reveals that individual differences between participants are substantial; the random effects standard deviation of 0.98 for participant baselines is nearly identical to the residual standard deviation of 1.00, indicating that the unique baseline score of an individual accounts for as much variance in the data as all other unmeasured factors and the cycle phases combined. Therefore, while a statistically significant pattern links the menstrual phase to higher symptom reports, the predominant finding is the extensive variability from person to person, underscoring that the experience of cycle-related mood swings is highly individual. 
 
 
 ### Appetite vs Estrogen
@@ -1234,7 +1232,7 @@ appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symp
 summary(appetite_model)
 ```
 
-Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869). 
+Based on the linear mixed-effects model, the analysis finds no statistically significant relationship between measured estrogen levels and self-reported appetite scores in this dataset. The model estimates that for every one-unit increase in estrogen, the appetite score increases by a mere 0.0001137 points, an effect size so small as to be negligible. This relationship is not reliable, as indicated by a p-value of 0.402, which is far above the conventional threshold for significance. The model estimates the average appetite score when estrogen is zero to be 2.897 points. More notably, the random effects structure reveals that differences between individuals account for meaningful variation; the standard deviation of individual baseline scores is 0.415, while the standard deviation of the within-person residuals is 0.726. This indicates that while people have different typical appetite levels, the unexplained variation within a person's own measurements over time is nearly twice as large as the differences between individuals, and estrogen, as modeled here, does not explain a significant portion of that within-person fluctuation.
 
 ### Stress score model
 
