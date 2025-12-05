@@ -1,53 +1,70 @@
 ---
-title: "EXERCISE: "
+title: "EXERCISE & MENSTRUAL HEALTH"
 output: html_document
 ---
+
+The following exploratory analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) metrics and self-reported menstrual symptoms across different menstrual cycle phases. We use data from both study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
+
+```{r, include = FALSE}
+# Loading libraries
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(scales)
+
+# Setting plot theme
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
+)
+```
+
+### Data Summary
+
+#### Data Quality Check
+
+-   Five observations showed extreme step counts (≥50,000) likely due to device errors. These were excluded from step count visualizations only, all analyses use the complete dataset as extreme values were isolated to step counts.
+
+-   These observations are retained in all descriptive statistics and statistical models to preserve the complete dataset. They are excluded only from the step count distribution plot to prevent visual distortion
+
 ```{r}
-# Load and prepare data
-raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
+# Outlier check: Identifying and viewing extreme observations
+extreme_obs = read.csv("./clean_data/all_daily_data.csv") |> 
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE) |> 
+  filter(total_steps >= 50000 | # unlikely to complete more than 50000 steps a day
+         total_active_min >= 1440 | # cannot have active exercise minutes for more than 24 hours
+         total_calories >= 10000) |> # unlikely to burn more than 10000 calories in a day
+  select(id, study_interval, day_in_study, 
+         total_steps, total_active_min, total_calories) |> 
+  arrange(desc(total_steps))
+
+# Displaying extreme observations
+  kable(extreme_obs,
+        caption = "Outliers with Extreme Values",
+        col.names = c("ID", "Year", "Day", "Steps", "Active Min", 
+                     "Calories")) |> 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+#### Descriptives: Exercise Metrics
+
+Overall, participants demonstrated moderate daily physical activity levels. The median daily step count was `r format(round(overall_desc$median_steps, 0), big.mark = ",")` steps, with a mean of `r format(round(overall_desc$mean_steps, 1), big.mark = ",")` steps (SD = `r format(round(overall_desc$sd_steps, 1), big.mark = ",")`). The large standard deviation and difference between mean and median indicate substantial right-skew in the distribution, driven by extreme outlier observations. Active exercise time averaged `r round(overall_desc$mean_active, 1)` minutes per day (Median = `r round(overall_desc$median_active, 1)` minutes), with participants burning an average of `r format(round(overall_desc$mean_calories, 1), big.mark = ",")` calories per session (Median = `r format(round(overall_desc$median_calories, 0), big.mark = ",")`). Most participants engaged in `r round(overall_desc$mean_sessions, 1)` exercise sessions per day (Median = `r round(overall_desc$median_sessions, 1)`). Physical activity was recorded on `r round(overall_desc$pct_active, 1)`% of study days, indicating high compliance with activity tracking.
+
+```{r, message = FALSE, warning = FALSE}
+# Loading data
+all_daily_data = read.csv("./clean_data/all_daily_data.csv") |> 
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
-# Identify outliers
-outliers_removed <- sum(raw_data$total_steps >= 50000, na.rm = TRUE)
-
-# Apply cleaning
-exercise_analysis <- raw_data %>%
-  filter(total_steps < 50000)
-
-# Sample characteristics
-sample_chars <- data.frame(
-  Characteristic = c("Unique participants", 
-                     "Total observations",
-                     "Observations removed",
-                     "Study years",
-                     "Participants in both years"),
-  Value = c(
-    n_distinct(exercise_analysis$id),
-    nrow(exercise_analysis),
-    paste0(outliers_removed, " (", 
-           round(outliers_removed/nrow(raw_data)*100, 1), "%)"),
-    paste(unique(exercise_analysis$study_interval), collapse = ", "),
-    paste0(sum(exercise_analysis %>% 
-               group_by(id) %>% 
-               summarise(n_years = n_distinct(study_interval)) %>% 
-               pull(n_years) == 2),
-           " (", 
-           round(mean(exercise_analysis %>% 
-                      group_by(id) %>% 
-                      summarise(n_years = n_distinct(study_interval)) %>% 
-                      pull(n_years) == 2) * 100, 1), 
-           "%)")
-  )
-)
-
-kable(sample_chars, 
-      col.names = c("", ""),
-      caption = "Sample Characteristics") %>%
-  kable_styling(bootstrap_options = "striped", full_width = FALSE, position = "left")
-
-
-# Overall descriptives
-overall_desc <- exercise_analysis %>%
+# Exercise descriptives
+overall_desc = all_daily_data |> 
   summarise(
     Variable = c("Daily Steps", "Active Minutes/Day", "Calories Burned", 
                  "Exercise Sessions/Day", "Days with Activity (%)"),
@@ -73,7 +90,7 @@ overall_desc <- exercise_analysis %>%
             NA),
     Percent = c(NA, NA, NA, NA,
                 mean(total_steps > 0, na.rm = TRUE) * 100)
-  ) %>%
+  ) |> 
   mutate(
     Mean = ifelse(!is.na(Mean), sprintf("%.1f", Mean), ""),
     SD = ifelse(!is.na(SD), sprintf("%.1f", SD), ""),
@@ -88,20 +105,41 @@ kable(overall_desc,
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
 
-### Descriptive Statistics: Symptom Severity
-
-```{r symptom-descriptives}
-# Symptom descriptives
-symptom_desc <- exercise_analysis %>%
+```{r, message = FALSE, warning = FALSE}
+# Comparison by study year
+year_comp = all_daily_data |> 
+  group_by(study_interval) |> 
   summarise(
-    across(c(cramps_score, fatigue_score, stress_score, moodswing_score,
+    `N Days` = n(),
+    `N Participants` = n_distinct(id),
+    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 0),
+    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 0),
+    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 1),
+    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 1),
+    `% Days Active` = round(mean(exercised_flag, na.rm = TRUE) * 100, 1)
+  ) |> 
+  rename(Year = study_interval)
+
+kable(year_comp,
+      caption = "Exercise Metrics by Study Year",
+      align = c("c", rep("r", 7))) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+#### Descriptives: Symptom Severity
+
+```{r}
+# Symptom descriptives
+symptom_desc = all_daily_data |> 
+  summarise(
+    across(c(cramps_score, fatigue_score, moodswing_score,
              sleepissue_score, bloating_score, appetite_score, 
              sorebreasts_score, foodcravings_score, indigestion_score),
            list(mean = ~mean(.x, na.rm = TRUE),
                 sd = ~sd(.x, na.rm = TRUE),
                 median = ~median(.x, na.rm = TRUE)),
            .names = "{.col}_{.fn}")
-  ) %>%
+  ) |> 
   pivot_longer(everything(),
                names_to = c("symptom", ".value"),
                names_pattern = "(.+)_score_(.+)") %>%
@@ -117,125 +155,13 @@ kable(symptom_desc,
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
 
-### Comparison by Study Year
 
-```{r year-comparison}
-year_comp <- exercise_analysis %>%
-  group_by(study_interval) %>%
-  summarise(
-    `N Days` = n(),
-    `N Participants` = n_distinct(id),
-    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 0),
-    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 0),
-    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 1),
-    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 1),
-    `% Days Active` = round(mean(total_steps > 0, na.rm = TRUE) * 100, 1)
-  ) %>%
-  rename(Year = study_interval)
-
-kable(year_comp,
-      caption = "Exercise Metrics by Study Year",
-      align = c("c", rep("r", 7))) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
-```
-
-This analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) and self-reported menstrual symptoms across different cycle phases. We use data from two study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
-
-```{r, message = FALSE, warning = FALSE}
-library(tidyverse)
-library(patchwork)
-library(scales)
-library(lme4)
-library(lmerTest)
-library(broom.mixed)
-
-# Set plot theme
-theme_set(theme_minimal() + theme(legend.position = "bottom"))
-options(
-  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
-  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
-
-  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
-  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
-)
-```
-
-# EDA
-
-### Data summaries
-
-```{r}
-# View observations with extreme values
-
-# Load raw data
-raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
-  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
-
-# Identify and view extreme observations
-extreme_obs <- raw_data %>%
-  filter(total_steps >= 50000 | 
-         total_active_min >= 1440 | 
-         total_calories >= 10000) %>%
-  select(id, study_interval, day_in_study, 
-         total_steps, total_active_min, total_calories,
-         n_sessions, total_duration_min) %>%
-  arrange(desc(total_steps))
-
-# Display the observations
-print(extreme_obs)
-
-# Or view in a nice table
-library(knitr)
-library(kableExtra)
-
-extreme_obs %>%
-  kable(caption = "Observations with Extreme Values",
-        col.names = c("ID", "Year", "Day", "Steps", "Active Min", 
-                     "Calories", "Sessions", "Duration")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"))
-```
-
-## Data Summary and Quality Checks
-
-```{r data-preparation, message=FALSE}
-# Load and check raw data
-raw_data <- read.csv("./clean_data/all_daily_data.csv") %>%
-  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
-
-# Identify extreme values
-outliers <- raw_data %>%
-  summarise(
-    extreme_steps = sum(total_steps >= 50000, na.rm = TRUE),
-    extreme_active = sum(total_active_min >= 1440, na.rm = TRUE),
-    extreme_calories = sum(total_calories >= 10000, na.rm = TRUE)
-  )
-
-outliers
-# Apply cleaning filters
-exercise_analysis <- raw_data %>%
-  filter(
-    total_steps < 50000,        # Realistic daily maximum
-    total_active_min < 1440,     # Cannot exceed 24 hours
-    total_calories < 10000       # Realistic exercise expenditure
-  )
-```
 
 ### Distribution of key exercise metrics
 
 ```{r, fig.width = 13, fig.height = 12}
 
-# Filtering realistic values
-
-exercise_analysis = read.csv("./clean_data/all_daily_data.csv")
-
-# exercise_analysis = read.csv("./clean_data/all_daily_data.csv") |> 
- # distinct(id, study_interval, day_in_study, .keep_all = TRUE) |> 
-  #filter(
-    # Removing outliers/impossible values
-   # total_steps < 50000,
-   # total_active_min < 1440,
-   # total_calories < 10000
- # )
+exercise_analysis = all_daily_data
 
 p1 = ggplot(exercise_analysis |> filter(total_steps > 0, total_steps < 50000), 
              aes(x = total_steps, fill = factor(study_interval))) +
@@ -562,8 +488,8 @@ Our analysis examined the relationship between objectively measured physical act
 
 3.  **Reverse Causation Concerns**: Positive associations (exercise → worse symptoms) likely reflect reverse causation. Symptoms prevent exercise rather than exercise causing symptoms.
 
-
 ### Model Diagnostics
+
 ```{r model-diagnostics, fig.width=10, fig.height=4}
 
 # Three essential plots
@@ -591,15 +517,11 @@ par(mfrow = c(1, 1))
 
 **Interpretation:**
 
-- **Residuals vs Fitted:** Should show random scatter around 0 (no pattern)
-- **Q-Q Plots:** Points should follow the red line (approximately normal)
+-   **Residuals vs Fitted:** Should show random scatter around 0 (no pattern)
+-   **Q-Q Plots:** Points should follow the red line (approximately normal)
 
 The diagnostic plots show that model assumptions are reasonably met: residuals show random scatter with no clear pattern, and both residuals and random effects are approximately normally distributed.
 
-**Assessment:** 
+**Assessment:**
 
-The residual vs fitted plot shows diagonal banding typical of ordinal outcome data 
-(symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying 
-linear models to Likert-scale data. The Q-Q plots indicate that residuals and random 
-effects are approximately normally distributed, supporting the use of mixed-effects 
-models. 
+The residual vs fitted plot shows diagonal banding typical of ordinal outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying linear models to Likert-scale data. The Q-Q plots indicate that residuals and random effects are approximately normally distributed, supporting the use of mixed-effects models.
