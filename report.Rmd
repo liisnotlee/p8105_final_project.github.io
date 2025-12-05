@@ -1523,9 +1523,19 @@ We found several associations between menstrual symptoms and lifestyle factors, 
 
 Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Similarly, minutes of activity was not positively associated with the reduction of any symptoms in our mixed-modal results. 
 
-### Exercise discussion
+### Exercise discussion Anu:
 
-Anu: 
+This study examined associations between daily physical activity and menstrual symptom severity using longitudinal data from 42 total participants tracked across 2022 and 2024. Mixed-effects models accounted for repeated measures and controlled for menstrual cycle phase and individual differences.
+
+
+Descriptive analyses revealed substantial differences between study years. The 2024 cohort showed markedly higher activity than 2022 (mean steps: 13,670 vs. 3,991; active minutes: 73.7 vs. 47.8), along with improved tracking (61.4% vs. 14.6% of days with recorded activity). Activity type analysis showed that walking dominated exercise routines (70-85% of activity days), with minimal representation of higher-intensity structured exercise. 
+
+Physical activity showed modest variation across menstrual cycle phases, with 2024 participants displaying more pronounced patterns (higher activity during fertility/follicular phases) compared to relatively stable patterns in 2022. 
+
+Contrary to expectations, mixed-effects models revealed minimal evidence for daily exercise-symptom associations. Of 11 symptoms examined, only fatigue (β = -0.0027, p = 0.049). Most notably, cramps showed no association with exercise (β = -0.00005, p = 0.96), nor did the remaining 10 symptoms.
+
+Several factors may explain these null findings. First, the predominance of walking-based activity may be insufficient to produce detectable symptom changes. Prior research demonstrating exercise benefits typically involves structured, moderate-to-vigorous intensity programs rather than daily walking variations. Second, individual heterogeneity was substantial; some participants may benefit from exercise while others do not, with population-level models averaging across these diverse responses and obscuring subgroup effects. Third, reverse causation is plausible: symptoms may reduce exercise more than exercise reduces symptoms, as evidenced by activity decreasing during symptomatic phases. Finally, daily variations in light-to-moderate activity may genuinely have minimal influence on symptom severity at the population level.
+
 
 ## Limitation
 
