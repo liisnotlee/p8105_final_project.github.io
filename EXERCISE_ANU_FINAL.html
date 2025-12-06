@@ -11,7 +11,7 @@
 
 
 
-<title>EXERCISE:</title>
+<title>EXERCISE &amp; MENSTRUAL HEALTH</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -346,7 +346,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
@@ -387,83 +387,47 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EXERCISE:</h1>
+<h1 class="title toc-ignore">EXERCISE &amp; MENSTRUAL HEALTH</h1>
 
 </div>
 
 
-<p>This analysis investigates the relationship between objectively
-measured exercise (steps, active minutes, calories) and self-reported
-menstrual symptoms across different cycle phases. We use data from two
-study intervals (2022 and 2024) to examine whether physical activity is
-associated with symptom severity.</p>
-<pre class="r"><code>library(tidyverse)
-library(patchwork)
-library(scales)
-library(lme4)
-library(lmerTest)
-library(broom.mixed)
-
-# Set plot theme
-theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
-options(
-  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
-  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = &quot;Pastel2&quot;),
-
-  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
-  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
-)</code></pre>
-<div id="eda" class="section level1">
-<h1>EDA</h1>
-<div id="data-summaries" class="section level3">
-<h3>Data summaries</h3>
-<pre class="r"><code># View observations with extreme values
-
-# Load raw data
-raw_data &lt;- read.csv(&quot;./clean_data/all_daily_data.csv&quot;) %&gt;%
-  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
-
-# Identify and view extreme observations
-extreme_obs &lt;- raw_data %&gt;%
-  filter(total_steps &gt;= 50000 | 
-         total_active_min &gt;= 1440 | 
-         total_calories &gt;= 10000) %&gt;%
+<p>The following exploratory analysis investigates the relationship
+between objectively measured exercise (steps, active minutes, calories)
+metrics and self-reported menstrual symptoms across different menstrual
+cycle phases. We use data from both study intervals (2022 and 2024) to
+examine whether physical activity is associated with symptom
+severity.</p>
+<div id="data-summary" class="section level3">
+<h3>Data Summary</h3>
+<div id="data-quality-check" class="section level4">
+<h4>Data Quality Check</h4>
+<p>Five observations showed extreme step counts (≥50,000) likely due to
+device errors. These were excluded from step count visualizations only,
+all analyses use the complete dataset as extreme values were isolated to
+step counts.These observations are retained in all descriptive
+statistics and statistical models to preserve the complete dataset. They
+are excluded only from the step count distribution plot to prevent
+visual distortion.</p>
+<pre class="r"><code># Outlier check: Identifying and viewing extreme observations
+extreme_obs = read.csv(&quot;./clean_data/all_daily_data.csv&quot;) |&gt; 
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE) |&gt; 
+  filter(total_steps &gt;= 50000 | # unlikely to complete more than 50000 steps a day
+         total_active_min &gt;= 1440 | # cannot have active exercise minutes for more than 24 hours
+         total_calories &gt;= 10000) |&gt; # unlikely to burn more than 10000 calories in a day
   select(id, study_interval, day_in_study, 
-         total_steps, total_active_min, total_calories,
-         n_sessions, total_duration_min) %&gt;%
+         total_steps, total_active_min, total_calories) |&gt; 
   arrange(desc(total_steps))
 
-# Display the observations
-print(extreme_obs)</code></pre>
-<pre><code>##   id study_interval day_in_study total_steps total_active_min total_calories
-## 1 22           2024          883     1880842         273.4644            183
-## 2 14           2024          922     1877616         234.2144            129
-## 3 18           2024          922     1877616         253.8477            238
-## 4 27           2024          887     1877616         234.2144            129
-## 5 33           2024          887     1877616         234.2144            129
-##   n_sessions total_duration_min
-## 1          3           274.0833
-## 2          2           234.8333
-## 3          3           254.4667
-## 4          2           234.8333
-## 5          2           234.8333</code></pre>
-<pre class="r"><code># Or view in a nice table
-library(knitr)
-library(kableExtra)</code></pre>
-<pre><code>## Warning: package &#39;kableExtra&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;kableExtra&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     group_rows</code></pre>
-<pre class="r"><code>extreme_obs %&gt;%
-  kable(caption = &quot;Observations with Extreme Values&quot;,
+# Displaying extreme observations
+  kable(extreme_obs,
+        caption = &quot;Outliers with Extreme Values&quot;,
         col.names = c(&quot;ID&quot;, &quot;Year&quot;, &quot;Day&quot;, &quot;Steps&quot;, &quot;Active Min&quot;, 
-                     &quot;Calories&quot;, &quot;Sessions&quot;, &quot;Duration&quot;)) %&gt;%
+                     &quot;Calories&quot;)) |&gt; 
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;))</code></pre>
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <caption>
-Observations with Extreme Values
+Outliers with Extreme Values
 </caption>
 <thead>
 <tr>
@@ -484,12 +448,6 @@ Active Min
 </th>
 <th style="text-align:right;">
 Calories
-</th>
-<th style="text-align:right;">
-Sessions
-</th>
-<th style="text-align:right;">
-Duration
 </th>
 </tr>
 </thead>
@@ -513,12 +471,6 @@ Duration
 <td style="text-align:right;">
 183
 </td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-274.0833
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -538,12 +490,6 @@ Duration
 </td>
 <td style="text-align:right;">
 129
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-234.8333
 </td>
 </tr>
 <tr>
@@ -565,12 +511,6 @@ Duration
 <td style="text-align:right;">
 238
 </td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-254.4667
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -590,12 +530,6 @@ Duration
 </td>
 <td style="text-align:right;">
 129
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-234.8333
 </td>
 </tr>
 <tr>
@@ -617,55 +551,495 @@ Duration
 <td style="text-align:right;">
 129
 </td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-234.8333
-</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="data-summary-and-quality-checks" class="section level2">
-<h2>Data Summary and Quality Checks</h2>
-<pre class="r"><code># Load and check raw data
-raw_data &lt;- read.csv(&quot;./clean_data/all_daily_data.csv&quot;) %&gt;%
+<div id="descriptives-exercise-metrics" class="section level4">
+<h4>Descriptives: Exercise Metrics</h4>
+<pre class="r"><code># Loading data
+all_daily_data = read.csv(&quot;./clean_data/all_daily_data.csv&quot;) |&gt; 
   distinct(id, study_interval, day_in_study, .keep_all = TRUE)
 
-# Identify extreme values
-outliers &lt;- raw_data %&gt;%
+# Exercise descriptives
+overall_desc = all_daily_data |&gt; 
   summarise(
-    extreme_steps = sum(total_steps &gt;= 50000, na.rm = TRUE),
-    extreme_active = sum(total_active_min &gt;= 1440, na.rm = TRUE),
-    extreme_calories = sum(total_calories &gt;= 10000, na.rm = TRUE)
+    Variable = c(&quot;Daily Steps&quot;, &quot;Active Minutes/Day&quot;, &quot;Calories Burned&quot;, 
+                 &quot;Exercise Sessions/Day&quot;, &quot;Days with Activity (%)&quot;),
+    Mean = round(c(mean(total_steps, na.rm = TRUE),
+                   mean(total_active_min, na.rm = TRUE),
+                   mean(total_calories, na.rm = TRUE),
+                   mean(n_sessions, na.rm = TRUE),
+                   NA), 2),
+    SD = round(c(sd(total_steps, na.rm = TRUE),
+                 sd(total_active_min, na.rm = TRUE),
+                 sd(total_calories, na.rm = TRUE),
+                 sd(n_sessions, na.rm = TRUE),
+                 NA), 2),
+    Median = round(c(median(total_steps, na.rm = TRUE),
+                     median(total_active_min, na.rm = TRUE),
+                     median(total_calories, na.rm = TRUE),
+                     median(n_sessions, na.rm = TRUE),
+                     NA), 2),
+    IQR = round(c(IQR(total_steps, na.rm = TRUE),
+                  IQR(total_active_min, na.rm = TRUE),
+                  IQR(total_calories, na.rm = TRUE),
+                  IQR(n_sessions, na.rm = TRUE),
+                  NA), 2),
+    Percent = round(c(NA, NA, NA, NA,
+                      mean(exercised_flag &gt; 0, na.rm = TRUE) * 100), 2)
   )
 
-outliers</code></pre>
-<pre><code>##   extreme_steps extreme_active extreme_calories
-## 1             5              0                0</code></pre>
-<pre class="r"><code># Apply cleaning filters
-exercise_analysis &lt;- raw_data %&gt;%
-  filter(
-    total_steps &lt; 50000,        # Realistic daily maximum
-    total_active_min &lt; 1440,     # Cannot exceed 24 hours
-    total_calories &lt; 10000       # Realistic exercise expenditure
-  )</code></pre>
+# Displaying table (and making NAs blank)
+overall_desc |&gt; 
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), &quot;&quot;, .))) |&gt; 
+  kable(caption = &quot;Descriptive Statistics: Exercise Metrics&quot;,
+        align = c(&quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;)) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Descriptive Statistics: Exercise Metrics
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+<th style="text-align:right;">
+Median
+</th>
+<th style="text-align:right;">
+IQR
+</th>
+<th style="text-align:right;">
+Percent
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Daily Steps
+</td>
+<td style="text-align:right;">
+10673.14
+</td>
+<td style="text-align:right;">
+100251.66
+</td>
+<td style="text-align:right;">
+4370
+</td>
+<td style="text-align:right;">
+5088.25
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Active Minutes/Day
+</td>
+<td style="text-align:right;">
+65.7
+</td>
+<td style="text-align:right;">
+50.43
+</td>
+<td style="text-align:right;">
+52.05
+</td>
+<td style="text-align:right;">
+59.73
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Calories Burned
+</td>
+<td style="text-align:right;">
+226.74
+</td>
+<td style="text-align:right;">
+225.59
+</td>
+<td style="text-align:right;">
+153
+</td>
+<td style="text-align:right;">
+209
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Exercise Sessions/Day
+</td>
+<td style="text-align:right;">
+2.09
+</td>
+<td style="text-align:right;">
+1.31
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Days with Activity (%)
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+30.82
+</td>
+</tr>
+</tbody>
+</table>
+<p>Overall, participants demonstrated moderate daily physical activity
+levels. The median daily step count was 4,370 steps, with a mean of
+10,673.14 steps (SD = 100,251.7). The large standard deviation and
+difference between mean and median indicate presence of extreme outlier
+observations (as identified earlier). Active exercise time averaged 65.7
+minutes per day (Median = 52.05 minutes), with participants burning an
+average of 226.74 calories per session (Median = 153). Most participants
+engaged in 2.09 exercise sessions per day (Median = 2). Physical
+activity was recorded on 30.82% of study days, indicating high
+compliance with activity tracking.</p>
+<pre class="r"><code># Comparison by study year
+year_comp = all_daily_data |&gt; 
+  group_by(study_interval) |&gt; 
+  summarise(
+    `N Days` = n(),
+    `N Participants` = n_distinct(id),
+    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 2),
+    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 2),
+    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 2),
+    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 2),
+    `% Days Active` = round(mean(exercised_flag, na.rm = TRUE) * 100, 2)
+  ) |&gt; 
+  rename(Year = study_interval)
+
+kable(year_comp,
+      caption = &quot;Exercise Metrics by Study Year&quot;,
+      align = c(&quot;c&quot;, rep(&quot;r&quot;, 7))) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Exercise Metrics by Study Year
+</caption>
+<thead>
+<tr>
+<th style="text-align:center;">
+Year
+</th>
+<th style="text-align:right;">
+N Days
+</th>
+<th style="text-align:right;">
+N Participants
+</th>
+<th style="text-align:right;">
+Mean Steps
+</th>
+<th style="text-align:right;">
+SD Steps
+</th>
+<th style="text-align:right;">
+Mean Active Min
+</th>
+<th style="text-align:right;">
+SD Active Min
+</th>
+<th style="text-align:right;">
+% Days Active
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+2022
+</td>
+<td style="text-align:right;">
+3698
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+3991.31
+</td>
+<td style="text-align:right;">
+3132.28
+</td>
+<td style="text-align:right;">
+47.79
+</td>
+<td style="text-align:right;">
+37.63
+</td>
+<td style="text-align:right;">
+14.6
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+2024
+</td>
+<td style="text-align:right;">
+1961
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+13669.97
+</td>
+<td style="text-align:right;">
+120533.68
+</td>
+<td style="text-align:right;">
+73.73
+</td>
+<td style="text-align:right;">
+53.30
+</td>
+<td style="text-align:right;">
+61.4
+</td>
+</tr>
+</tbody>
+</table>
+<p>Exercise patterns differed substantially between study years. The
+2024 cohort showed considerably higher activity levels compared to 2022
+across all metrics. 2024 participants averaged 73.73 active minutes per
+day compared to 47.79 minutes in 2022. The proportion of days with
+recorded activity increased from 14.6% in 2022 to 61.4% in 2024.</p>
+</div>
+<div id="descriptives-symptom-severity" class="section level4">
+<h4>Descriptives: Symptom Severity</h4>
+<pre class="r"><code># Symptom descriptives
+symptom_desc = all_daily_data |&gt; 
+  summarise(
+    across(c(appetite_score, headaches_score, cramps_score, sorebreasts_score, fatigue_score, sleepissue_score, moodswing_score, foodcravings_score, indigestion_score, bloating_score),
+           list(mean = ~mean(.x, na.rm = TRUE),
+                sd = ~sd(.x, na.rm = TRUE),
+                median = ~median(.x, na.rm = TRUE)),
+           .names = &quot;{.col}_{.fn}&quot;)
+  ) |&gt; 
+  pivot_longer(everything(),
+               names_to = c(&quot;symptom&quot;, &quot;.value&quot;),
+               names_pattern = &quot;(.+)_score_(.+)&quot;) %&gt;%
+  mutate(
+    symptom = str_to_title(str_replace_all(symptom, &quot;_&quot;, &quot; &quot;)),
+    across(where(is.numeric), ~round(.x, 2))
+  )
+
+kable(symptom_desc,
+      col.names = c(&quot;Symptom&quot;, &quot;Mean&quot;, &quot;SD&quot;, &quot;Median&quot;),
+      caption = &quot;Descriptive Statistics: Symptom Severity (Scale 0-5)&quot;,
+      align = c(&quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;)) %&gt;%
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Descriptive Statistics: Symptom Severity (Scale 0-5)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Symptom
+</th>
+<th style="text-align:right;">
+Mean
+</th>
+<th style="text-align:right;">
+SD
+</th>
+<th style="text-align:right;">
+Median
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Appetite
+</td>
+<td style="text-align:right;">
+2.91
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Headaches
+</td>
+<td style="text-align:right;">
+1.46
+</td>
+<td style="text-align:right;">
+1.41
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cramps
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+1.27
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sorebreasts
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+1.11
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fatigue
+</td>
+<td style="text-align:right;">
+2.50
+</td>
+<td style="text-align:right;">
+1.48
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sleepissue
+</td>
+<td style="text-align:right;">
+2.01
+</td>
+<td style="text-align:right;">
+1.48
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Moodswing
+</td>
+<td style="text-align:right;">
+1.57
+</td>
+<td style="text-align:right;">
+1.42
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Foodcravings
+</td>
+<td style="text-align:right;">
+1.83
+</td>
+<td style="text-align:right;">
+1.53
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Indigestion
+</td>
+<td style="text-align:right;">
+1.45
+</td>
+<td style="text-align:right;">
+1.42
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bloating
+</td>
+<td style="text-align:right;">
+1.60
+</td>
+<td style="text-align:right;">
+1.48
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+</tbody>
+</table>
+<p>Symptom severity varied across menstrual cycle phases and between
+individuals. Most physical symptoms showed low-to-moderate mean severity
+on the 0-5 scale: cramps (M = 1.00, SD = 1.27), fatigue (M = 2.50, SD =
+1.48), and bloating (M = 1.60, SD = 1.48). Psychological symptoms
+including mood swings (M = 1.57, SD = 1.42) and appetite changes (M =
+2.91, SD = 0.83) were similarly mild on average. The relatively large
+standard deviations across all symptoms reflect substantial variability
+in symptom experiences across the menstrual cycle.</p>
+</div>
+</div>
 <div id="distribution-of-key-exercise-metrics" class="section level3">
-<h3>Distribution of key exercise metrics</h3>
-<pre class="r"><code># Filtering realistic values
+<h3>Distribution of Key Exercise Metrics</h3>
+<pre class="r"><code>exercise_analysis = all_daily_data
 
-exercise_analysis = read.csv(&quot;./clean_data/all_daily_data.csv&quot;)
-
-# exercise_analysis = read.csv(&quot;./clean_data/all_daily_data.csv&quot;) |&gt; 
- # distinct(id, study_interval, day_in_study, .keep_all = TRUE) |&gt; 
-  #filter(
-    # Removing outliers/impossible values
-   # total_steps &lt; 50000,
-   # total_active_min &lt; 1440,
-   # total_calories &lt; 10000
- # )
-
+# Distribution of daily step count
 p1 = ggplot(exercise_analysis |&gt; filter(total_steps &gt; 0, total_steps &lt; 50000), 
              aes(x = total_steps, fill = factor(study_interval))) +
   geom_histogram(bins = 50, alpha = 0.7, position = &quot;dodge&quot;) +
@@ -680,6 +1054,7 @@ p1 = ggplot(exercise_analysis |&gt; filter(total_steps &gt; 0, total_steps &lt; 
        fill = &quot;Study Year&quot;) +
   scale_x_continuous(labels = scales::comma)
 
+# Active minutes distribution
 p2 = ggplot(exercise_analysis |&gt; filter(total_active_min &gt; 0), 
              aes(x = total_active_min, fill = factor(study_interval))) +
   geom_histogram(bins = 50, alpha = 0.7, position = &quot;dodge&quot;) +
@@ -693,6 +1068,7 @@ p2 = ggplot(exercise_analysis |&gt; filter(total_active_min &gt; 0),
        y = &quot;Count&quot;,
        fill = &quot;Study Year&quot;)
 
+# Calories Burned Distribution
 p3 = ggplot(exercise_analysis |&gt; filter(total_calories &gt; 0), 
              aes(x = total_calories, fill = factor(study_interval))) +
   geom_histogram(bins = 50, alpha = 0.7, position = &quot;dodge&quot;) +
@@ -707,7 +1083,8 @@ p3 = ggplot(exercise_analysis |&gt; filter(total_calories &gt; 0),
        fill = &quot;Study Year&quot;) +
   scale_x_continuous(labels = scales::comma)
 
-p4 &lt;- ggplot(exercise_analysis |&gt; filter(n_sessions &gt; 0), 
+# Exercise Sessions Per Day
+p4 = ggplot(exercise_analysis |&gt; filter(n_sessions &gt; 0), 
              aes(x = n_sessions, fill = factor(study_interval))) +
   geom_bar(alpha = 0.7, position = &quot;dodge&quot;) +
   labs(title = &quot;Exercise Sessions Per Day&quot;,
@@ -717,32 +1094,39 @@ p4 &lt;- ggplot(exercise_analysis |&gt; filter(n_sessions &gt; 0),
 
 (p1 + p2) / (p3 + p4) + 
   plot_layout(guides = &quot;collect&quot;)</code></pre>
-<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-3-1.png" width="1248" /></p>
-<p><strong>Data Cleaning Notes:</strong></p>
-<ul>
-<li>Removed duplicate observations based on participant ID, study
-interval, and day</li>
-<li>Filtered out physiologically impossible values (&gt;50k steps,
-&gt;24 hours active)</li>
-<li>This ensures data quality and prevents aggregation errors from
-affecting results</li>
-</ul>
-<p><strong>Key Findings:</strong></p>
-<ul>
-<li><strong>Distribution Shape</strong>: Exercise metrics show
-right-skewed distributions, typical of activity data where some days
-have very high activity</li>
-<li><strong>Central Tendency</strong>: Median steps around 4,455
-steps/day, suggesting moderate activity levels overall</li>
-<li><strong>Between-Year Comparison</strong>: The side-by-side
-histograms reveal whether activity patterns changed between 2022 and
-2024 study intervals</li>
-</ul>
+<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-6-1.png" width="1248" /></p>
+<p><strong>Step Count Distribution:</strong> Daily steps on active days
+showed pronounced right-skew with a median of 4,455 steps. The bulk of
+observations fell between 2,000-8,000 steps, with a long tail extending
+beyond 20,000 steps. The 2024 distribution (orange) shifted notably
+rightward compared to 2022 (teal), indicating higher step counts. Five
+extreme observations (≥50,000 steps) were excluded from this
+visualization only, as they distorted the scale and were obvious data
+errors.</p>
+<p><strong>Active Minutes Distribution:</strong> Exercise duration
+exhibited similar right-skew (52 minutes), with most sessions lasting
+20-80 minutes. The 2024 cohort showed longer session durations, with the
+distribution peak occurring at higher values than 2022. This pattern
+suggests not only more frequent exercise in 2024, but also longer
+duration per session.</p>
+<p><strong>Calories Burned Distribution:</strong> Energy expenditure
+followed the expected pattern given step and duration data (Median = 153
+calories). The heavy concentration near zero with gradual right tail
+indicates predominantly light-to-moderate intensity exercise, with
+occasional high-intensity sessions. The 2024-2022 difference parallels
+that observed in steps and active minutes duration.</p>
+<p><strong>Exercise Sessions:</strong> Most active days included 1-3
+discrete exercise sessions, with a clear mode at 2 sessions. The 2024
+cohort showed higher frequencies of 2+ sessions compared to 2022,
+suggesting either improved activity tracking or genuinely more
+structured exercise routines.</p>
+<p>These distributions collectively demonstrate substantial right-skew,
+high between-person variability.</p>
 </div>
-<div id="activity-type" class="section level3">
-<h3>Activity type</h3>
-<pre class="r"><code># Prepare activity types data
-activities_long &lt;- exercise_analysis |&gt; 
+<div id="activity-type-distribution" class="section level3">
+<h3>Activity type distribution</h3>
+<pre class="r"><code># Preparing activity types data
+activities_long = exercise_analysis |&gt; 
   filter(!is.na(activity_types), activity_types != &quot;&quot;, activity_types != &quot;NA&quot;) |&gt; 
   select(id, study_interval, day_in_study, activity_types) |&gt; 
   mutate(
@@ -773,27 +1157,27 @@ activities_long</code></pre>
 ##  9     1           2022           44 Outdoor Bike  
 ## 10     1           2022           44 Walk          
 ## # ℹ 2,068 more rows</code></pre>
-<pre class="r"><code># Count activities by year
-activity_counts &lt;- activities_long %&gt;%
-  group_by(study_interval, activity_types) %&gt;%
-  summarise(n_days = n(), .groups = &quot;drop&quot;) %&gt;%
-  group_by(study_interval) %&gt;%
-  mutate(pct = n_days / sum(n_days) * 100) %&gt;%
+<pre class="r"><code># Counting activities by year
+activity_counts = activities_long |&gt; 
+  group_by(study_interval, activity_types) |&gt; 
+  summarise(n_days = n(), .groups = &quot;drop&quot;) |&gt; 
+  group_by(study_interval) |&gt; 
+  mutate(pct = n_days / sum(n_days) * 100) |&gt; 
   ungroup()
 
-# Get top 10 activities
-top_activities &lt;- activity_counts %&gt;%
-  group_by(activity_types) %&gt;%
-  summarise(total = sum(n_days)) %&gt;%
-  arrange(desc(total)) %&gt;%
-  slice(1:10) %&gt;%
+# Getting top 10 activities
+top_activities = activity_counts |&gt; 
+  group_by(activity_types) |&gt; 
+  summarise(total = sum(n_days)) |&gt; 
+  arrange(desc(total)) |&gt; 
+  slice(1:10) |&gt; 
   pull(activity_types)
 
-activity_counts_top &lt;- activity_counts %&gt;%
+activity_counts_top = activity_counts |&gt; 
   filter(activity_types %in% top_activities)
 
-# Plot 1: Activity type frequency by year
-p1 &lt;- ggplot(activity_counts_top, 
+# Plot: Activity type frequency by year
+p1 = ggplot(activity_counts_top, 
              aes(x = reorder(activity_types, pct), y = pct, 
                  fill = factor(study_interval))) +
   geom_col(position = &quot;dodge&quot;, alpha = 0.8) +
@@ -806,7 +1190,17 @@ p1 &lt;- ggplot(activity_counts_top,
   theme(legend.position = &quot;bottom&quot;)
 
 p1</code></pre>
-<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-7-1.png" width="960" />
+Walking dominated exercise routines in both study years, accounting for
+the vast majority of recorded activity sessions. Beyond walking,
+participants engaged in diverse activities including aerobic workouts,
+general sport, and strength training (weights). The 2024 cohort showed
+greater diversity in activity types, with more structured exercises such
+as aerobic workouts and weight training compared to 2022. Activities
+like outdoor biking, running, treadmill, and swimming appeared in both
+years but at much lower frequencies. Notably, some activities (e.g.,
+weights, treadmill, swim, workout, hike) appeared exclusively or
+predominantly in 2024.</p>
 </div>
 <div id="exercise-patterns-across-menstrual-cycle-phases"
 class="section level3">
@@ -838,26 +1232,26 @@ p2 = ggplot(exercise_analysis |&gt; filter(!is.na(phase), total_active_min &gt; 
         axis.text.x = element_text(angle = 45, hjust = 1))
 
 p1 / p2 + plot_layout(guides = &quot;collect&quot;)</code></pre>
-<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
-<p><strong>Key Findings:</strong></p>
-<ul>
-<li><strong>Visual Patterns</strong>: The box plots reveal whether
-activity varies systematically across cycle phases</li>
-<li><strong>Menstrual Phase</strong>: Often shows slightly lower
-activity (if present) due to symptom burden</li>
-<li><strong>Follicular/Fertility</strong>: May show higher activity as
-energy levels typically increase</li>
-<li><strong>Luteal Phase</strong>: Activity patterns may decrease as PMS
-symptoms emerge</li>
-<li><strong>Year Consistency</strong>: Faceting by year shows whether
-these patterns are stable across study intervals</li>
-</ul>
+<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-8-1.png" width="960" />
+Physical activity varied across menstrual cycle phases, with patterns
+differing by year. In 2022, activity levels remained relatively stable
+across phases, with only slight differences between fertility,
+follicular, luteal, and menstrual phases. In contrast, 2024 showed more
+pronounced phase-related patterns, with the fertility phase
+demonstrating highest activity levels, followed by the follicular phase,
+and lower activity during luteal and menstrual phases. Both years
+exhibited substantial individual variability, as evident by the wide
+spread of data points and multiple outliers, suggesting that not all
+participants followed the same phase-related activity patterns. The 2024
+cohort showed consistently higher activity across all phases compared to
+2022, confirming the year differences observed in overall descriptive
+statistics.</p>
 </div>
 <div id="exercise-vs.-menstrual-symptoms" class="section level3">
 <h3>Exercise vs. menstrual symptoms</h3>
 <pre class="r"><code>symptoms_long = exercise_analysis |&gt; 
   filter(total_active_min &gt; 0) |&gt; 
-  select(id, total_active_min, appetite_score, sorebreasts_score, sleepissue_score, cramps_score, fatigue_score, 
+  select(id, total_active_min, appetite_score, headaches_score, sorebreasts_score, sleepissue_score, cramps_score, fatigue_score, 
          headaches_score, moodswing_score, foodcravings_score, indigestion_score, bloating_score) |&gt; 
   pivot_longer(cols = ends_with(&quot;_score&quot;), 
                names_to = &quot;symptom&quot;, 
@@ -865,6 +1259,7 @@ these patterns are stable across study intervals</li>
   filter(!is.na(severity)) |&gt; 
   mutate(symptom = case_when(
     symptom == &quot;appetite_score&quot; ~ &quot;Appetite&quot;,
+    symptom == &quot;headaches_score&quot; ~&quot;Head Aches&quot;,
     symptom == &quot;sorebreasts_score&quot; ~ &quot;Sore Breasts&quot;,
     symptom == &quot;sleepissue_score&quot; ~ &quot;Sleep Issue&quot;,
     symptom == &quot;cramps_score&quot; ~ &quot;Cramps&quot;,
@@ -879,7 +1274,7 @@ these patterns are stable across study intervals</li>
 p4 = ggplot(symptoms_long, 
              aes(x = total_active_min, y = severity, color = symptom)) +
   geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
-  geom_smooth(method = &quot;lm&quot;, se = TRUE, linewidth = 1.5) +
+  geom_smooth(method = &quot;lm&quot;, se = TRUE, linewidth = 1.5, alpha = 0.2) +
   facet_wrap(~symptom, ncol = 2) +
   labs(title = &quot;Daily Activity vs Individual Symptoms&quot;,
        x = &quot;Total Daily Activity (mins)&quot;,
@@ -889,42 +1284,50 @@ p4 = ggplot(symptoms_long,
   theme(legend.position = &quot;none&quot;)
 
 p4</code></pre>
-<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
-<p><strong>Key Findings:</strong></p>
-<ul>
-<li><strong>Slope Direction</strong>:
-<ul>
-<li>Downward slopes (negative correlations) suggest exercise is
-associated with <em>reduced</em> symptom severity</li>
-<li>Upward slopes (positive correlations) could indicate either: (a)
-symptoms prevent exercise, or (b) exercise exacerbates symptoms</li>
-<li>Flat lines suggest no relationship</li>
-</ul></li>
-<li><strong>Symptom-Specific Patterns</strong>:
-<ul>
-<li><strong>Cramps</strong>: Look for negative slope - exercise may
-reduce cramping</li>
-<li><strong>Fatigue</strong>: Relationship could go either way -
-exercise might reduce fatigue OR fatigue prevents exercise</li>
-<li><strong>Mood/Stress</strong>: Exercise typically shows beneficial
-(negative) associations</li>
-<li><strong>Physical symptoms</strong> (bloating, sore breasts): May be
-less responsive to exercise</li>
-</ul></li>
-</ul>
-</div>
-</div>
+<p><img src="EXERCISE_ANU_FINAL_files/figure-html/unnamed-chunk-9-1.png" width="960" />
+The scatterplots examine crude associations between daily activity
+(exercise) and each symptom:</p>
+<p><strong>Negative slopes (potential benefits):</strong> -
+<strong>Bloating</strong>: Modest downward trend suggests higher
+activity associates with reduced bloating - <strong>Food
+cravings</strong>: Slight negative association, though relationship
+appears weak - <strong>Indigestion</strong>: Minimal negative slope with
+high variability</p>
+<p><strong>Flat relationships (no clear association):</strong> -
+<strong>Cramps</strong>: Near-horizontal line despite being primary
+outcome - <strong>Appetite, headaches, sleep issues, sore
+breasts</strong>: Essentially flat with wide confidence bands -
+<strong>Mood swings</strong>: Slight positive but nearly flat, high
+uncertainty</p>
+<p><strong>Positive slope (likely reverse causation):</strong> -
+<strong>Fatigue</strong>: Higher fatigue appears to reduce exercise, not
+vice versa</p>
+<p><strong>Sleep issues</strong> and <strong>sore breasts</strong>
+exhibited insufficient data spread to estimate reliable trends</p>
+<p>Across all panels, several key patterns emerge. First, the wide
+confidence bands indicate substantial uncertainty in all bivariate
+relationships. Second, the considerable scatter reveals that
+individual-level associations vary widely, i.e., some participants show
+strong exercise-symptom relationships while others show none. Third,
+many data points cluster at low activity levels (0-100 minutes), with
+sparser observations at higher activity, reflecting the right-skewed
+activity distribution. Fourth, symptoms generally concentrate at lower
+severity levels (0-2 on 0-5 scale), with relatively few observations at
+high severity, consistent with the descriptive statistics.</p>
 </div>
 <div id="modelling-and-inferential-analysis" class="section level1">
 <h1>Modelling and inferential analysis</h1>
 <p>We used linear mixed-effects models to test associations between
-daily physical activity and menstrual symptom severity. For each of 10
-symptoms, we fit models with:</p>
+daily physical activity and menstrual symptom severity. This modeling
+approach was necessary because our data violate the independence
+assumption of standard linear regression. Mixed-effects models
+explicitly account for this hierarchical data structure through random
+effects.</p>
+<p>For each of 11 symptoms, we fit models with:</p>
 <ul>
 <li><strong>Outcome</strong>: Symptom severity (0-5 scale)</li>
 <li><strong>Predictor</strong>: Total active exercise minutes per
-day<br />
-</li>
+day</li>
 <li><strong>Covariate</strong>: Menstrual cycle phase (Menstrual,
 Follicular, Fertility, Luteal)</li>
 <li><strong>Random effects</strong>: Random intercepts for participants
@@ -932,9 +1335,13 @@ Follicular, Fertility, Luteal)</li>
 </ul>
 <p>The random intercept structure accounts for repeated measures within
 individuals, including the 20 participants (47.6%) who contributed data
-in both 2022 and 2024 study intervals. Models were fit using the lme4
-package in R with REML = FALSE. Statistical significance was assessed at
-α = 0.05.</p>
+in both 2022 and 2024 study intervals. Each participant’s random
+intercept captures their baseline symptom tendency, allowing the model
+to distinguish between-person effects (do people who exercise more
+generally have fewer symptoms?) from within-person effects (on days when
+a person exercises more, do they experience fewer symptoms?).</p>
+<p>Models were fit using the lme4 package in R with REML = FALSE.
+Statistical significance was assessed at α = 0.05.</p>
 <pre class="r"><code># Model 1: Exercise → cramps
 model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
@@ -1013,45 +1420,45 @@ summary(model_fatigue)</code></pre>
 ## phasefllclr -0.270 -0.124              
 ## phaseluteal -0.325  0.014  0.545       
 ## phasemnstrl -0.295  0.004  0.464  0.527</code></pre>
-<pre class="r"><code># Model 3: Exercise → stress
-model_stress = lmer(stress_score ~ total_active_min + phase + (1|id), 
+<pre class="r"><code># Model 3: Exercise → headaches
+model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
                      REML = FALSE)
-summary(model_stress)</code></pre>
+summary(model_headaches)</code></pre>
 <pre><code>## Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite&#39;s
 ##   method [lmerModLmerTest]
-## Formula: stress_score ~ total_active_min + phase + (1 | id)
+## Formula: headaches_score ~ total_active_min + phase + (1 | id)
 ##    Data: exercise_analysis
 ## 
 ##       AIC       BIC    logLik -2*log(L)  df.resid 
-##    8927.5    8963.9   -4456.8    8913.5      1328 
+##    1423.2    1452.5    -704.6    1409.2       478 
 ## 
 ## Scaled residuals: 
-##      Min       1Q   Median       3Q      Max 
-## -11.8306  -0.5371   0.0438   0.6073   2.3966 
+##     Min      1Q  Median      3Q     Max 
+## -2.6236 -0.5364 -0.2010  0.4692  4.1854 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance Std.Dev.
-##  id       (Intercept)  8.729   2.954   
-##  Residual             44.477   6.669   
-## Number of obs: 1335, groups:  id, 26
+##  id       (Intercept) 0.7962   0.8923  
+##  Residual             0.9451   0.9721  
+## Number of obs: 485, groups:  id, 23
 ## 
 ## Fixed effects:
 ##                    Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)       7.699e+01  7.535e-01  5.895e+01 102.172   &lt;2e-16 ***
-## total_active_min -1.170e-03  3.634e-03  1.328e+03  -0.322    0.748    
-## phasefollicular   5.202e-01  5.444e-01  1.327e+03   0.956    0.339    
-## phaseluteal      -7.110e-01  5.076e-01  1.327e+03  -1.401    0.162    
-## phasemenstrual    2.018e-01  5.828e-01  1.317e+03   0.346    0.729    
+## (Intercept)        1.607615   0.218946  34.723276   7.343 1.46e-08 ***
+## total_active_min  -0.002302   0.001252 467.878650  -1.839  0.06648 .  
+## phasefollicular    0.138579   0.131170 465.125112   1.056  0.29130    
+## phaseluteal        0.190578   0.125562 468.969403   1.518  0.12974    
+## phasemenstrual     0.446385   0.144749 469.189552   3.084  0.00216 ** 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) ttl_c_ phsfll phsltl
-## totl_ctv_mn -0.344                     
-## phasefllclr -0.379  0.055              
-## phaseluteal -0.418  0.069  0.525       
-## phasemnstrl -0.343  0.049  0.446  0.502</code></pre>
+## totl_ctv_mn -0.235                     
+## phasefllclr -0.276 -0.119              
+## phaseluteal -0.330  0.010  0.547       
+## phasemnstrl -0.295 -0.013  0.463  0.528</code></pre>
 <pre class="r"><code># Model 4: Exercise → mood swings
 model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
@@ -1326,13 +1733,13 @@ summary(model_indigestion)</code></pre>
 ## phaseluteal -0.284  0.010  0.547       
 ## phasemnstrl -0.257 -0.010  0.464  0.529</code></pre>
 <pre class="r"><code># Cleaning results:
-# Extract coefficients for exercise effect
+# Extracting coefficients for exercise effect
 results_summary = bind_rows(
   tidy(model_cramps, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Cramps&quot;),
   tidy(model_fatigue, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Fatigue&quot;),
-  tidy(model_stress, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Stress&quot;),
-  tidy(model_mood, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Mood swings&quot;),
-  tidy(model_sleep, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Sleep issues&quot;),
+  tidy(model_headaches, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Head Aches&quot;),
+  tidy(model_mood, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Mood Swings&quot;),
+  tidy(model_sleep, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Sleep Issues&quot;),
   tidy(model_bloating, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Bloating&quot;),
   tidy(model_appetite, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Appetite&quot;),
   tidy(model_indigestion, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Indigestion&quot;),
@@ -1384,15 +1791,15 @@ knitr::kable(results_summary)</code></pre>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
-<td align="left">Stress</td>
-<td align="right">-0.0011698</td>
-<td align="right">0.0036337</td>
-<td align="right">-0.3219312</td>
-<td align="left">0.7476</td>
+<td align="left">Head Aches</td>
+<td align="right">-0.0023021</td>
+<td align="right">0.0012515</td>
+<td align="right">-1.8394980</td>
+<td align="left">0.0665</td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
-<td align="left">Mood swings</td>
+<td align="left">Mood Swings</td>
 <td align="right">-0.0011226</td>
 <td align="right">0.0012213</td>
 <td align="right">-0.9191398</td>
@@ -1400,7 +1807,7 @@ knitr::kable(results_summary)</code></pre>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
-<td align="left">Sleep issues</td>
+<td align="left">Sleep Issues</td>
 <td align="right">-0.0003841</td>
 <td align="right">0.0012664</td>
 <td align="right">-0.3033156</td>
@@ -1449,25 +1856,54 @@ knitr::kable(results_summary)</code></pre>
 </tr>
 </tbody>
 </table>
-<p>Our analysis examined the relationship between objectively measured
-physical activity and menstrual symptom severity across 10 different
-symptoms. The mixed-effects modeling approach appropriately accounts for
-the repeated-measures structure of the data and controls for menstrual
-cycle phase and study year effects.</p>
-<p><strong>Key Takeaways:</strong></p>
-<ol style="list-style-type: decimal">
-<li><p><strong>Individual Variation Dominates</strong>: The high ICC
-values indicate that most variance in symptoms is between individuals
-rather than within individuals over time. This suggests symptom
-experiences are highly personalized.</p></li>
-<li><p><strong>Exercise Effects Are Complex</strong>: The relationship
-between exercise and symptoms is not uniformly beneficial or harmful.
-Some symptoms may respond to exercise while others do not.</p></li>
-<li><p><strong>Reverse Causation Concerns</strong>: Positive
-associations (exercise → worse symptoms) likely reflect reverse
-causation. Symptoms prevent exercise rather than exercise causing
-symptoms.</p></li>
-</ol>
+<p>Linear mixed-effects models showed limited evidence for associations
+between daily physical activity and menstrual symptom severity after
+controlling for cycle phase and individual differences. Of the 11
+symptoms examined, only fatigue showed statistically significant
+relationships with exercise at α = 0.05: fatigue (β = -0.0026819 , SE =
+0.0013608, p = 0.0493).</p>
+<p>For fatigue, the negative coefficient indicates that each additional
+minute of daily active exercise was associated with a 0.0027 point
+decrease in fatigue severity on the 0-5 scale.</p>
+<p>The remaining 9 symptoms showed no significant associations with
+exercise. Effect estimates for these symptoms were near-zero with
+confidence intervals spanning positive and negative values, indicating
+no detectable relationship between daily exercise and symptom severity
+after controlling for menstrual cycle phase.</p>
+<p>Interestingly, cramps, the primary outcome of interest given its
+prominence in menstrual symptom research, showed essentially no
+association with exercise (β = -0.00005, p = 0.9647). The point estimate
+had wide confidence intervals indicating no evidence of either
+beneficial or harmful effects.</p>
+<div id="model-diagnostics" class="section level3">
+<h3>Model Diagnostics</h3>
+<pre class="r"><code># Three essential plots
+par(mfrow = c(1, 3))
+
+# 1. Residuals vs Fitted (linearity + homoscedasticity)
+plot(fitted(model_fatigue), resid(model_fatigue),
+     xlab = &quot;Fitted Values&quot;, ylab = &quot;Residuals&quot;,
+     main = &quot;Residuals vs Fitted&quot;,
+     pch = 16, col = rgb(0, 0, 0, 0.3))
+abline(h = 0, col = &quot;red&quot;, lty = 2, lwd = 2)
+
+# 2. Q-Q Plot (normality of residuals)
+qqnorm(resid(model_cramps), main = &quot;Q-Q Plot: Residuals&quot;,
+       pch = 16, col = rgb(0, 0, 0, 0.3))
+qqline(resid(model_cramps), col = &quot;red&quot;, lwd = 2)
+
+# 3. Q-Q Plot (normality of random effects)
+qqnorm(ranef(model_cramps)$id[,1], main = &quot;Q-Q Plot: Random Effects&quot;,
+       pch = 16, col = rgb(0, 0, 0, 0.5))
+qqline(ranef(model_cramps)$id[,1], col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="EXERCISE_ANU_FINAL_files/figure-html/model-diagnostics-1.png" width="960" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>The residual vs fitted plot shows diagonal banding typical of ordinal
+outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is
+expected when applying linear models to Likert-scale data. The Q-Q plots
+indicate that residuals and random effects are approximately normally
+distributed, supporting the use of mixed-effects models.</p>
+</div>
 </div>
 
 

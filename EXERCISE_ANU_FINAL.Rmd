@@ -93,7 +93,6 @@ overall_desc |>
         align = c("l", "r", "r", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
-```
 Overall, participants demonstrated moderate daily physical activity levels. The median daily step count was `r format(overall_desc$Median[1], big.mark = ",")` steps, with a mean of `r format(overall_desc$Mean[1], big.mark = ",")` steps (SD = `r format(overall_desc$SD[1], big.mark = ",")`). The large standard deviation and difference between mean and median indicate presence of extreme outlier observations (as identified earlier). Active exercise time averaged `r overall_desc$Mean[2]` minutes per day (Median = `r overall_desc$Median[2]` minutes), with participants burning an average of `r format(overall_desc$Mean[3], big.mark = ",")` calories per session (Median = `r format(overall_desc$Median[3], big.mark = ",")`). Most participants engaged in `r overall_desc$Mean[4]` exercise sessions per day (Median = `r overall_desc$Median[4]`). Physical activity was recorded on `r overall_desc$Percent[5]`% of study days, indicating high compliance with activity tracking.
 
 ```{r, message = FALSE, warning = FALSE}
@@ -116,7 +115,7 @@ kable(year_comp,
       align = c("c", rep("r", 7))) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
-Exercise patterns differed substantially between study years. The 2024 cohort showed considerably higher activity levels compared to 2022 across all metrics. 2024 participants averaged `r round(year_2024$mean_active, 1)` active minutes per day compared to `r round(year_2022$mean_active, 1)` minutes in 2022. The proportion of days with recorded activity increased from `r round(year_2022$pct_active, 1)`% in 2022 to `r round(year_2024$pct_active, 1)`% in 2024.
+Exercise patterns differed substantially between study years. The 2024 cohort showed considerably higher activity levels compared to 2022 across all metrics. 2024 participants averaged `r year_comp$"Mean Active Min"[2]` active minutes per day compared to `r year_comp$"Mean Active Min"[1]` minutes in 2022. The proportion of days with recorded activity increased from `r year_comp$"% Days Active"[1]`% in 2022 to `r year_comp$"% Days Active"[2]`% in 2024.
 
 #### Descriptives: Symptom Severity
 ```{r}
