@@ -106,7 +106,7 @@ All dataframes can be linked by participant's `id`. Besides `subejct_info`, othe
 
 ------------------------------------------------------------------------
 
-### `subject_info`: Subject-Relevant Data
+#### `subject_info`: Subject-Relevant Data
 
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
 
@@ -238,7 +238,7 @@ subject_info <- subject_info_raw  |>
   
 ```
 
-### `hormone_symptoms`: Daily Hormone and Self-Reported Symptom-Related Data
+#### `hormone_symptoms`: Daily Hormone and Self-Reported Symptom-Related Data
 
 The `hormone_symptoms` dataframe contains participants' daily hormone data (LH, E3G, PdG) and self-reported symptom-related data (e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from 0 ("Not at all") to 5 ("Very high"), from `hormones_and_selfreport.csv`.
 
@@ -323,7 +323,7 @@ hormone_symptoms <- hormone_symptoms_raw |>
   )
 ```
 
-### `sleep_stress_daily`: Daily Sleep and Stress Related Data
+#### `sleep_stress_daily`: Daily Sleep and Stress Related Data
 
 The `sleep_stress_daily` dataframe contains participants' daily sleep and stress data from 3 csv files (`sleep.csv`, `sleep_score.csv` and `stress_score.csv`).
 
@@ -387,7 +387,7 @@ sleep <- sleep_raw|>
 sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))
 ```
 
-### `exercise_daily`:  Daily Exercise Related Data
+#### `exercise_daily`:  Daily Exercise Related Data
 
 The `exercise_daily` dataframe contains participants' daily exercise related data from `exercise.csv`).
 
@@ -425,7 +425,7 @@ exercise_daily <- exercise_raw |>
   rename(day_in_study = start_day_in_study) 
 ```
 
-### `all_daily_data`: Merged Multimodal Daily Data
+#### `all_daily_data`: Merged Multimodal Daily Data
 
 The `all_daily_data` is a merged multimodal dataframe that contains all **daily-level** data from `hormone_symptoms`, `exercise_daily`, and `sleep_stress_daily` dataframes, and used `hormone_symptoms` as the anchor dataframe. Each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
 
@@ -559,7 +559,7 @@ The cohort includes 42 participants with a median age of \~21 years and a small 
 
 The average age of menarche was 11.9, though some participants reported first menstruating as late as age 15. Our participants largely identified as women (88.7%) and as Asian (59.7%) or white (22.6%). More than 4 in 5 participants had completed at least some college, with 25.8% having a college degree and 8.1% having a graduate degree. 
 
-### Age of first menarche
+#### Age of first menarche
 
 ```{r, include=FALSE}
 menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
@@ -577,7 +577,7 @@ menarche_plot
 
 Age of first menarche ranges roughly from 10 to 15 years with a median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche distribution suggests a relatively standard reproductive development history across participants; because very early or very late menarche can influence cycle regularity and hormonal profiles, the lack of extreme variability here supports attributing observed hormone–symptom patterns primarily to current cycle phase rather than developmental differences.
 
-### BMI
+#### BMI
 
 ```{r bmi-boxplot}
 overall_bmi_n <- subject_info |> 
@@ -611,7 +611,7 @@ bmi_all
 
 Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
 
-## Hormone and Symptoms
+### Hormone and Symptoms
 
 ```{r, warning= FALSE}
 hormone_symptoms_eda=
@@ -619,7 +619,7 @@ hormone_symptoms_eda=
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
-### LH & Estrogen
+#### LH & Estrogen
 
 We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
 
@@ -650,7 +650,7 @@ ggplot(hormone_avg, aes(x = phase)) +
 
 Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
 
-### Mood Swing
+#### Mood Swing
 
 Moodswing Distribution Across Phases
 
@@ -720,7 +720,7 @@ Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase 
 
 
 
-### Flow Volume
+#### Flow Volume
 
 Flow Volume Distribution Across Phases
 
@@ -774,7 +774,7 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1) )+
 
 Menstrual phase has the highest average flow (2.38), luteal is lowest (0.03), fertility is 0.07, and follicular is 0.23.
 
-### Appetite
+#### Appetite
 
 Average Appetite Across Phases
 
@@ -799,7 +799,7 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
 Appetite was highest in the Fertility phase (2.96), a pattern that visually paralleled the estrogen trend, leading me to formally test their relationship using a linear mixed model.
 
 
-## Sleep and stress
+### Sleep and stress
 
 Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase—when individuals typically experience higher energy levels—participants spent less time in bed but obtained greater amounts of deep sleep.
 ```{r, message=FALSE, warning= FALSE}
@@ -1052,8 +1052,8 @@ tidy(m2, effects = "fixed")|>
   knitr::kable(digits = 3)
 ```
 
-### ANU: STRESS
-### Distribution of Key Exercise Metrics
+### EXERCISE
+#### Distribution of Key Exercise Metrics
 ```{r, fig.width = 13, fig.height = 12}
 
 exercise_analysis = all_daily_data
@@ -1141,7 +1141,7 @@ routines.
 These distributions collectively demonstrate substantial right-skew, high between-person 
 variability.
 
-### Exercise patterns across menstrual cycle phases
+#### Exercise patterns across menstrual cycle phases
 ```{r, fig.width = 10, fig.height = 10}
 
 p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0, total_steps < 50000), 
@@ -1175,7 +1175,7 @@ p1 / p2 + plot_layout(guides = "collect")
 
 Physical activity varied across menstrual cycle phases, with patterns differing by year. In 2022, activity levels remained relatively stable across phases, with only slight differences between fertility, follicular, luteal, and menstrual phases. In contrast, 2024 showed more pronounced phase-related patterns, with the fertility phase demonstrating highest activity levels, followed by the follicular phase, and lower activity during luteal and menstrual phases. Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns. The 2024 cohort showed consistently higher activity across all phases compared to 2022, confirming the year differences observed in overall descriptive statistics. 
 
-### Exercise vs. menstrual symptoms
+#### Exercise vs. menstrual symptoms
 
 ```{r, fig.width = 10, fig.height = 10, warning = FALSE, message = FALSE}
 symptoms_long = exercise_analysis |> 
@@ -1234,9 +1234,9 @@ The scatterplots examine crude associations between daily  activity (exercise) a
 Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, the considerable scatter reveals that individual-level associations vary widely, i.e., some participants show strong exercise-symptom relationships while others show none. Third, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Fourth, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.
 
 
-# Modelling
-## Hormone and Symptoms
-### Mood Swing Linear Mixed Models
+## Modelling
+### Hormone and Symptoms
+#### Mood Swing Linear Mixed Models
 
 
 Test whether mood swing differ by menstrual phase, accounting for repeated measures.
@@ -1271,7 +1271,7 @@ mood_table <- create_model_table(mood_mixed_model, "Mood Swing ~ Phase")
 
 Based on the model results, the average mood swing score during the menstrual phase (the model intercept) is 1.77. Compared to this, symptoms are modestly lower in other phases, with the follicular phase showing the largest reduction of 0.37 points, followed by the fertility window at 0.34 points lower, and the luteal phase at 0.24 points lower. However, the analysis reveals that individual differences between participants are substantial; the random effects standard deviation of 0.98 for participant baselines is nearly identical to the residual standard deviation of 1.00, indicating that the unique baseline score of an individual accounts for as much variance in the data as all other unmeasured factors and the cycle phases combined. Therefore, while a statistically significant pattern links the menstrual phase to higher symptom reports, the predominant finding is the extensive variability from person to person, underscoring that the experience of cycle-related mood swings is highly individual. 
 
-### Flow volume vs LH
+#### Flow volume vs LH
 Observing in exploratory scatter plots that self-reported flow volume scores appeared to follow an inverse pattern relative to luteinizing hormone (LH) levels, I conducted a linear mixed model analysis to formally test this visual hypothesis. The model was used to determine if this apparent inverse relationship was statistically significant when rigorously accounting for the repeated measures within each individual participant.
 
 ```{r, warning= FALSE}
@@ -1282,7 +1282,7 @@ flow_table
 ```
 Based on the linear mixed model, a significant but modest relationship exists between luteinizing hormone (LH) levels and perceived menstrual flow volume. For every one-unit increase in LH, the flow volume score is estimated to decrease by -0.01138 points (p = 0.00129). While statistically significant, this effect is small in magnitude. The model indicates substantial individual differences, as the variation in scores within a single person over time (residual SD = 1.19) is much greater than the average differences between individuals' baselines (intercept SD = 0.45). Therefore, while LH shows a significant inverse association with flow volume, within-person biological and measurement variability remains the dominant feature of the data.
 
-### Appetite vs Estrogen
+#### Appetite vs Estrogen
 
 After observing in a scatter plot that average moodswing scores appeared to follow estrogen patterns, I applied a linear mixed model to appetite to formally test whether estrogen levels directly predict its changes within individuals.
 
@@ -1343,8 +1343,8 @@ physiology_model_table
 
 We ran a binomial regression between menstruation and self-reported symptoms. The results of our preliminary regression analysis show that menstruation was positively associated with `fatigue`, `cramps`, and `bloating`. There was a negative association between menstruation and reported `sleep issues` and `sore breasts` as well as measured `estrogen` and `luteinizing hormone (lh)`. 
 
-## Demographic and Lifestyle Factors and Symptoms 
-#### Focusing on symptoms that were reported as statistically significant 
+#### Demographic and Lifestyle Factors and Symptoms 
+##### Focusing on symptoms that were reported as statistically significant 
 ```{r, include=FALSE}
 #Fatigue and Demographic/Lifestyle Factors
 fatigue_model = lmer( 
@@ -1416,7 +1416,7 @@ We found sleep issues to be positively associated with an educational attainment
 
 We found sore breasts to be only positively associated with older age (p < 0.01). We did not find cramping symptoms to be associated with any biometric or demographic characteristic. 
 
-### STRESS: ANU
+### EXERCISE MODELLING
 
 We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. Mixed-effects models explicitly account for this hierarchical data structure through random effects.
 
@@ -1528,7 +1528,7 @@ The remaining 9 symptoms showed no significant associations with exercise. Effec
 Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = -0.00005, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
 
 
-# Discussion
+## Discussion
 
 ### Data Handling
 
