@@ -19,10 +19,8 @@ navbar:
     - text: "Proposal"
       href: p8105_final_project_proposal.html
   right:
-    - text: "Meet the Team"
-      href: about.html
     - icon: fa-github fa-lg
-      href: 
+      href: "https://github.com/liisnotlee/p8105_final_project.github.io"
 output:
   html_document:
     theme: readable
@@ -32,8 +30,7 @@ output:
     
     
 site:
-  exclude:
-    - "clean_data/"        
+  exclude:  
     - "data/"       
     - "old_analyses/"
     - "*.pptx"  
