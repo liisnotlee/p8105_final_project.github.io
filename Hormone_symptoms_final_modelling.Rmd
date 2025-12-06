@@ -14,6 +14,8 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 options(
   ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
   ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
+```
+
 
 
 ```{r, message=FALSE, warning = FALSE, include=FALSE}
