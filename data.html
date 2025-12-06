@@ -344,17 +344,10 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-<<<<<<< HEAD
-      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
-    </li>
-    <li>
-      <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
-=======
       <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
->>>>>>> ac1cfffa48466e3ad71237884384526fa70dbd29
     </li>
     <li>
       <a href="exercise_final.html">Exercise</a>
@@ -438,6 +431,8 @@ durations, and quality metrics collected by Fitbit</li>
 <li><code>sleep_score.csv</code>: daily sleep score breakdowns provided
 by Fitbit, summarizing overall sleep quality based on multiple
 contributing factors</li>
+<li><code>exercise.csv</code>: individual logged exercise sessions
+collected by Fitbit</li>
 </ul></li>
 </ul>
 <hr />
@@ -494,10 +489,7 @@ linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
 <pre class="r"><code>library(tidyverse)
 library(patchwork)
 library(ggsci)</code></pre>
-<<<<<<< HEAD
 <pre><code>## Warning: package &#39;ggsci&#39; was built under R version 4.5.2</code></pre>
-=======
->>>>>>> ac1cfffa48466e3ad71237884384526fa70dbd29
 <ol start="2" style="list-style-type: decimal">
 <li><p>To ensure a traceable and consistent data cleaning process, we
 first read in and saved all original data from csv files to
@@ -529,7 +521,7 @@ demographics data from <code>subject_info.csv</code> and
 <code>height_and_weight.csv</code>, as well as participants study
 enrollment year (this piece of information is from
 <code>hormones_and_selfreport.csv</code>).</p>
-<p>It contains a total of 62 observations of 18 variables. Some key
+<p>It contains a total of 62 observations of 19 variables. Some key
 variables are the following:</p>
 <ul>
 <li><code>id</code>: participant’s unique identifier</li>
