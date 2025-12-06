@@ -342,7 +342,8 @@ expectations</p>
 <pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 Estrogen levels are highest in the Fertility (ovulatory) phase, second
 highest in Luteal, and relatively low in Menstrual, gradually rising
@@ -357,8 +358,8 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 490 rows containing missing values or values outside the scale
-## range (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 473 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 Violin plots show substantial inter-individual variability. Menstrual
 phase has the highest mood swing intensity (right-skewed distribution,
@@ -373,6 +374,72 @@ fertility phases.</p>
 <p>Mood SwingLinear Mixed Models</p>
 <p>Test whether mood swing and fatigue differ by menstrual phase,
 accounting for repeated measures.</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="17%" />
+<col width="9%" />
+<col width="10%" />
+<col width="9%" />
+<col width="10%" />
+<col width="8%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Mood Swing ~ Phase</td>
+<td align="left">(Intercept)</td>
+<td align="right">1.428</td>
+<td align="right">0.157</td>
+<td align="right">1.120</td>
+<td align="right">1.735</td>
+<td align="right">9.108</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">Mood Swing ~ Phase</td>
+<td align="left">phasefollicular</td>
+<td align="right">-0.024</td>
+<td align="right">0.056</td>
+<td align="right">-0.134</td>
+<td align="right">0.085</td>
+<td align="right">-0.437</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">Mood Swing ~ Phase</td>
+<td align="left">phaseluteal</td>
+<td align="right">0.104</td>
+<td align="right">0.053</td>
+<td align="right">0.001</td>
+<td align="right">0.208</td>
+<td align="right">1.985</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">Mood Swing ~ Phase</td>
+<td align="left">phasemenstrual</td>
+<td align="right">0.345</td>
+<td align="right">0.061</td>
+<td align="right">0.224</td>
+<td align="right">0.465</td>
+<td align="right">5.607</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
 <p>Mood swings are lowest near ovulation, slightly higher in Luteal, and
 peak during Menstrual phase. Fatigue shows a similar pattern: lowest
 near ovulation, increasing through Luteal, highest during Menstrual
@@ -387,8 +454,8 @@ captures day-to-day variability.</p>
 variation across phases with violin plots.</p>
 <pre><code>## Warning: Removed 24 rows containing non-finite outside the scale range
 ## (`stat_ydensity()`).</code></pre>
-<pre><code>## Warning: Removed 1126 rows containing missing values or values outside the
-## scale range (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 1140 rows containing missing values or values outside the scale range
+## (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 Luteal phase shows a right-skewed distribution, indicating most low-flow
 observations but a few high-flow days. Menstrual phase is narrow and
@@ -409,13 +476,55 @@ this apparent inverse relationship was statistically significant when
 rigorously accounting for the repeated measures within each individual
 participant.</p>
 <pre class="r"><code>flow_volume_model &lt;- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms)
-flow_table &lt;- create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;)
+flow_table &lt;- create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;)|&gt;
+  knitr::kable(digits = 3)
 flow_table</code></pre>
-<pre><code>## # A tibble: 2 × 8
-##   model         term  estimate std.error conf.low conf.high  p.value significant
-##   &lt;chr&gt;         &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
-## 1 Flow Volume … (Int…   0.641    0.0766    0.486    0.797   7.88e-10 Yes        
-## 2 Flow Volume … lh     -0.0114   0.00353  -0.0183  -0.00445 1.29e- 3 Yes</code></pre>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="13%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="9%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Flow Volume ~ LH</td>
+<td align="left">(Intercept)</td>
+<td align="right">0.641</td>
+<td align="right">0.077</td>
+<td align="right">0.491</td>
+<td align="right">0.792</td>
+<td align="right">8.369</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">Flow Volume ~ LH</td>
+<td align="left">lh</td>
+<td align="right">-0.011</td>
+<td align="right">0.004</td>
+<td align="right">-0.018</td>
+<td align="right">-0.004</td>
+<td align="right">-3.221</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
 <p>Based on the linear mixed model, a significant but modest
 relationship exists between luteinizing hormone (LH) levels and
 perceived menstrual flow volume. For every one-unit increase in LH, the
@@ -439,11 +548,52 @@ Luteal 2.95, Menstrual 2.90.</p>
 <p>Linear Mixed Model: Appetite vs Estrogen Explore the relationship
 between estrogen levels and appetite scores, accounting for repeated
 measures.</p>
-<pre><code>## # A tibble: 2 × 8
-##   model         term  estimate std.error conf.low conf.high  p.value significant
-##   &lt;chr&gt;         &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
-## 1 Appetite ~ E… (Int… 2.89      0.0694    2.75e+0  3.03     1.16e-39 Yes        
-## 2 Appetite ~ E… estr… 0.000129  0.000149 -1.63e-4  0.000421 3.85e- 1 No</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="22%" />
+<col width="13%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="8%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Appetite ~ Estrogen</td>
+<td align="left">(Intercept)</td>
+<td align="right">2.894</td>
+<td align="right">0.069</td>
+<td align="right">2.757</td>
+<td align="right">3.03</td>
+<td align="right">41.677</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">Appetite ~ Estrogen</td>
+<td align="left">estrogen</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.00</td>
+<td align="right">0.869</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
 <p>Random intercept variance (0.1746) indicates participant-specific
 baseline appetite differences. The fixed effect of estrogen is small
 (0.00013 per unit) and not significant (t = 0.869).</p>
