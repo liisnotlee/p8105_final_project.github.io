@@ -289,7 +289,7 @@ $(document).ready(function () {
       <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
-      <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
+      <a href="sleep_stress_final_modelling.html">Sleep &amp; Stress</a>
     </li>
     <li>
       <a href="exercise_final_modelling.html">Exercise</a>
@@ -342,8 +342,7 @@ expectations</p>
 <pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 Estrogen levels are highest in the Fertility (ovulatory) phase, second
 highest in Luteal, and relatively low in Menstrual, gradually rising
@@ -358,8 +357,8 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 473 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 486 rows containing missing values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 Violin plots show substantial inter-individual variability. Menstrual
 phase has the highest mood swing intensity (right-skewed distribution,
@@ -403,10 +402,10 @@ accounting for repeated measures.</p>
 <td align="left">(Intercept)</td>
 <td align="right">1.428</td>
 <td align="right">0.157</td>
-<td align="right">1.120</td>
-<td align="right">1.735</td>
-<td align="right">9.108</td>
-<td align="left">No</td>
+<td align="right">1.112</td>
+<td align="right">1.743</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Mood Swing ~ Phase</td>
@@ -415,8 +414,8 @@ accounting for repeated measures.</p>
 <td align="right">0.056</td>
 <td align="right">-0.134</td>
 <td align="right">0.085</td>
-<td align="right">-0.437</td>
-<td align="left">Yes</td>
+<td align="right">0.662</td>
+<td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">Mood Swing ~ Phase</td>
@@ -425,8 +424,8 @@ accounting for repeated measures.</p>
 <td align="right">0.053</td>
 <td align="right">0.001</td>
 <td align="right">0.208</td>
-<td align="right">1.985</td>
-<td align="left">No</td>
+<td align="right">0.047</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Mood Swing ~ Phase</td>
@@ -435,8 +434,8 @@ accounting for repeated measures.</p>
 <td align="right">0.061</td>
 <td align="right">0.224</td>
 <td align="right">0.465</td>
-<td align="right">5.607</td>
-<td align="left">No</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 </tbody>
 </table>
@@ -454,8 +453,8 @@ captures day-to-day variability.</p>
 variation across phases with violin plots.</p>
 <pre><code>## Warning: Removed 24 rows containing non-finite outside the scale range
 ## (`stat_ydensity()`).</code></pre>
-<pre><code>## Warning: Removed 1140 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 1185 rows containing missing values or values outside the
+## scale range (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 Luteal phase shows a right-skewed distribution, indicating most low-flow
 observations but a few high-flow days. Menstrual phase is narrow and
@@ -508,10 +507,10 @@ flow_table</code></pre>
 <td align="left">(Intercept)</td>
 <td align="right">0.641</td>
 <td align="right">0.077</td>
-<td align="right">0.491</td>
-<td align="right">0.792</td>
-<td align="right">8.369</td>
-<td align="left">No</td>
+<td align="right">0.486</td>
+<td align="right">0.797</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Flow Volume ~ LH</td>
@@ -520,7 +519,7 @@ flow_table</code></pre>
 <td align="right">0.004</td>
 <td align="right">-0.018</td>
 <td align="right">-0.004</td>
-<td align="right">-3.221</td>
+<td align="right">0.001</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
@@ -577,10 +576,10 @@ measures.</p>
 <td align="left">(Intercept)</td>
 <td align="right">2.894</td>
 <td align="right">0.069</td>
-<td align="right">2.757</td>
-<td align="right">3.03</td>
-<td align="right">41.677</td>
-<td align="left">No</td>
+<td align="right">2.754</td>
+<td align="right">3.033</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Appetite ~ Estrogen</td>
@@ -588,8 +587,8 @@ measures.</p>
 <td align="right">0.000</td>
 <td align="right">0.000</td>
 <td align="right">0.000</td>
-<td align="right">0.00</td>
-<td align="right">0.869</td>
+<td align="right">0.000</td>
+<td align="right">0.385</td>
 <td align="left">No</td>
 </tr>
 </tbody>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>SLEEP &amp; STRESS: STATISTICAL MODELLING</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-solid fa-spa"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Exploratory Data Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+    </li>
+    <li>
+      <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_final.html">Exercise</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Statistical Modelling
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+    </li>
+    <li>
+      <a href="sleep_stress_final_modelling.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_final_modelling.html">Exercise</a>
+    </li>
+    <li>
+      <a href="report.html">Overall Model</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="p8105_final_project_proposal.html">Proposal</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/liisnotlee/p8105_final_project.github.io">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">SLEEP &amp; STRESS: STATISTICAL
+MODELLING</h1>
+
+</div>
+
+
+<p>Our dataset are from two studies in two different times, year 2022
+and year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
+Therefore the assumptions of independence is violated so we cannot use
+statistical tests that required independence assumptions. Instead, we
+used generalized linear mixed effects model to evaluate the significant
+different of stress score and sleep score between menstrual phases.</p>
+<p>A linear mixed-effects model was fitted to examine the association
+between menstrual cycle phase and stress score, with menstrual phase as
+the reference category and participant included as a random intercept.
+The results showed that stress scores during the follicular phase did
+not differ significantly from the menstrual phase (estimate = 0.291, SE
+= 0.213, p = 0.172). In contrast, stress scores were significantly lower
+during the fertility (ovulatory) phase (estimate = –0.594, SE = 0.211, p
+= 0.005) and the luteal phase (estimate = –0.525, SE = 0.198, p = 0.008)
+compared with the menstrual phase.</p>
+<p>Because higher scores reflect lower perceived stress, these negative
+estimates indicate that participants experienced more stress during both
+the fertility and luteal phases relative to the menstrual phase.
+Overall, the model suggests meaningful fluctuations in stress across the
+menstrual cycle, with perceived stress notably increased during the
+fertility and luteal phases.</p>
+<pre class="r"><code>m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(
+    title = &quot;Linear mixed effect models for stress score variation by menstrual phases&quot;,
+    digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">76.664</td>
+<td align="right">0.715</td>
+<td align="right">0.000</td>
+<td align="right">75.102</td>
+<td align="right">78.227</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">0.277</td>
+<td align="right">0.212</td>
+<td align="right">0.192</td>
+<td align="right">-0.139</td>
+<td align="right">0.694</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.583</td>
+<td align="right">0.211</td>
+<td align="right">0.006</td>
+<td align="right">-0.997</td>
+<td align="right">-0.170</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.528</td>
+<td align="right">0.197</td>
+<td align="right">0.007</td>
+<td align="right">-0.915</td>
+<td align="right">-0.141</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>A linear mixed-effects model was used to evaluate differences in
+sleep scores across menstrual cycle phases, with the menstrual phase
+serving as the reference category and participant modeled as a random
+intercept. The results showed significant reductions in sleep score
+during all non-menstrual phases. Compared with the menstrual phase,
+sleep scores were significantly lower during the follicular phase
+(estimate = –1.037, SE = 0.283), the fertility (ovulatory) phase
+(estimate = –1.342, SE = 0.281), and the luteal phase (estimate =
+–1.126, SE = 0.263), with all effects statistically significant (p &lt;
+0.001).</p>
+<p>Because higher scores reflect better sleep quality, these negative
+estimates indicate that participants slept worse during the follicular,
+fertility, and luteal phases compared with the menstrual phase. The
+largest decrease in sleep score occurred during the fertility phase,
+suggesting that ovulation is associated with the poorest sleep quality.
+Overall, the model demonstrates that sleep quality varies systematically
+across the menstrual cycle, with the menstrual phase representing the
+period of highest sleep quality.</p>
+<pre class="r"><code>m2 = lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">77.436</td>
+<td align="right">0.709</td>
+<td align="right">0</td>
+<td align="right">76.003</td>
+<td align="right">78.869</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.037</td>
+<td align="right">0.283</td>
+<td align="right">0</td>
+<td align="right">-1.591</td>
+<td align="right">-0.483</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-1.342</td>
+<td align="right">0.281</td>
+<td align="right">0</td>
+<td align="right">-1.892</td>
+<td align="right">-0.792</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-1.126</td>
+<td align="right">0.263</td>
+<td align="right">0</td>
+<td align="right">-1.641</td>
+<td align="right">-0.611</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>m3 = lmer(timeinbed_mean ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m3, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="12%" />
+<col width="13%" />
+<col width="10%" />
+<col width="12%" />
+<col width="13%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">458.906</td>
+<td align="right">5.444</td>
+<td align="right">0.000</td>
+<td align="right">447.929</td>
+<td align="right">469.883</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-6.089</td>
+<td align="right">3.182</td>
+<td align="right">0.056</td>
+<td align="right">-12.326</td>
+<td align="right">0.148</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-10.346</td>
+<td align="right">3.160</td>
+<td align="right">0.001</td>
+<td align="right">-16.542</td>
+<td align="right">-4.151</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-4.710</td>
+<td align="right">2.957</td>
+<td align="right">0.111</td>
+<td align="right">-10.506</td>
+<td align="right">1.086</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+<p>With an estimate of 0.032 and a p-value of 0.043 (which is less than
+the typical significance level of 0.05), this variable is a significant
+positive predictor of stress score. This suggests that, on average, for
+every additional minute of deep sleep, the stress score is predicted to
+increase by 0.032 points, assuming other variables are constant. Time in
+bed is a is a significant positive predictor of stress score ( p =
+0.013) For every additional minute in bed (mean), the stress score is
+predicted to increase by 0.009 points, holding all other variables
+constant. The 95% confidence intervals for the significant predictors
+(deep_sleep_in_minutes and timeinbed_mean) do not contain zero, further
+supporting their statistical significance. When we explore more
+variables, the menstrual phases do not affect the stress score
+significantly.</p>
+<pre class="r"><code>#  model
+m4 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m4, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="11%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="10%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">73.254</td>
+<td align="right">1.848</td>
+<td align="right">69.591</td>
+<td align="right">76.917</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.166</td>
+<td align="right">0.866</td>
+<td align="right">-2.869</td>
+<td align="right">0.536</td>
+<td align="right">0.179</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.964</td>
+<td align="right">0.854</td>
+<td align="right">-2.643</td>
+<td align="right">0.714</td>
+<td align="right">0.259</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.840</td>
+<td align="right">0.753</td>
+<td align="right">-2.321</td>
+<td align="right">0.641</td>
+<td align="right">0.265</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">deep_sleep_in_minutes</td>
+<td align="right">0.032</td>
+<td align="right">0.016</td>
+<td align="right">0.001</td>
+<td align="right">0.063</td>
+<td align="right">0.043</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">timeinbed_mean</td>
+<td align="right">0.009</td>
+<td align="right">0.004</td>
+<td align="right">0.002</td>
+<td align="right">0.016</td>
+<td align="right">0.013</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">total_active_min</td>
+<td align="right">-0.009</td>
+<td align="right">0.008</td>
+<td align="right">-0.024</td>
+<td align="right">0.006</td>
+<td align="right">0.232</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">moodswing_score</td>
+<td align="right">-0.199</td>
+<td align="right">0.255</td>
+<td align="right">-0.701</td>
+<td align="right">0.303</td>
+<td align="right">0.436</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># check the residuals
+qqnorm(residuals(m4)) </code></pre>
+<p><img src="sleep_stress_final_modelling_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><strong>Discussion</strong> This analysis cyclical variations in
+sleep quality and perceived stress across the menstrual cycle using
+mixed-effects models to account for repeated measures within
+individuals. The findings demonstrate consistent and meaningful changes
+in both sleep and stress that align with known physiological
+fluctuations across the menstrual phases.</p>
+<p>Sleep quality was highest during the menstrual phase and decreased
+significantly during the follicular, fertility, and luteal phases.
+Notably, the fertility (ovulatory) phase showed the largest decline in
+sleep score, suggesting that the hormonal surge—particularly in estrogen
+and luteinizing hormone—may disrupt restorative sleep. This pattern
+aligns with previous research indicating that ovulation can be
+associated with increased physiological arousal and thermoregulatory
+changes, which may impair sleep continuity and depth. Despite spending
+more time in bed during menstruation, participants achieved better sleep
+quality during this phase, possibly reflecting a compensatory
+physiological need for rest.</p>
+<p>Stress scores followed a complementary pattern: participants
+experienced the lowest stress (i.e., highest stress scores) during the
+menstrual phase and the highest stress during the fertility and luteal
+phases. The increase in stress during the luteal phase is consistent
+with known premenstrual symptoms such as mood fluctuations,
+irritability, and heightened emotional sensitivity. The elevated stress
+during the ovulatory window may reflect endocrine-driven changes that
+influence emotional reactivity or cognitive load. Together, these
+results underscore the interconnected nature of hormonal rhythms, stress
+regulation, and sleep quality across the menstrual cycle.
+<strong>Limitation</strong> The sample size and ethnic distribution may
+limit generalizability; some ethnic groups were represented by fewer
+participants, potentially affecting the stability of subgroup trends. In
+addition, leep and stress scores were derived from self-reported or
+device-based composite measures, which may not capture the full
+complexity of physiological processes such as sleep architecture or
+cortisol variation.</p>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
