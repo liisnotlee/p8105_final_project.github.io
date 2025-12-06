@@ -5,6 +5,7 @@ output:
     toc: false
     toc_float: false
 ---
+<br>
 
 The following exploratory analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) metrics and self-reported menstrual symptoms across different menstrual cycle phases. We use data from both study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
 
@@ -29,6 +30,8 @@ options(
   ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
 )
 ```
+
+<br>
 
 ### Data Summary
 
@@ -114,7 +117,7 @@ year_comp = all_daily_data |>
   rename(Year = study_interval)
 
 kable(year_comp,
-      caption = "Exercise Metrics by Study Year",
+      caption = "Descriptive Statistics: Exercise Metrics by Study Year",
       align = c("c", rep("r", 7))) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
@@ -143,7 +146,7 @@ symptom_desc = all_daily_data |>
 
 kable(symptom_desc,
       col.names = c("Symptom", "Mean", "SD", "Median"),
-      caption = "Symptom Severity (Scale: 0 = None, 5 = Very High)",
+      caption = "Descriptive Statistics: Symptom Severity (Scale: 0 = None, 5 = Very High)",
       align = c("l", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
@@ -241,17 +244,15 @@ variability.
 
 
 ### Activity type distribution
-```{r, fig.width = 10, fig.height = 17}
+```{r, fig.width = 11, fig.height = 11}
 # Preparing activity types data
 activities_long = exercise_analysis |> 
   filter(!is.na(activity_types), activity_types != "", activity_types != "NA") |> 
   select(id, study_interval, day_in_study, activity_types) |> 
   mutate(
-    # Clean activity types column
     activity_types = str_replace_all(activity_types, "\\n", ","),
     activity_types = str_replace_all(activity_types, "\"", "")
   ) |> 
-  # Split comma-separated activities into rows
   separate_rows(activity_types, sep = ",") |> 
   mutate(
     activity_types = str_trim(activity_types),
@@ -278,22 +279,27 @@ top_activities = activity_counts |>
 activity_counts_top = activity_counts |> 
   filter(activity_types %in% top_activities)
 
-# Plot: Activity type frequency by year
+# Plot: Top 10 activities by year
 p1 = ggplot(activity_counts_top, 
              aes(x = reorder(activity_types, pct), y = pct, 
                  fill = factor(study_interval))) +
   geom_col(position = "dodge", alpha = 0.8) +
+  geom_text(aes(label = paste0(round(pct, 2), "%")),
+            position = position_dodge(width = 0.9),
+            hjust = -0.1,
+            size = 3) +
   coord_flip() +
   labs(title = "Most Common Activity Types by Study Year",
        x = "Activity Type",
        y = "% of Days with Exercise",
        fill = "Study Year") +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  expand_limits(y = max(activity_counts_top$pct) * 1.15)
 
 p1
 ```
-Walking dominated exercise routines in both study years, accounting for the vast majority of recorded activity sessions. Beyond walking, participants engaged in diverse activities including aerobic workouts, general sport, and strength training (weights). The 2024 cohort showed greater diversity in activity types, with more structured exercises such as aerobic workouts and weight training compared to 2022. Activities like outdoor biking, running, treadmill, and swimming appeared in both years but at much lower frequencies. Notably, some activities (e.g., weights, treadmill, swim, workout, hike) appeared exclusively or predominantly in 2024.
+Walking dominated exercise routines in both study years (2022: 84.06%, 2024: 72.01%), accounting for the vast majority of recorded activity sessions. Beyond walking, participants engaged in diverse activities including aerobic workouts, general sport, and strength training (weights). The 2024 cohort showed greater diversity in activity types, with more structured exercises such as aerobic workouts and weight training compared to 2022. Activities like outdoor biking, running, treadmill, and swimming appeared in both years but at much lower frequencies. Notably, some activities (e.g., weights, treadmill, swim, workout, hike) appeared exclusively or predominantly in 2024.
 
 ### Exercise patterns across menstrual cycle phases
 ```{r, fig.width = 10, fig.height = 10}
@@ -326,7 +332,9 @@ p2 = ggplot(exercise_analysis |> filter(!is.na(phase), total_active_min > 0),
 
 p1 / p2 + plot_layout(guides = "collect")
 ```
-Physical activity varied across menstrual cycle phases, with patterns differing by year. In 2022, activity levels remained relatively stable across phases, with only slight differences between fertility, follicular, luteal, and menstrual phases. In contrast, 2024 showed more pronounced phase-related patterns, with the fertility phase demonstrating highest activity levels, followed by the follicular phase, and lower activity during luteal and menstrual phases. Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns. The 2024 cohort showed consistently higher activity across all phases compared to 2022, confirming the year differences observed in overall descriptive statistics. 
+**Daily Steps:** In 2022, step counts remained relatively stable across all phases, with medians around 3,000-4,000 steps. In 2024, phase-related differences were more pronounced; the fertility phase showed higher median step counts (~6,000 steps), while the luteal and menstrual phases showed lower activity (~5,000 steps). The 2024 cohort demonstrated consistently higher step counts across all phases compared to 2022. Five extreme observations (≥50,000 steps) were excluded from this visualization as they distorted the scale and were obvious data errors.
+
+**Active Minutes:** Similar patterns emerged for active minutes. In 2022, all phases showed comparable median active time (~30-40 minutes). In 2024, the fertility phase showed higher active minutes (~ 70 minutes), while follicular, luteal and menstrual phases were lower (~50-60 minutes). Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns.
 
 ### Exercise vs. menstrual symptoms
 
@@ -356,53 +364,52 @@ symptoms_long = exercise_analysis |>
 p4 = ggplot(symptoms_long, 
              aes(x = total_active_min, y = severity, color = symptom)) +
   geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
-  geom_smooth(method = "lm", se = TRUE, linewidth = 1.5, alpha = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 2.0, alpha = 0.2) +
   facet_wrap(~symptom, ncol = 2) +
   labs(title = "Daily Activity vs Individual Symptoms",
        x = "Total Daily Activity (mins)",
        y = "Symptom Severity (0-5)") +
   scale_x_continuous(labels = comma) +
   scale_y_continuous(breaks = 0:5) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  scale_color_brewer(palette = "Set2")
 
 p4
 ```
 The scatterplots examine crude associations between daily  activity (exercise) and each symptom:
 
 **Negative slopes (potential benefits):**
-- **Bloating**: Modest downward trend suggests higher activity associates with reduced bloating
-- **Food cravings**: Slight negative association, though relationship appears weak
-- **Indigestion**: Minimal negative slope with high variability
+
+* **Bloating**: Considerable downward trend suggests higher activity associates with reduced bloating
+* **Fatigue**: Considerable downward trend suggests higher activity associates with reduced fatigue
+* **Food cravings**: Considerable downward trend suggests higher activity associates with fewer food cravings
+* **Head aches**: Slight downward trend suggests higher activity associates with fewer headaches
+* **Indigestion**: Considerable downward trend suggests higher activity associates with lower indigestion
 
 **Flat relationships (no clear association):**
-- **Cramps**: Near-horizontal line despite being primary outcome
-- **Appetite, headaches, sleep issues, sore breasts**: Essentially flat with wide confidence bands
-- **Mood swings**: Slight positive but nearly flat, high uncertainty
-
-**Positive slope (likely reverse causation):**
-- **Fatigue**: Higher fatigue appears to reduce exercise, not vice versa
+* **Appetite, headaches, sleep issues, sore breasts**: Essentially flat line
+* **Cramps**: Near-horizontal line despite often being referred as one of the primary symptoms of menstruation
+* **Mood swings**: Nearly flat line
 
 **Sleep issues** and **sore breasts** exhibited insufficient data spread to estimate reliable trends
 
-Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, the considerable scatter reveals that individual-level associations vary widely, i.e., some participants show strong exercise-symptom relationships while others show none. Third, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Fourth, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.
+Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Third, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.Given the observable trends between daily activity and symptom severity, formal statistical modeling would be beneficial to quantify these associations and determine whether these relationships are statistically significant after accounting for potential confounders.
 
 
 # Modelling and inferential analysis
 
-We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. Mixed-effects models explicitly account for this hierarchical data structure through random effects.
+We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. However, mixed-effects models explicitly account for this hierarchical data structure through random effects.
 
-For each of 11 symptoms, we fit models with:
+For each of 10 symptoms, we fit models with:
+*   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
+*   **Predictor**: Total active exercise minutes per day
+*   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+*   **Random effects**: Random intercepts for participants (1|id)
 
--   **Outcome**: Symptom severity (0-5 scale)
--   **Predictor**: Total active exercise minutes per day
--   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
--   **Random effects**: Random intercepts for participants (1|id)
-
-The random intercept structure accounts for repeated measures within individuals, including the 20 participants (47.6%) who contributed data in both 2022 and 2024 study intervals. Each participant's random intercept captures their baseline symptom tendency, allowing the model to distinguish between-person effects (do people who exercise more generally have fewer symptoms?) from within-person effects (on days when a person exercises more, do they experience fewer symptoms?). 
+The random intercept for participant ID accounts for repeated measures within individuals across both days and study years, including the 20 participants (47.6%) who contributed data in both 2022 and 2024.
 
 Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
 ```{r}
-
 # Model 1: Exercise → cramps
 model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
@@ -466,7 +473,6 @@ summary(model_indigestion)
 ```
 
 ```{r}
-# Cleaning results:
 # Extracting coefficients for exercise effect
 results_summary = bind_rows(
   tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
@@ -477,26 +483,32 @@ results_summary = bind_rows(
   tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
   tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite"),
   tidy(model_indigestion, effects = "fixed") %>% mutate(outcome = "Indigestion"),
-  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore breasts"),
-  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food cravings")
+  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore Breasts"),
+  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food Cravings")
 ) %>%
   filter(term == "total_active_min") %>%
   select(outcome, estimate, std.error, statistic, p.value) %>%
+  arrange(outcome) %>%
   mutate(
     significant = ifelse(p.value < 0.05, "Yes", "No"),
+    across(c(estimate, std.error, statistic), ~round(.x, 4)),
     p.value = format.pval(p.value, digits = 3, eps = 0.001)
   )
 
-knitr::kable(results_summary)
+kable(results_summary,
+      col.names = c("Symptom", "Estimate", "SE", "t-statistic", "p-value", "Significant"),
+      caption = "Effect of Daily Active Minutes on Symptom Severity",
+      align = c("l", "r", "r", "r", "r", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
 
-Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 11 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0026819	, SE = 0.0013608, p = 0.0493).
+Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 10 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0027, SE = 0.0014, p = 0.0493).
 
 For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
 
-The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were near-zero with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
+The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were insignificant with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
 
-Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = -0.00005, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
+Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = 0, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
 
 
 ### Model Diagnostics
@@ -525,4 +537,4 @@ qqline(ranef(model_cramps)$id[,1], col = "red", lwd = 2)
 
 par(mfrow = c(1, 1))
 ```
-The residual vs fitted plot shows diagonal banding typical of ordinal outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying linear models to Likert-scale data. The Q-Q plots indicate that residuals and random effects are approximately normally distributed, supporting the use of mixed-effects models.
+Only the fatigue model showed a statistically significant association, so diagnostic checks were conducted for this model only. The residual vs fitted plot shows diagonal banding typical of ordinal outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying linear models to Likert-scale data. The Q-Q plots indicate that residuals and random effects are approximately normally distributed, supporting the use of mixed-effects models.
