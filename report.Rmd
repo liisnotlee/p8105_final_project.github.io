@@ -47,7 +47,7 @@ By leveraging Fitbit data with menstrual self-reported menstrual symptoms from a
 ## Related Work
 Our project is inspired by new and upcoming research examining how lifestyle factors influence menstrual health and the emerging use of wearables in this space.
 
-Studies have established that short sleep duration and both sedentary and vigorous physical activity can contribute to the risk of developing menstrual disorders[(PubMed Central)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10393940/), while poorer sleep quality in the premenstrual phase and during menstruation is common in women with premenstrual symptoms or painful cramps [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/30098748/).  Regarding exercise, it has been found that exercise performed for about 45 to 60 minutes, three times per week or more, may provide a clinically significant reduction in menstrual pain intensity [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/31538328/).
+Studies have established that short sleep duration and both sedentary and vigorous physical activity can contribute to the risk of developing menstrual disorders [(PubMed Central)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10393940/), while poorer sleep quality in the premenstrual phase and during menstruation is common in women with premenstrual symptoms or painful cramps [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/30098748/).  Regarding exercise, it has been found that exercise performed for about 45 to 60 minutes, three times per week or more, may provide a clinically significant reduction in menstrual pain intensity [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/31538328/).
 
 <br>
 
@@ -238,7 +238,7 @@ subject_info <- subject_info_raw  |>
   
 ```
 
-#### `hormone_symptoms`: Daily Hormone and Self-Reported Symptom-Related Data
+#### `hormone_symptoms`: Daily Hormone & Self-Reported Symptom-Related Data
 
 The `hormone_symptoms` dataframe contains participants' daily hormone data (LH, E3G, PdG) and self-reported symptom-related data (e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from 0 ("Not at all") to 5 ("Very high"), from `hormones_and_selfreport.csv`.
 
@@ -323,7 +323,7 @@ hormone_symptoms <- hormone_symptoms_raw |>
   )
 ```
 
-#### `sleep_stress_daily`: Daily Sleep and Stress Related Data
+#### `sleep_stress_daily`: Daily Sleep & Stress Related Data
 
 The `sleep_stress_daily` dataframe contains participants' daily sleep and stress data from 3 csv files (`sleep.csv`, `sleep_score.csv` and `stress_score.csv`).
 
@@ -611,17 +611,16 @@ bmi_all
 
 Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
 
-### Hormone and Symptoms
+<br>
 
+### Hormone & Symptoms
 ```{r, warning= FALSE}
 hormone_symptoms_eda=
   hormone_symptoms|>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
-
-#### LH & Estrogen
-
-We want to examine average estrogen and LH levels across menstrual cycle phases to see if hormonal patterns match biological expectations
+#### Luteinizing hormone (LH) & Estrogen
+We want to examine average estrogen and LH levels across menstrual cycle phases, to see if hormonal patterns match biological expectations.
 
 ```{r, warning= FALSE}
 hormone_avg <- hormone_symptoms_eda|>
@@ -646,16 +645,12 @@ ggplot(hormone_avg, aes(x = phase)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+Estrogen levels are highest in the fertility (ovulatory) phase, second highest in luteal, and relatively low in menstrual, gradually rising from follicular to lluteal. Overall, LH levels are much lower than estrogen, peaking sharply during fertility phase, and remaining low in the other phases.
 
+<br>
 
-Estrogen levels are highest in the Fertility (ovulatory) phase, second highest in Luteal, and relatively low in Menstrual, gradually rising from Follicular to Luteal. LH is much lower than estrogen overall, peaking sharply in Fertility and remaining low in the other phases.
-
-#### Mood Swing
-
-Moodswing Distribution Across Phases
-
-Using violin plots to assess whether menstrual cycle hases influence mood swing intensity. 
-
+#### Mood Swing Distribution Across Phases
+Using violin plots, we want to assess whether menstrual cycle phases influence mood swing intensity. 
 ```{r, warning= FALSE}
 # Mood swing
 ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score, fill = phase)) +
@@ -665,23 +660,22 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score, fill = phase)) 
   labs(
     title = "Distribution of Mood Swing Intensity Across Phases",
     x = "Phase",
-    y = "Mood Swing (0–5)"
+    y = "Mood Swing (Scale: 0–5)"
   ) + 
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
     plot.title = element_text(face = "bold"),
     panel.grid.major = element_line(color = "grey90")
   )
-
 ```
 
-Violin plots show substantial inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), while Luteal phase shows lower values with a wider base (more individuals with low mood swing).
+The violin plots show significant inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), whereas luteal phase shows lower values with a wider base (more individuals with low mood swings).
 
+<br>
 
-Average Mood Swing Across Phases
+#### Average Mood Swing Across Phases
 
-To visualize general trends, we should summarize the average mood swing intensity across phases.
-
+To understand general moodswing trends, we can summarize the average mood swing intensity across phases.
 ```{r, warning= FALSE}
 symptom_means <- hormone_symptoms_eda |>
   group_by(phase) |>
@@ -713,18 +707,14 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
     plot.title = element_text(face = "bold"),
     panel.grid.major = element_line(color = "grey90")
   )
-
 ```
 
-Average mood swing is highest in Menstrual phase (1.85), lowest in Luteal phase (1.41), with intermediate levels in follicular and fertility phases.
+Average mood swing intensity is highest in menstrual phase (1.85), lowest in luteal phase (1.41), with intermediate levels in follicular and fertility phases.
 
+<br>
 
-
-#### Flow Volume
-
-Flow Volume Distribution Across Phases
-
-To assess flow volume distribution patterns, we visualize flow volume variation across phases with violin plots.
+#### Flow Volume Distribution Across Phases
+Here, we assess flow volume distribution patterns, and visualize flow volume variation across phases with violin plots.
 
 ```{r, warning= FALSE}
 #violin
@@ -733,7 +723,7 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score, fill = phase)
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   labs(
     title = "Distribution of Flow Volume Across Phases",
-    x = "Phase", y = "Flow Volume (0–6)"
+    x = "Phase", y = "Flow Volume (Scale: 0–6)"
   ) +
   scale_y_continuous(limits = c(0,5), breaks = 0:5) +
   theme_minimal()
@@ -741,11 +731,11 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score, fill = phase)
 
 Luteal phase shows a right-skewed distribution, indicating most low-flow observations but a few high-flow days. Menstrual phase is narrow and tall, indicating consistently higher flow intensity.
 
+<br>
 
-Average Flow Volume Across Phases
-
-Summarize average flow volume to observe general trends across the menstrual cycle.
-```{r, warning= FALSE}
+#### Average Flow Volume Across Phases
+We looked at average flow volume to observe general trends across the menstrual cycle.
+```{r, warning= FALSE, fig.height = 7}
 cycle_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
@@ -771,22 +761,20 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1) )+
   )
 
 ```
+Menstrual phase has the highest average flow (2.38), whereas luteal is the lowest (0.03). Average flow during fertility and follicular phases is 0.07 and 0.23, respectively.
 
-Menstrual phase has the highest average flow (2.38), luteal is lowest (0.03), fertility is 0.07, and follicular is 0.23.
+<br>
 
-#### Appetite
-
-Average Appetite Across Phases
-
-Summarize average appetite to observe general trends across the menstrual cycle.
-```{r, warning= FALSE}
+#### Average Appetite Across Phases
+We looked at average appetite to observe general trends across the menstrual cycle.
+```{r, warning= FALSE, fig.height = 7}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
   geom_line(aes(color = "Appetite"),size = 1.2, show.legend = FALSE) +
   geom_point(aes(color = "Appetite"),size = 3, show.legend = FALSE) +
   geom_text(aes(label = round(avg_appetite, 2)), vjust = -1, size = 4, fontface = "bold") +
   labs(title = "Average Appetite Across Phases",
-       subtitle = "Higher values indicate more higher appetite (Scale: 0–5)",
+       subtitle = "Higher values indicate to stronger appetite (Scale: 0–5)",
        x = "Phase", y = "Appetite Score") +
   theme_minimal()+
   theme(
@@ -796,12 +784,13 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
   )
 ```
 
-Appetite was highest in the Fertility phase (2.96), a pattern that visually paralleled the estrogen trend, leading me to formally test their relationship using a linear mixed model.
+Average appetite score was highest in the fertility phase (2.96), a pattern that visually paralleled the estrogen trend we saw earlier. This warrants formal statistical testing, where we can investigate the relationship between the two (using a linear mixed model).
 
+<br>
 
-### Sleep and stress
+### Sleep & Stress
 
-Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase—when individuals typically experience higher energy levels—participants spent less time in bed but obtained greater amounts of deep sleep.
+Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase, when individuals typically experience higher energy levels, participants spent less time in bed but obtained greater amounts of deep sleep.
 ```{r, message=FALSE, warning= FALSE}
 sleep_stress_df = all_daily_data|>
   filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
@@ -811,6 +800,8 @@ sleep_stress_df = all_daily_data|>
     phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
   )
 sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
+
+sleep_stress_df
 ```
 
 We further examined variations in stress scores across the menstrual cycle. Overall sleep quality scores were highest during the menstrual phase, indicating that participants may benefit from prioritizing rest during this time. The lowest sleep scores were observed during the ovulatory (fertile) window, a period characterized by elevated estrogen and luteinizing hormone (LH) concentrations, which may contribute to reduced sleep quality. In this scoring system, higher values indicate lower perceived stress. Participants exhibited the lowest stress levels during the follicular phase, consistent with increased energy and improved well-being. Conversely, the highest stress levels were recorded during the luteal phase.
