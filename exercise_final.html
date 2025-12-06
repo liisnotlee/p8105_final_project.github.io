@@ -346,7 +346,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
@@ -364,7 +364,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
@@ -1303,7 +1303,7 @@ phase-related activity patterns.</p>
 p4 = ggplot(symptoms_long, 
              aes(x = total_active_min, y = severity, color = symptom)) +
   geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
-  geom_smooth(method = &quot;lm&quot;, se = TRUE, linewidth = 2.0, alpha = 0.2) +
+  geom_smooth(method = &quot;lm&quot;, se = TRUE, linewidth = 1.0, alpha = 0.2) +
   facet_wrap(~symptom, ncol = 2) +
   labs(title = &quot;Daily Activity vs Individual Symptoms&quot;,
        x = &quot;Total Daily Activity (mins)&quot;,
@@ -1320,23 +1320,22 @@ The scatterplots examine crude associations between daily activity
 <p><strong>Negative slopes (potential benefits):</strong></p>
 <ul>
 <li><strong>Bloating</strong>: Considerable downward trend suggests
-higher activity associates with reduced bloating</li>
+higher activity level is associated with reduced bloating</li>
 <li><strong>Fatigue</strong>: Considerable downward trend suggests
-higher activity associates with reduced fatigue</li>
+higher activity is level associated with reduced fatigue</li>
 <li><strong>Food cravings</strong>: Considerable downward trend suggests
-higher activity associates with fewer food cravings</li>
+higher activity level is associated with fewer food cravings</li>
 <li><strong>Head aches</strong>: Slight downward trend suggests higher
-activity associates with fewer headaches</li>
+activity level is associated with fewer headaches</li>
 <li><strong>Indigestion</strong>: Considerable downward trend suggests
-higher activity associates with lower indigestion</li>
+higher activity level is associated with lower indigestion</li>
 </ul>
 <p><strong>Flat relationships (no clear association):</strong></p>
 <ul>
-<li><strong>Appetite, headaches, sleep issues, sore breasts</strong>:
-Essentially flat line</li>
+<li><strong>Appetite, headaches, sleep issues, sore breasts,
+moodswings</strong>: Nearly flat line</li>
 <li><strong>Cramps</strong>: Near-horizontal line despite often being
 referred as one of the primary symptoms of menstruation</li>
-<li><strong>Mood swings</strong>: Nearly flat line</li>
 </ul>
 <p><strong>Sleep issues</strong> and <strong>sore breasts</strong>
 exhibited insufficient data spread to estimate reliable trends</p>
@@ -1392,7 +1391,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 

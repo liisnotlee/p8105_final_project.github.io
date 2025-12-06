@@ -11,7 +11,7 @@
 
 
 
-<title>Report</title>
+<title>REPORT</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -344,7 +344,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
@@ -362,7 +362,7 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
@@ -403,7 +403,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Report</h1>
+<h1 class="title toc-ignore">REPORT</h1>
 
 </div>
 
@@ -418,9 +418,8 @@ library(tidyr)
 library(patchwork)
 library(lme4)
 library(lmerTest)
-library(gt)</code></pre>
-<pre><code>## Warning: package &#39;gt&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code>library(ggsci)
+library(gt)
+library(ggsci)
 library(knitr)
 library(broom.mixed) # for tidy
 library(scales)
@@ -434,44 +433,70 @@ options(
   ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
   ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
 )</code></pre>
-<div id="motivation" class="section level1">
-<h1>Motivation</h1>
+<p><br></p>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
 <p>Half of the world’s population has experienced or will experience
-menstruation; for many, this physiologic function occurs monthly for
+menstruation; a physiological function that typically occurs monthly for
 several decades. For young adults who menstruate, symptoms and regular
-menstruation can be a vital health indicator. Abnormal symptoms can
-further suggest reproductive tract abnormalities, such as uterine
-fibroids or endometriosis. However, abnormal symptoms such as heavy
-bleeding or extreme pain can also be attributed to lifestyle
-characteristics. By leveraging a cohort of young adult menstruators, we
-hope to better understand the relationship between physiological
-menstrual characteristics and lifestyle factors such as stress, sleep,
-and exercise. Understanding how day-to-day factors influence menstrual
-health can help individuals who menstruate understand how to better
-manage concerning symptoms or identify when abnormal symptoms could be
-indicative of a more serious health concern.</p>
+menstruation can serve as a vital health indicator. Abnormal symptoms
+can further suggest reproductive tract abnormalities, such as uterine
+fibroids, endometriosis, and other abnormalities, which may be
+attributed to lifestyle characteristics.</p>
+<p>While relationships between lifestyle factors (exercise, sleep,
+stress) and menstrual health are generally known, much of this knowledge
+comes from self-reported surveys. Our team of all women who have
+personally navigated menstrual symptoms, saw an opportunity to examine
+these connections using wearable device data that captures daily
+physiological metrics alongside self-reported symptoms.</p>
+<p>By leveraging Fitbit data with menstrual self-reported menstrual
+symptoms from a cohort of young adult menstruators, we aim to better
+understand the influence of lifestyle factors on menstrual health.
+Understanding these patterns can help individuals who menstruate
+understand how to better manage concerning symptoms or identify when
+abnormal symptoms could be indicative of a more serious health
+concern.</p>
+<p><br></p>
 </div>
-<div id="related-work" class="section level1">
-<h1>Related Work</h1>
+<div id="related-work" class="section level2">
+<h2>Related Work</h2>
+<p>Our project is inspired by new and upcoming research examining how
+lifestyle factors influence menstrual health and the emerging use of
+wearables in this space.</p>
+<p>Studies have established that short sleep duration and both sedentary
+and vigorous physical activity can contribute to the risk of developing
+menstrual disorders<a
+href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10393940/">(PubMed
+Central)</a>, while poorer sleep quality in the premenstrual phase and
+during menstruation is common in women with premenstrual symptoms or
+painful cramps <a
+href="https://pubmed.ncbi.nlm.nih.gov/30098748/">(PubMed)</a>. Regarding
+exercise, it has been found that exercise performed for about 45 to 60
+minutes, three times per week or more, may provide a clinically
+significant reduction in menstrual pain intensity <a
+href="https://pubmed.ncbi.nlm.nih.gov/31538328/">(PubMed)</a>.</p>
+<p><br></p>
 </div>
-<div id="questions" class="section level1">
-<h1>Questions</h1>
+<div id="initial-questions" class="section level2">
+<h2>Initial Questions</h2>
 <ol style="list-style-type: decimal">
-<li>What are background characteristics of people who participated in
-this study?</li>
-<li>How does the menstrual cycle and hormones affect sleep and
-stress?</li>
-<li>How does exercise and caloric consumption affect menstrual symptoms
-and hormonal levels?</li>
-<li>How do hormonal levels affect menstrual symptoms?</li>
-<li>What is the significance of menstruation on self-reported symptoms
-of participants in this study?</li>
+<li>What are the demographic and health characteristics of participants
+in this study?</li>
+<li>How do hormone fluctuations across the cycle correlate with reported
+symptoms?</li>
+<li>How do sleep quality and stress levels vary across menstrual cycle
+phases, and do hormonal changes explain these patterns?</li>
+<li>Does physical activity level influence the severity of menstrual
+symptoms such as pain, bloating, and fatigue?</li>
+<li>Can we use wearable data and self-reported information to predict
+menstrual symptom severity?</li>
 </ol>
+<p><br></p>
 </div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<div id="data-sources" class="section level2">
-<h2>Data Sources</h2>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<div id="data-sources" class="section level3">
+<h3>Data Sources</h3>
 <p>We utilized the inclusive, multimodal, longitudinal, and
 de-identified <a
 href="https://physionet.org/content/mcphases/1.0.0/">mcPHASES</a>
@@ -555,8 +580,9 @@ stress score, daily exercise data.</li>
 Besides <code>subejct_info</code>, other dataframes can be further
 linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
 <hr />
-<div id="subject_info---subject-relevant-data" class="section level3">
-<h3><code>subject_info</code> - Subject-Relevant Data</h3>
+</div>
+<div id="subject_info-subject-relevant-data" class="section level3">
+<h3><code>subject_info</code>: Subject-Relevant Data</h3>
 <p>The <code>subject_info</code> dataframe contains participants
 demographics data from <code>subject_info.csv</code> and
 <code>height_and_weight.csv</code>, as well as participants study
@@ -696,9 +722,9 @@ subject_info &lt;- subject_info_raw  |&gt;
   )</code></pre>
 </div>
 <div
-id="hormone_symptoms---daily-hormone-and-self-reported-symptom-related-data"
+id="hormone_symptoms-daily-hormone-and-self-reported-symptom-related-data"
 class="section level3">
-<h3><code>hormone_symptoms</code> - Daily Hormone and Self-Reported
+<h3><code>hormone_symptoms</code>: Daily Hormone and Self-Reported
 Symptom-Related Data</h3>
 <p>The <code>hormone_symptoms</code> dataframe contains participants’
 daily hormone data (LH, E3G, PdG) and self-reported symptom-related data
@@ -796,9 +822,9 @@ hormone_symptoms &lt;- hormone_symptoms_raw |&gt;
     )
   )</code></pre>
 </div>
-<div id="sleep_stress_daily---daily-sleep-and-stress-related-data"
+<div id="sleep_stress_daily-daily-sleep-and-stress-related-data"
 class="section level3">
-<h3><code>sleep_stress_daily</code> - Daily Sleep and Stress Related
+<h3><code>sleep_stress_daily</code>: Daily Sleep and Stress Related
 Data</h3>
 <p>The <code>sleep_stress_daily</code> dataframe contains participants’
 daily sleep and stress data from 3 csv files (<code>sleep.csv</code>,
@@ -868,9 +894,9 @@ sleep &lt;- sleep_raw|&gt;
 # MERGE
 sleep_stress_daily &lt;- full_join(sleep, sleep_stress_score, by=c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;))</code></pre>
 </div>
-<div id="exercise_daily---daily-exercise-related-data"
+<div id="exercise_daily-daily-exercise-related-data"
 class="section level3">
-<h3><code>exercise_daily</code> - Daily Exercise Related Data</h3>
+<h3><code>exercise_daily</code>: Daily Exercise Related Data</h3>
 <p>The <code>exercise_daily</code> dataframe contains participants’
 daily exercise related data from <code>exercise.csv</code>).</p>
 <p>It contains a total of 1744 observations of 12 variables. Some key
@@ -916,9 +942,9 @@ exercise_daily &lt;- exercise_raw |&gt;
   ) |&gt; 
   rename(day_in_study = start_day_in_study) </code></pre>
 </div>
-<div id="all_daily_data---merged-multimodal-daily-data"
+<div id="all_daily_data-merged-multimodal-daily-data"
 class="section level3">
-<h3><code>all_daily_data</code> - Merged Multimodal Daily Data</h3>
+<h3><code>all_daily_data</code>: Merged Multimodal Daily Data</h3>
 <p>The <code>all_daily_data</code> is a merged multimodal dataframe that
 contains all <strong>daily-level</strong> data from
 <code>hormone_symptoms</code>, <code>exercise_daily</code>, and
@@ -958,31 +984,31 @@ session or if both stress and sleep scores are present.</p>
   )  
   # MERGE demographic data
   # left_join(subject_info, by = c(&quot;id&quot;, &quot;study_interval&quot;)) </code></pre>
+<p><br></p>
 </div>
 </div>
-</div>
-<div id="exploratory-data-analysis" class="section level1">
-<h1>Exploratory Data Analysis</h1>
-<div id="participant-characteristics" class="section level2">
-<h2>Participant Characteristics</h2>
+<div id="exploratory-data-analysis" class="section level2">
+<h2>Exploratory Data Analysis</h2>
+<div id="participant-characteristics" class="section level3">
+<h3>Participant Characteristics</h3>
 <pre class="r"><code>summary_table_gt</code></pre>
-<div id="dpttfglykg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#dpttfglykg table {
+<div id="myjunaduzk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#myjunaduzk table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#dpttfglykg thead, #dpttfglykg tbody, #dpttfglykg tfoot, #dpttfglykg tr, #dpttfglykg td, #dpttfglykg th {
+#myjunaduzk thead, #myjunaduzk tbody, #myjunaduzk tfoot, #myjunaduzk tr, #myjunaduzk td, #myjunaduzk th {
   border-style: none;
 }
 
-#dpttfglykg p {
+#myjunaduzk p {
   margin: 0;
   padding: 0;
 }
 
-#dpttfglykg .gt_table {
+#myjunaduzk .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1008,12 +1034,12 @@ session or if both stress and sleep scores are present.</p>
   border-left-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_caption {
+#myjunaduzk .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#dpttfglykg .gt_title {
+#myjunaduzk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1025,7 +1051,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-width: 0;
 }
 
-#dpttfglykg .gt_subtitle {
+#myjunaduzk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1037,7 +1063,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-width: 0;
 }
 
-#dpttfglykg .gt_heading {
+#myjunaduzk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1049,13 +1075,13 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_bottom_border {
+#myjunaduzk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_col_headings {
+#myjunaduzk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1070,7 +1096,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_col_heading {
+#myjunaduzk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1090,7 +1116,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#dpttfglykg .gt_column_spanner_outer {
+#myjunaduzk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1102,15 +1128,15 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 4px;
 }
 
-#dpttfglykg .gt_column_spanner_outer:first-child {
+#myjunaduzk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dpttfglykg .gt_column_spanner_outer:last-child {
+#myjunaduzk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dpttfglykg .gt_column_spanner {
+#myjunaduzk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1122,11 +1148,11 @@ session or if both stress and sleep scores are present.</p>
   width: 100%;
 }
 
-#dpttfglykg .gt_spanner_row {
+#myjunaduzk .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#dpttfglykg .gt_group_heading {
+#myjunaduzk .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1152,7 +1178,7 @@ session or if both stress and sleep scores are present.</p>
   text-align: left;
 }
 
-#dpttfglykg .gt_empty_group_heading {
+#myjunaduzk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1167,15 +1193,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: middle;
 }
 
-#dpttfglykg .gt_from_md > :first-child {
+#myjunaduzk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dpttfglykg .gt_from_md > :last-child {
+#myjunaduzk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dpttfglykg .gt_row {
+#myjunaduzk .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -1194,7 +1220,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#dpttfglykg .gt_stub {
+#myjunaduzk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1207,7 +1233,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#dpttfglykg .gt_stub_row_group {
+#myjunaduzk .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1221,15 +1247,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: top;
 }
 
-#dpttfglykg .gt_row_group_first td {
+#myjunaduzk .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dpttfglykg .gt_row_group_first th {
+#myjunaduzk .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#dpttfglykg .gt_summary_row {
+#myjunaduzk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1239,16 +1265,16 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#dpttfglykg .gt_first_summary_row {
+#myjunaduzk .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_first_summary_row.thick {
+#myjunaduzk .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dpttfglykg .gt_last_summary_row {
+#myjunaduzk .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1258,7 +1284,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_grand_summary_row {
+#myjunaduzk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1268,7 +1294,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#dpttfglykg .gt_first_grand_summary_row {
+#myjunaduzk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1278,7 +1304,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_last_grand_summary_row_top {
+#myjunaduzk .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1288,11 +1314,11 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_striped {
+#myjunaduzk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dpttfglykg .gt_table_body {
+#myjunaduzk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1301,7 +1327,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_footnotes {
+#myjunaduzk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1315,7 +1341,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_footnote {
+#myjunaduzk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1324,7 +1350,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#dpttfglykg .gt_sourcenotes {
+#myjunaduzk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1338,7 +1364,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#dpttfglykg .gt_sourcenote {
+#myjunaduzk .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1346,72 +1372,72 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#dpttfglykg .gt_left {
+#myjunaduzk .gt_left {
   text-align: left;
 }
 
-#dpttfglykg .gt_center {
+#myjunaduzk .gt_center {
   text-align: center;
 }
 
-#dpttfglykg .gt_right {
+#myjunaduzk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dpttfglykg .gt_font_normal {
+#myjunaduzk .gt_font_normal {
   font-weight: normal;
 }
 
-#dpttfglykg .gt_font_bold {
+#myjunaduzk .gt_font_bold {
   font-weight: bold;
 }
 
-#dpttfglykg .gt_font_italic {
+#myjunaduzk .gt_font_italic {
   font-style: italic;
 }
 
-#dpttfglykg .gt_super {
+#myjunaduzk .gt_super {
   font-size: 65%;
 }
 
-#dpttfglykg .gt_footnote_marks {
+#myjunaduzk .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#dpttfglykg .gt_asterisk {
+#myjunaduzk .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dpttfglykg .gt_indent_1 {
+#myjunaduzk .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dpttfglykg .gt_indent_2 {
+#myjunaduzk .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dpttfglykg .gt_indent_3 {
+#myjunaduzk .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dpttfglykg .gt_indent_4 {
+#myjunaduzk .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dpttfglykg .gt_indent_5 {
+#myjunaduzk .gt_indent_5 {
   text-indent: 25px;
 }
 
-#dpttfglykg .katex-display {
+#myjunaduzk .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#dpttfglykg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#myjunaduzk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1501,6 +1527,7 @@ reported first menstruating as late as age 15. Our participants largely
 identified as women (88.7%) and as Asian (59.7%) or white (22.6%). More
 than 4 in 5 participants had completed at least some college, with 25.8%
 having a college degree and 8.1% having a graduate degree.</p>
+</div>
 <div id="age-of-first-menarche" class="section level3">
 <h3>Age of first menarche</h3>
 <pre class="r"><code>menarche_plot</code></pre>
@@ -2314,7 +2341,6 @@ sparser observations at higher activity, reflecting the right-skewed
 activity distribution. Fourth, symptoms generally concentrate at lower
 severity levels (0-2 on 0-5 scale), with relatively few observations at
 high severity, consistent with the descriptive statistics.</p>
-</div>
 </div>
 </div>
 <div id="modelling" class="section level1">

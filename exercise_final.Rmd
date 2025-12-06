@@ -1,6 +1,8 @@
 ---
 title: "EXCERCISE: EXPLORATORY DATA ANALYSIS"
-output: html_document
+output:
+  html_document:
+    code_folding: hide 
 ---
 <br>
 
@@ -374,7 +376,7 @@ symptoms_long = exercise_analysis |>
 p4 = ggplot(symptoms_long, 
              aes(x = total_active_min, y = severity, color = symptom)) +
   geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
-  geom_smooth(method = "lm", se = TRUE, linewidth = 2.0, alpha = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.0, alpha = 0.2) +
   facet_wrap(~symptom, ncol = 2) +
   labs(title = "Daily Activity vs Individual Symptoms",
        x = "Total Daily Activity (mins)",
@@ -390,17 +392,16 @@ The scatterplots examine crude associations between daily  activity (exercise) a
 
 **Negative slopes (potential benefits):**
 
-* **Bloating**: Considerable downward trend suggests higher activity associates with reduced bloating
-* **Fatigue**: Considerable downward trend suggests higher activity associates with reduced fatigue
-* **Food cravings**: Considerable downward trend suggests higher activity associates with fewer food cravings
-* **Head aches**: Slight downward trend suggests higher activity associates with fewer headaches
-* **Indigestion**: Considerable downward trend suggests higher activity associates with lower indigestion
+* **Bloating**: Considerable downward trend suggests higher activity level is associated with reduced bloating
+* **Fatigue**: Considerable downward trend suggests higher activity is level associated with reduced fatigue
+* **Food cravings**: Considerable downward trend suggests higher activity level is associated with fewer food cravings
+* **Head aches**: Slight downward trend suggests higher activity level is associated with fewer headaches
+* **Indigestion**: Considerable downward trend suggests higher activity level is associated with lower indigestion
 
 **Flat relationships (no clear association):**
 
-* **Appetite, headaches, sleep issues, sore breasts**: Essentially flat line
+* **Appetite, headaches, sleep issues, sore breasts, moodswings**: Nearly flat line
 * **Cramps**: Near-horizontal line despite often being referred as one of the primary symptoms of menstruation
-* **Mood swings**: Nearly flat line
 
 **Sleep issues** and **sore breasts** exhibited insufficient data spread to estimate reliable trends
 

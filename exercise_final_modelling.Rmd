@@ -1,7 +1,21 @@
 ---
 title: "EXCERCISE: STATISTICAL MODELLING"
-output: html_document
+output:
+  html_document:
+    code_folding: hide 
 ---
+```{r, include = FALSE}
+# Loading libraries
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(scales)
+```
+
 <br>
 
 This analysis investigates whether daily physical activity predicts menstrual symptom severity. We fit linear mixed-effects models for 10 symptoms, using active exercise minutes as the primary predictor while controlling for menstrual cycle phase.
