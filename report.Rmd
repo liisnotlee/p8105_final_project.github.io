@@ -1,11 +1,11 @@
 ---
-title: "Report"
+title: "REPORT"
 output:
   html_document:
     code_folding: hide 
 ---
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning = FALSE}
 # Load packages 
 library(tidyverse)
 library(ggplot2)
@@ -33,22 +33,37 @@ options(
 )
 ```
 
-# Motivation
-Half of the world's population has experienced or will experience menstruation; for many, this physiologic function occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstruation can be a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids or endometriosis. However, abnormal symptoms such as heavy bleeding or extreme pain can also be attributed to lifestyle characteristics. By leveraging a cohort of young adult menstruators, we hope to better understand the relationship between physiological menstrual characteristics and lifestyle factors such as stress, sleep, and exercise. Understanding how day-to-day factors influence menstrual health can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern.
+<br>
 
-# Related Work
+## Motivation
+Half of the world's population has experienced or will experience menstruation; a physiological function that typically occurs monthly for several decades. For young adults who menstruate, symptoms and regular menstruation can serve as a vital health indicator. Abnormal symptoms can further suggest reproductive tract abnormalities, such as uterine fibroids, endometriosis, and other abnormalities, which may be attributed to lifestyle characteristics.
 
-# Questions
+While relationships between lifestyle factors (exercise, sleep, stress) and menstrual health are generally known, much of this knowledge comes from self-reported surveys. Our team of all women who have personally navigated menstrual symptoms, saw an opportunity to examine these connections using wearable device data that captures daily physiological metrics alongside self-reported symptoms.
 
-1.  What are background characteristics of people who participated in this study?
-2.  How does the menstrual cycle and hormones affect sleep and stress?
-3.  How does exercise and caloric consumption affect menstrual symptoms and hormonal levels?
-4.  How do hormonal levels affect menstrual symptoms?
-5.  What is the significance of menstruation on self-reported symptoms of participants in this study?
+By leveraging Fitbit data with menstrual self-reported menstrual symptoms from a cohort of young adult menstruators, we aim to better understand the influence of lifestyle factors on menstrual health. Understanding these patterns can help individuals who menstruate understand how to better manage concerning symptoms or identify when abnormal symptoms could be indicative of a more serious health concern.
 
-# Data
+<br>
 
-## Data Sources
+## Related Work
+Our project is inspired by new and upcoming research examining how lifestyle factors influence menstrual health and the emerging use of wearables in this space.
+
+Studies have established that short sleep duration and both sedentary and vigorous physical activity can contribute to the risk of developing menstrual disorders[(PubMed Central)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10393940/), while poorer sleep quality in the premenstrual phase and during menstruation is common in women with premenstrual symptoms or painful cramps [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/30098748/).  Regarding exercise, it has been found that exercise performed for about 45 to 60 minutes, three times per week or more, may provide a clinically significant reduction in menstrual pain intensity [(PubMed)](https://pubmed.ncbi.nlm.nih.gov/31538328/).
+
+<br>
+
+## Initial Questions
+
+1. What are the demographic and health characteristics of participants in this study?
+2. How do hormone fluctuations across the cycle correlate with reported symptoms?
+3. How do sleep quality and stress levels vary across menstrual cycle phases, and do hormonal changes explain these patterns?
+4. Does physical activity level influence the severity of menstrual symptoms such as pain, bloating, and fatigue?
+5. Can we use wearable data and self-reported information to predict menstrual symptom severity?
+
+<br>
+
+## Data
+
+### Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified [mcPHASES](https://physionet.org/content/mcphases/1.0.0/) (menstrual cycle Physiological, Hormonal, and Self-Reported Events and Symptoms) dataset for menstrual health tracking with wearable devices.
 
@@ -91,7 +106,7 @@ All dataframes can be linked by participant's `id`. Besides `subejct_info`, othe
 
 ------------------------------------------------------------------------
 
-### `subject_info` - Subject-Relevant Data
+### `subject_info`: Subject-Relevant Data
 
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
 
@@ -223,7 +238,7 @@ subject_info <- subject_info_raw  |>
   
 ```
 
-### `hormone_symptoms` - Daily Hormone and Self-Reported Symptom-Related Data
+### `hormone_symptoms`: Daily Hormone and Self-Reported Symptom-Related Data
 
 The `hormone_symptoms` dataframe contains participants' daily hormone data (LH, E3G, PdG) and self-reported symptom-related data (e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from 0 ("Not at all") to 5 ("Very high"), from `hormones_and_selfreport.csv`.
 
@@ -308,7 +323,7 @@ hormone_symptoms <- hormone_symptoms_raw |>
   )
 ```
 
-### `sleep_stress_daily` - Daily Sleep and Stress Related Data
+### `sleep_stress_daily`: Daily Sleep and Stress Related Data
 
 The `sleep_stress_daily` dataframe contains participants' daily sleep and stress data from 3 csv files (`sleep.csv`, `sleep_score.csv` and `stress_score.csv`).
 
@@ -372,7 +387,7 @@ sleep <- sleep_raw|>
 sleep_stress_daily <- full_join(sleep, sleep_stress_score, by=c("id", "study_interval", "day_in_study"))
 ```
 
-### `exercise_daily` - Daily Exercise Related Data
+### `exercise_daily`:  Daily Exercise Related Data
 
 The `exercise_daily` dataframe contains participants' daily exercise related data from `exercise.csv`).
 
@@ -410,7 +425,7 @@ exercise_daily <- exercise_raw |>
   rename(day_in_study = start_day_in_study) 
 ```
 
-### `all_daily_data` - Merged Multimodal Daily Data
+### `all_daily_data`: Merged Multimodal Daily Data
 
 The `all_daily_data` is a merged multimodal dataframe that contains all **daily-level** data from `hormone_symptoms`, `exercise_daily`, and `sleep_stress_daily` dataframes, and used `hormone_symptoms` as the anchor dataframe. Each row represents a daily data for a person in a specific study year (including sleep score, stress score, daily exercise data, hormone and self-reported symptoms).
 
@@ -443,9 +458,11 @@ all_daily_data <- hormone_symptoms |>
   # left_join(subject_info, by = c("id", "study_interval")) 
 ```
 
-# Exploratory Data Analysis
+<br> 
 
-## Participant Characteristics
+## Exploratory Data Analysis
+
+### Participant Characteristics
 
 ```{r, include = FALSE}
 #This is setup to make a clean table with simplified variables, count, percent count, except for menarche which is mean and (range)
