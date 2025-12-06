@@ -24,7 +24,7 @@ navbar:
         href: sleep_stress_final_modelling.html
       - text: "Exercise"
         href: exercise_final_modelling.html
-      - text: "Multimodal Models"
+      - text: "Multivariate Models"
         href: multimodal_final_modelling.html
     - text: "Proposal"
       href: p8105_final_project_proposal.html

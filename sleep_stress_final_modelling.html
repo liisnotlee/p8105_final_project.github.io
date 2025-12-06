@@ -371,7 +371,7 @@ div.tocify {
       <a href="exercise_final_modelling.html">Exercise</a>
     </li>
     <li>
-      <a href="multimodal_final_modelling.html">Multimodal Models</a>
+      <a href="multimodal_final_modelling.html">Multivariate Models</a>
     </li>
   </ul>
 </li>
@@ -409,6 +409,11 @@ MODELLING</h1>
 </div>
 
 
+<p><br></p>
+<p>In this analysis, we examine how sleep quality and stress levels
+fluctuate across menstrual cycle phases, and whether sleep metrics
+predict stress.</p>
+<p><br></p>
 <p>Our dataset are from two studies in two different times, year 2022
 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
 Therefore the assumptions of independence is violated so we cannot use
@@ -430,22 +435,7 @@ the fertility and luteal phases relative to the menstrual phase.
 Overall, the model suggests meaningful fluctuations in stress across the
 menstrual cycle, with perceived stress notably increased during the
 fertility and luteal phases.</p>
-<pre class="r"><code>all_data_df = 
-  read_csv(&quot;clean_data/all_daily_data.csv&quot;) |&gt;
-  janitor::clean_names()
-subject_info = 
-  read_csv(&quot;clean_data/subject_info.csv&quot;) |&gt;
-  janitor::clean_names() |&gt;
-  select(id, ethnicity, education_abrv)
-sleep_stress_df = all_data_df|&gt;
-  filter(!is.na(stress_score) &amp; !is.na(sleep_score) &amp; !is.na(timeinbed_mean)) |&gt;
-  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |&gt;
-  mutate(
-    phase = fct_relevel(phase,&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)
-  )
-sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
-
-m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+<pre class="r"><code>m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
 tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
   select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
   mutate(
@@ -477,38 +467,38 @@ tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">76.654</td>
-<td align="right">0.785</td>
+<td align="right">76.664</td>
+<td align="right">0.715</td>
 <td align="right">0.000</td>
-<td align="right">74.828</td>
-<td align="right">78.479</td>
+<td align="right">75.102</td>
+<td align="right">78.227</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">0.120</td>
-<td align="right">0.249</td>
-<td align="right">0.630</td>
-<td align="right">-0.368</td>
-<td align="right">0.608</td>
+<td align="right">0.277</td>
+<td align="right">0.212</td>
+<td align="right">0.192</td>
+<td align="right">-0.139</td>
+<td align="right">0.694</td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-0.690</td>
-<td align="right">0.247</td>
-<td align="right">0.005</td>
-<td align="right">-1.175</td>
-<td align="right">-0.206</td>
+<td align="right">-0.583</td>
+<td align="right">0.211</td>
+<td align="right">0.006</td>
+<td align="right">-0.997</td>
+<td align="right">-0.170</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-0.865</td>
-<td align="right">0.231</td>
-<td align="right">0.000</td>
-<td align="right">-1.318</td>
-<td align="right">-0.411</td>
+<td align="right">-0.528</td>
+<td align="right">0.197</td>
+<td align="right">0.007</td>
+<td align="right">-0.915</td>
+<td align="right">-0.141</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
@@ -562,37 +552,37 @@ tidy(m2, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
 <tr class="odd">
 <td align="left">(Intercept)</td>
 <td align="right">77.436</td>
-<td align="right">0.707</td>
+<td align="right">0.709</td>
 <td align="right">0</td>
-<td align="right">76.007</td>
-<td align="right">78.865</td>
+<td align="right">76.003</td>
+<td align="right">78.869</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">-1.021</td>
-<td align="right">0.282</td>
+<td align="right">-1.037</td>
+<td align="right">0.283</td>
 <td align="right">0</td>
-<td align="right">-1.575</td>
-<td align="right">-0.467</td>
+<td align="right">-1.591</td>
+<td align="right">-0.483</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-1.336</td>
-<td align="right">0.280</td>
+<td align="right">-1.342</td>
+<td align="right">0.281</td>
 <td align="right">0</td>
-<td align="right">-1.886</td>
-<td align="right">-0.786</td>
+<td align="right">-1.892</td>
+<td align="right">-0.792</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-1.108</td>
-<td align="right">0.262</td>
+<td align="right">-1.126</td>
+<td align="right">0.263</td>
 <td align="right">0</td>
-<td align="right">-1.622</td>
-<td align="right">-0.594</td>
+<td align="right">-1.641</td>
+<td align="right">-0.611</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
@@ -627,38 +617,38 @@ tidy(m3, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">459.022</td>
-<td align="right">5.401</td>
+<td align="right">458.906</td>
+<td align="right">5.444</td>
 <td align="right">0.000</td>
-<td align="right">448.133</td>
-<td align="right">469.911</td>
+<td align="right">447.929</td>
+<td align="right">469.883</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">-5.952</td>
-<td align="right">3.180</td>
-<td align="right">0.061</td>
-<td align="right">-12.185</td>
-<td align="right">0.282</td>
+<td align="right">-6.089</td>
+<td align="right">3.182</td>
+<td align="right">0.056</td>
+<td align="right">-12.326</td>
+<td align="right">0.148</td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-10.394</td>
-<td align="right">3.159</td>
+<td align="right">-10.346</td>
+<td align="right">3.160</td>
 <td align="right">0.001</td>
-<td align="right">-16.586</td>
-<td align="right">-4.202</td>
+<td align="right">-16.542</td>
+<td align="right">-4.151</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-4.595</td>
-<td align="right">2.953</td>
-<td align="right">0.120</td>
-<td align="right">-10.384</td>
-<td align="right">1.195</td>
+<td align="right">-4.710</td>
+<td align="right">2.957</td>
+<td align="right">0.111</td>
+<td align="right">-10.506</td>
+<td align="right">1.086</td>
 <td align="left">No</td>
 </tr>
 </tbody>
@@ -809,9 +799,9 @@ irritability, and heightened emotional sensitivity. The elevated stress
 during the ovulatory window may reflect endocrine-driven changes that
 influence emotional reactivity or cognitive load. Together, these
 results underscore the interconnected nature of hormonal rhythms, stress
-regulation, and sleep quality across the menstrual cycle.
-<strong>Limitation</strong> The sample size and ethnic distribution may
-limit generalizability; some ethnic groups were represented by fewer
+regulation, and sleep quality across the menstrual cycle.</p>
+<p><strong>Limitation</strong> The sample size and ethnic distribution
+may limit generalizability; some ethnic groups were represented by fewer
 participants, potentially affecting the stability of subgroup trends. In
 addition, leep and stress scores were derived from self-reported or
 device-based composite measures, which may not capture the full
