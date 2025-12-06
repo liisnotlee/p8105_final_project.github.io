@@ -1,6 +1,9 @@
 ---
 title: "EXERCISE & MENSTRUAL HEALTH"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 The following exploratory analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) metrics and self-reported menstrual symptoms across different menstrual cycle phases. We use data from both study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.
@@ -130,20 +133,21 @@ symptom_desc = all_daily_data |>
   ) |> 
   pivot_longer(everything(),
                names_to = c("symptom", ".value"),
-               names_pattern = "(.+)_score_(.+)") %>%
+               names_pattern = "(.+)_score_(.+)") |> 
   mutate(
     symptom = str_to_title(str_replace_all(symptom, "_", " ")),
     across(where(is.numeric), ~round(.x, 2))
-  )
+  ) |> 
+  # Alphabetical order
+  arrange(symptom)
 
 kable(symptom_desc,
       col.names = c("Symptom", "Mean", "SD", "Median"),
-      caption = "Descriptive Statistics: Symptom Severity (Scale 0-5)",
+      caption = "Symptom Severity (Scale: 0 = None, 5 = Very High)",
       align = c("l", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
-Symptom severity varied across menstrual cycle phases and between individuals. Most physical symptoms showed low-to-moderate mean severity on the 0-5 scale: cramps (M = 1.00, SD = 1.27), fatigue (M = 2.50, SD = 1.48), and bloating (M = 1.60, SD = 1.48). Psychological symptoms including mood swings (M = 1.57, SD = 1.42) and appetite changes 
-(M = 2.91, SD = 0.83) were similarly mild on average. The relatively large standard deviations across all symptoms reflect substantial variability in symptom  experiences across the menstrual cycle.
+Symptom severity varied across menstrual cycle phases and between individuals. Most physical symptoms showed low-to-moderate mean severity on the 0-5 scale: cramps (M = `r symptom_desc$mean[3]`, SD = `r symptom_desc$sd[3]`), fatigue (M = `r symptom_desc$mean[4]`, SD = `r symptom_desc$sd[4]`), and bloating (M = `r symptom_desc$mean[2]`, SD = `r symptom_desc$sd[2]`). Psychological symptoms including mood swings (M = `r symptom_desc$mean[8]`, SD = `r symptom_desc$sd[8]`) and appetite changes (M = `r symptom_desc$mean[1]`, SD = `r symptom_desc$sd[1]`) were similarly mild to moderate on average. The relatively large standard deviations across all symptoms reflect substantial variability in symptom experiences across the menstrual cycle.
 
 
 ### Distribution of Key Exercise Metrics
@@ -232,7 +236,7 @@ clear mode at 2 sessions. The 2024 cohort showed higher frequencies of 2+ sessio
 to 2022, suggesting either improved activity tracking or genuinely more structured exercise 
 routines.
 
-These distributions collectively demonstrate substantial right-skew, high between-person 
+These distributions collectively demonstrate substantial right-skew, and high 
 variability.
 
 
@@ -254,8 +258,6 @@ activities_long = exercise_analysis |>
     activity_types = str_to_title(activity_types)
   ) |> 
   filter(activity_types != "", activity_types != "Na")
-
-activities_long
 
 # Counting activities by year
 activity_counts = activities_long |> 

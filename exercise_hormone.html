@@ -346,13 +346,13 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="hormone_final.html">Hormone &amp; Symptoms</a>
+      <a href="Hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
     </li>
     <li>
       <a href="sleep_stress_khue.html">Sleep &amp; Stress</a>
     </li>
     <li>
-      <a href="exercise_hormone.html">Exercise</a>
+      <a href="EXERCISE_ANU_FINAL.html">Exercise</a>
     </li>
   </ul>
 </li>
@@ -557,10 +557,10 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
 <pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
-<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale
-## range (`stat_smooth()`).</code></pre>
-<pre><code>## Warning: Removed 92 rows containing missing values or values outside
-## the scale range (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing non-finite outside the scale range
+## (`stat_smooth()`).</code></pre>
+<pre><code>## Warning: Removed 92 rows containing missing values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code># LH (luteinizing hormone) vs exercise
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0), 
@@ -572,8 +572,8 @@ ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0),
        y = &quot;Exercise Duration (min)&quot;,
        color = &quot;Phase&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Removed 91 rows containing missing values or values outside
-## the scale range (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 91 rows containing missing values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 <pre class="r"><code># Progesterone (PdG) vs exercise duration
 ggplot(merged_data %&gt;% filter(total_duration_min &gt; 0 &amp; !is.na(pdg)), 
@@ -658,12 +658,10 @@ ggplot(individual_patterns, aes(x = phase, y = mean_duration, group = id)) +
        x = &quot;Menstrual Phase&quot;, 
        y = &quot;Mean Exercise Duration (min)&quot;) +
   theme_minimal()</code></pre>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2
-## 3.4.0.
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where
-## this warning was generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <p><img src="exercise_hormone_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code># Don&#39;t really see much variation, seems exercise duration does not change dramatically across phases</code></pre>
 <div id="summary-statistics" class="section level3">
@@ -701,24 +699,11 @@ so each individual contributes equally to the analysis</p>
 # install.packages(&quot;lmerTest&quot;)
 # install.packages(&quot;broom.mixed&quot;)
 # install.packages(&quot;ggeffects&quot;)
-library(lme4)</code></pre>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## 
-## Attaching package: &#39;Matrix&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
-## 
-##     expand, pack, unpack</code></pre>
-<pre class="r"><code>library(lmerTest)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lmerTest&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:lme4&#39;:
-## 
-##     lmer</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     step</code></pre>
-<pre class="r"><code>library(broom.mixed)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
 library(ggeffects)</code></pre>
+<pre><code>## Warning: package &#39;ggeffects&#39; was built under R version 4.5.2</code></pre>
 <pre class="r"><code># Preparing analysis dataset
 analysis_data = merged_data %&gt;%
   mutate(study_interval = factor(study_interval))
@@ -1195,8 +1180,92 @@ anova(model_appetite, model_appetite_int)</code></pre>
 ##                    npar    AIC    BIC  logLik -2*log(L)  Chisq Df Pr(&gt;Chisq)
 ## model_appetite        7 6302.0 6344.4 -3144.0    6288.0                     
 ## model_appetite_int   10 6306.5 6367.2 -3143.3    6286.5 1.4539  3      0.693</code></pre>
+<p>==================================================================================================================</p>
 </div>
 </div>
+</div>
+<div id="data-import-and-cleaning" class="section level1">
+<h1>Data import and cleaning</h1>
+<p>This analysis combines exercise tracking data with hormone and
+self-reported symptom data to examine relationships between physical
+activity and menstrual cycle phases. The exercise data was first cleaned
+by removing duplicate entries and selecting relevant variables including
+exercise duration, active time, and heart rate. Individual exercise
+sessions were then aggregated to the daily level, with duration
+variables converted from milliseconds to minutes. Daily summaries
+include total exercise duration, total active minutes, average heart
+rate, and number of exercise sessions per day. The hormone and
+self-reported symptom data was cleaned by converting all Likert scale
+responses (ranging from “Very Low/Little” to “Very High”) to numeric
+values from 1 to 5 for quantitative analysis. Menstrual cycle phases
+were ordered chronologically (Menstrual, Follicular, Fertility, Luteal)
+as an ordered factor variable to ensure proper sequencing during
+analyses.</p>
+<pre><code>
+
+
+
+``` r
+# Read data
+exercise = read_csv(&quot;./data/exercise.csv&quot;)
+hormones = read_csv(&quot;./data/hormones_and_selfreport.csv&quot;)
+
+
+# Clean and de-duplicate exercise data
+exercise_clean = exercise %&gt;%
+  distinct() %&gt;%
+  select(id, study_interval, start_day_in_study, activityname, duration, activeduration, averageheartrate)
+
+# Aggregate to daily level
+exercise_daily = exercise_clean %&gt;%
+  group_by(id, study_interval, start_day_in_study) %&gt;%
+  summarise(
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    n_sessions = n(),
+    .groups = &quot;drop&quot;
+  ) %&gt;%
+  rename(day_in_study = start_day_in_study)
+
+# Convert Likert scales to numeric
+likert_to_num = c(&quot;Very Low/Little&quot; = 1, &quot;Low&quot; = 2, &quot;Moderate&quot; = 3, 
+                   &quot;High&quot; = 4, &quot;Very High&quot; = 5)
+
+hormones_clean = hormones %&gt;%
+  mutate(
+    # Convert all symptoms to numeric
+    headaches_num = recode(headaches, !!!likert_to_num),
+    cramps_num = recode(cramps, !!!likert_to_num),
+    sorebreasts_num = recode(sorebreasts, !!!likert_to_num),
+    fatigue_num = recode(fatigue, !!!likert_to_num),
+    sleepissue_num = recode(sleepissue, !!!likert_to_num),
+    moodswing_num = recode(moodswing, !!!likert_to_num),
+    stress_num = recode(stress, !!!likert_to_num),
+    foodcravings_num = recode(foodcravings, !!!likert_to_num),
+    indigestion_num = recode(indigestion, !!!likert_to_num),
+    bloating_num = recode(bloating, !!!likert_to_num),
+    appetite_num = recode(appetite, !!!likert_to_num),
+    
+    # Order phase factor
+    phase = factor(phase, 
+                   levels = c(&quot;Menstrual&quot;, &quot;Follicular&quot;, &quot;Fertility&quot;, &quot;Luteal&quot;))
+    )
+
+# Merge datasets
+merged_data = hormones_clean %&gt;%
+  left_join(exercise_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) %&gt;%
+  mutate(
+    # Replace NA with 0 for days without exercise
+    total_duration_min = replace_na(total_duration_min, 0),
+    total_active_min = replace_na(total_active_min, 0),
+    n_sessions = replace_na(n_sessions, 0),
+    
+   # Did they exercise today?
+    exercised_today = ifelse(n_sessions &gt; 0, 1, 0)) %&gt;%
+  
+  # Remove individuals with no phase
+  filter(!is.na(phase))</code></pre>
 </div>
 
 

@@ -851,20 +851,22 @@ symptom_desc = all_daily_data |&gt;
   ) |&gt; 
   pivot_longer(everything(),
                names_to = c(&quot;symptom&quot;, &quot;.value&quot;),
-               names_pattern = &quot;(.+)_score_(.+)&quot;) %&gt;%
+               names_pattern = &quot;(.+)_score_(.+)&quot;) |&gt; 
   mutate(
     symptom = str_to_title(str_replace_all(symptom, &quot;_&quot;, &quot; &quot;)),
     across(where(is.numeric), ~round(.x, 2))
-  )
+  ) |&gt; 
+  # Alphabetical order
+  arrange(symptom)
 
 kable(symptom_desc,
       col.names = c(&quot;Symptom&quot;, &quot;Mean&quot;, &quot;SD&quot;, &quot;Median&quot;),
-      caption = &quot;Descriptive Statistics: Symptom Severity (Scale 0-5)&quot;,
+      caption = &quot;Symptom Severity (Scale 0-5)&quot;,
       align = c(&quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;)) %&gt;%
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
 <table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
-Descriptive Statistics: Symptom Severity (Scale 0-5)
+Symptom Severity (Scale 0-5)
 </caption>
 <thead>
 <tr>
@@ -899,13 +901,13 @@ Appetite
 </tr>
 <tr>
 <td style="text-align:left;">
-Headaches
+Bloating
 </td>
 <td style="text-align:right;">
-1.46
+1.60
 </td>
 <td style="text-align:right;">
-1.41
+1.48
 </td>
 <td style="text-align:right;">
 1
@@ -927,20 +929,6 @@ Cramps
 </tr>
 <tr>
 <td style="text-align:left;">
-Sorebreasts
-</td>
-<td style="text-align:right;">
-0.85
-</td>
-<td style="text-align:right;">
-1.11
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 Fatigue
 </td>
 <td style="text-align:right;">
@@ -951,34 +939,6 @@ Fatigue
 </td>
 <td style="text-align:right;">
 3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Sleepissue
-</td>
-<td style="text-align:right;">
-2.01
-</td>
-<td style="text-align:right;">
-1.48
-</td>
-<td style="text-align:right;">
-2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Moodswing
-</td>
-<td style="text-align:right;">
-1.57
-</td>
-<td style="text-align:right;">
-1.42
-</td>
-<td style="text-align:right;">
-1
 </td>
 </tr>
 <tr>
@@ -997,6 +957,20 @@ Foodcravings
 </tr>
 <tr>
 <td style="text-align:left;">
+Headaches
+</td>
+<td style="text-align:right;">
+1.46
+</td>
+<td style="text-align:right;">
+1.41
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 Indigestion
 </td>
 <td style="text-align:right;">
@@ -1011,28 +985,65 @@ Indigestion
 </tr>
 <tr>
 <td style="text-align:left;">
-Bloating
+Moodswing
 </td>
 <td style="text-align:right;">
-1.60
+1.57
+</td>
+<td style="text-align:right;">
+1.42
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sleepissue
+</td>
+<td style="text-align:right;">
+2.01
 </td>
 <td style="text-align:right;">
 1.48
 </td>
 <td style="text-align:right;">
-1
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sorebreasts
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+1.11
+</td>
+<td style="text-align:right;">
+0
 </td>
 </tr>
 </tbody>
 </table>
 <p>Symptom severity varied across menstrual cycle phases and between
 individuals. Most physical symptoms showed low-to-moderate mean severity
-on the 0-5 scale: cramps (M = 1.00, SD = 1.27), fatigue (M = 2.50, SD =
-1.48), and bloating (M = 1.60, SD = 1.48). Psychological symptoms
+on the 0-5 scale: cramps (M = 1, SD = 1.27), fatigue (M = 2.5, SD =
+1.48), and bloating (M = 1.6, SD = 1.48). Psychological symptoms
 including mood swings (M = 1.57, SD = 1.42) and appetite changes (M =
 2.91, SD = 0.83) were similarly mild on average. The relatively large
 standard deviations across all symptoms reflect substantial variability
 in symptom experiences across the menstrual cycle.</p>
+<p>Symptom severity varied across menstrual cycle phases and between
+individuals. Most physical symptoms showed low-to-moderate mean severity
+on the 0-5 scale (0 = none at all, 5 = very high): cramps (M = 1.00, SD
+= 1.27), fatigue (M = 2.50, SD = 1.48), and bloating (M = 1.60, SD =
+1.48). Psychological symptoms including mood swings (M = 1.57, SD =
+1.42) and appetite changes (M = 2.91, SD = 0.83) were similarly mild on
+average. The relatively large standard deviations across all symptoms
+reflect substantial variability in symptom experiences across the
+menstrual cycle.</p>
 </div>
 </div>
 <div id="distribution-of-key-exercise-metrics" class="section level3">
