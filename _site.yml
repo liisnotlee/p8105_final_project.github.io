@@ -21,7 +21,7 @@ navbar:
       - text: "Hormone & Symptoms"
         href: Hormone_symtoms_final.html
       - text: "Sleep & Stress"
-        href: sleep_stress_final.html
+        href: sleep_stress_final_modelling.html
       - text: "Exercise"
         href: exercise_final_modelling.html
       - text: "Overall Model"
