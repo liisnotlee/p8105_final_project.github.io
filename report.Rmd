@@ -637,26 +637,20 @@ bmi_boxplots <- bmi_all + bmi_by_study
 ```{r}
 bmi_boxplots
 ```
+
 Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m² (IQR ≈ 20–26) with one high outlier (\~39). Overall, most participants fall in the normal-to-overweight range. Because adiposity influences sex steroid metabolism and inflammation, it is important to note that BMI variability could contribute to between-person differences in both hormone levels and symptom severity; including BMI as a covariate in later models may help separate phase effects from adiposity-driven variation.
 
 
-
-
-
-
-
-
-
-### Hormone & Symptoms
+## Hormone & Symptoms
 ```{r, warning= FALSE}
 hormone_symptoms_eda=
   hormone_symptoms|>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
-#### Luteinizing hormone (LH) & Estrogen
+### Luteinizing hormone (LH) & Estrogen
 We want to examine average estrogen and LH levels across menstrual cycle phases, to see if hormonal patterns match biological expectations.
 
-```{r, warning= FALSE}
+```{r, warning= FALSE, fig.width=5, fig.height=3}
 hormone_avg <- hormone_symptoms_eda|>
   group_by(phase) |>
   summarise(
@@ -679,20 +673,21 @@ ggplot(hormone_avg, aes(x = phase)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
 Estrogen levels are highest in the fertility (ovulatory) phase, second highest in luteal, and relatively low in menstrual, gradually rising from follicular to lluteal. Overall, LH levels are much lower than estrogen, peaking sharply during fertility phase, and remaining low in the other phases.
 
 <br>
 
-#### Mood Swing Distribution Across Phases
+### Mood Swing Distribution Across Phases
 Using violin plots, we want to assess whether menstrual cycle phases influence mood swing intensity. 
-```{r, warning= FALSE}
+```{r, warning= FALSE, fig.width=5, fig.height=3}
 # Mood swing
 ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score, fill = phase)) +
   geom_violin(trim = TRUE, alpha = 0.5) +
   geom_jitter(width = 0.15, alpha = 0.3, size = 1) +
   scale_y_continuous(limits = c(0,5), breaks = 0:5) +
   labs(
-    title = "Distribution of Mood Swing Intensity Across Phases",
+    title = "Distribution of Mood Swing Intensity",
     x = "Phase",
     y = "Mood Swing (Scale: 0–5)"
   ) + 
@@ -742,11 +737,12 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
 Average mood swing intensity is highest in menstrual phase (1.85), lowest in luteal phase (1.41), with intermediate levels in follicular and fertility phases.
 
 <br>
 
-#### Flow Volume Distribution Across Phases
+### Flow Volume Distribution Across Phases
 Here, we assess flow volume distribution patterns, and visualize flow volume variation across phases with violin plots.
 
 ```{r, warning= FALSE, fig.width=5, fig.height=3}
@@ -771,7 +767,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 <br>
 
-#### Average Flow Volume Across Phases
+### Average Flow Volume Across Phases
 We looked at average flow volume to observe general trends across the menstrual cycle.
 ```{r, warning= FALSE, fig.width=5, fig.height=3}
 cycle_avg <- hormone_symptoms_eda |>
@@ -802,11 +798,12 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
   )
 
 ```
+
 Menstrual phase has the highest average flow (2.38), whereas luteal is the lowest (0.03). Average flow during fertility and follicular phases is 0.07 and 0.23, respectively.
 
 <br>
 
-#### Average Appetite Across Phases
+### Average Appetite Across Phases
 Here, we looked at average appetite to observe general trends across the menstrual cycle.
 ```{r, warning= FALSE, fig.width=5, fig.height=3.4}
 # Appetite
