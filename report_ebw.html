@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Report</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-solid fa-spa"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
+<li>
+  <a href="data.html">Data</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Lifestyle Factors Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+    </li>
+    <li>
+      <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_final.html">Exercise</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="p8105_final_project_proposal.html">Proposal</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/liisnotlee/p8105_final_project.github.io">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Report</h1>
+
+</div>
+
+
+<pre class="r"><code># Load packages 
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(mgcv)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(lme4)
+library(lmerTest)
+library(gt)
+library(ggsci)
+library(knitr)
+library(broom.mixed) # for tidy
+
+# Set plot theme
+theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = &quot;Pastel2&quot;),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = &quot;Pastel2&quot;),
+
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = &quot;PuRd&quot;),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = &quot;PuRd&quot;)
+)</code></pre>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>Half of the world’s population has experienced or will experience
+menstruation; for many, this physiologic function occurs monthly for
+several decades. For young adults who menstruate, symptoms and regular
+menstruation can be a vital health indicator. Abnormal symptoms can
+further suggest reproductive tract abnormalities, such as uterine
+fibroids or endometriosis. However, abnormal symptoms such as heavy
+bleeding or extreme pain can also be attributed to lifestyle
+characteristics. By leveraging a cohort of young adult menstruators, we
+hope to better understand the relationship between physiological
+menstrual characteristics and lifestyle factors such as stress, sleep,
+and exercise. Understanding how day-to-day factors influence menstrual
+health can help individuals who menstruate understand how to better
+manage concerning symptoms or identify when abnormal symptoms could be
+indicative of a more serious health concern.</p>
+</div>
+<div id="related-work" class="section level1">
+<h1>Related Work</h1>
+</div>
+<div id="questions" class="section level1">
+<h1>Questions</h1>
+<ol style="list-style-type: decimal">
+<li>What are background characteristics of people who participated in
+this study?</li>
+<li>How does the menstrual cycle and hormones affect sleep and
+stress?</li>
+<li>How does exercise and caloric consumption affect menstrual symptoms
+and hormonal levels?</li>
+<li>How do hormonal levels affect menstrual symptoms?</li>
+<li>What is the significance of menstruation on self-reported symptoms
+of participants in this study?</li>
+</ol>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<div id="data-sources" class="section level2">
+<h2>Data Sources</h2>
+<p>We utilized the inclusive, multimodal, longitudinal, and
+de-identified <a
+href="https://physionet.org/content/mcphases/1.0.0/">mcPHASES</a>
+(menstrual cycle Physiological, Hormonal, and Self-Reported Events and
+Symptoms) dataset for menstrual health tracking with wearable
+devices.</p>
+<p>Data was collected from 42 menstruating young adults in Canada over
+two 3-month intervals: Interval 1 (January–April 2022) and Interval 2
+(July–October 2024). Participants wore Fitbit Sense smartwatches to
+measure physiological signals, and Mira Plus Starter Kits to track their
+hormone levels. Participants also self-reported daily symptom
+experiences like cramps, sleep quality, and stress levels via a
+smartphone diary app.</p>
+<p>The original dataset contains 23 structured tables organized by
+signal category. For this project, we focused on the lifestyle factors
+such as exercise, sleep, and stress, and menstrual cycle symptoms. The
+datasets we used are the following:</p>
+<ul>
+<li>Demographics:
+<ul>
+<li><code>subject_info.csv</code>: demographic data such as age,
+education, and age at menarche, and background survey responses
+collected at the start of the study</li>
+<li><code>height_and_weight.csv</code>: participant’s baseline height
+and weight</li>
+</ul></li>
+<li>Hormone and Symptoms:
+<ul>
+<li><code>hormones_and_selfreport.csv</code>：hormone data (LH, E3G,
+PdG) from the Mira fertility device and daily self-reported symptom
+survey responses (e.g., cramps, mood, menstrual flow) on a 6-level
+Likert-type scale from 0 (“Not at all”) to 5 (“Very high”)</li>
+</ul></li>
+<li>Lifestyle Factors:
+<ul>
+<li><code>stress_score.csv</code>: daily Stress Management Score from
+those who have access to the Stress Management experience</li>
+<li><code>sleep.csv</code>: sleep session logs including timestamps,
+durations, and quality metrics collected by Fitbit</li>
+<li><code>sleep_score.csv</code>: daily sleep score breakdowns provided
+by Fitbit, summarizing overall sleep quality based on multiple
+contributing factors</li>
+</ul></li>
+</ul>
+<hr />
+<p><strong>In total, we have 5 tidy dataframes:</strong></p>
+<ol style="list-style-type: decimal">
+<li><code>subject_info</code>
+<ul>
+<li>Contains demographics and background survey responses data where
+each row represents a participant</li>
+<li>A total of 62 observations of 18 variables</li>
+</ul></li>
+<li><code>hormone_symptoms</code>
+<ul>
+<li>Contains daily hormone and self-reported symptom-related data</li>
+<li>A total of 5659 observations of 36 variables</li>
+</ul></li>
+<li><code>sleep_stress_daily</code>
+<ul>
+<li>Contains daily sleep and stress related data</li>
+<li>A total of 5400 observations of 7 variables</li>
+</ul></li>
+<li><code>exercise_daily</code>
+<ul>
+<li>Contains daily exercise related data</li>
+<li>A total of 1744 observations of 12 variables</li>
+</ul></li>
+<li><code>all_daily_data</code>
+<ul>
+<li>The multimodal merged version of dataframes 2,3,4, where each row
+represents a <strong>daily</strong> data for a person in a specific
+study year, including hormone and self-reported symptoms, sleep score,
+stress score, daily exercise data.</li>
+<li>A total of 5659 observations of 50 variables</li>
+</ul></li>
+</ol>
+<p>All dataframes can be linked by participant’s <code>id</code>.
+Besides <code>subejct_info</code>, other dataframes can be further
+linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
+<hr />
+<div id="subject_info---subject-relevant-data" class="section level3">
+<h3><code>subject_info</code> - Subject-Relevant Data</h3>
+<p>The <code>subject_info</code> dataframe contains participants
+demographics data from <code>subject_info.csv</code> and
+<code>height_and_weight.csv</code>, as well as participants study
+enrollment year (this piece of information is from
+<code>hormones_and_selfreport.csv</code>).</p>
+<p>It contains a total of 62 observations of 18 variables. Some key
+variables are the following:</p>
+<ul>
+<li><code>id</code>: participant’s unique identifier</li>
+<li>Age relevant variables: <code>birth_year</code> and
+<code>age_of_first_menarche</code></li>
+<li>Height and weight related variables: <code>avg_height</code>,
+<code>avg_weight</code>, <code>bmi</code></li>
+<li>Study enrollment related information: <code>study</code> (flag of
+which study the participant enrolled in, <code>1</code>=2022,
+<code>2</code>=2024, <code>3</code>=both), <code>year</code> (the year
+of study)</li>
+<li>Categorical/Factor variables like <code>ethnicity</code>,
+<code>education</code>,
+<code>self_report_menstrual_health_literacy</code>, etc.</li>
+</ul>
+<pre class="r"><code>ht_wt = read_csv(&quot;data/height_and_weight.csv&quot;)|&gt; 
+  janitor::clean_names() |&gt; 
+  # calculate mean height/weight
+  rowwise() |&gt;
+  mutate(
+    avg_height = mean(c(height_2022, height_2024), na.rm = TRUE),
+    avg_weight = mean(c(weight_2022, weight_2024), na.rm = TRUE)
+  ) |&gt;
+  ungroup()
+
+# import csv file
+hormones_and_selfreport = read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() 
+# extract study_flag
+study_flag &lt;- hormones_and_selfreport  |&gt; 
+  distinct(id, study_interval) |&gt; 
+  mutate(flag = 1,
+         study_interval = paste0(&quot;study_&quot;, study_interval)) |&gt; 
+  pivot_wider(
+    names_from = study_interval,
+    values_from = flag,
+    values_fill = 0  
+  )
+
+# read in subject-info.csv
+subject_info_raw = read_csv(&quot;data/subject-info.csv&quot;) |&gt; 
+  janitor::clean_names()
+
+subject_info &lt;- subject_info_raw  |&gt; 
+  # merging
+  left_join(ht_wt, by = &quot;id&quot;) |&gt; 
+  left_join(study_flag, by = &quot;id&quot;) |&gt;
+  # add a study_flag
+  mutate(
+    study = case_when(
+      study_2022 == 1 &amp; study_2024 == 1 ~ 3L,  # both 2022 &amp; 2024
+      study_2022 == 1 &amp; study_2024 == 0 ~ 1L,  
+      study_2024 == 1 &amp; study_2022 == 0 ~ 2L,  
+      TRUE ~ NA_integer_
+    )
+  ) |&gt; 
+  # pivot_long for wt &amp; ht
+  pivot_longer(
+    cols = c(weight_2022, weight_2024, height_2022, height_2024),
+    names_to  = c(&quot;.value&quot;, &quot;year&quot;), 
+    names_sep = &quot;_&quot;                 
+  ) |&gt; 
+  rename(
+    weight_yr = weight,
+    height_yr = height
+  ) |&gt; 
+  # keep only the relevant study year
+  filter(
+    (study == 1 &amp; year == 2022) |
+    (study == 2 &amp; year == 2024) |
+    (study == 3)
+  ) |&gt; 
+  # calculate age
+  mutate(
+    year = as.numeric(year),
+    birth_year = as.numeric(birth_year),
+    age = year - birth_year
+  ) |&gt; 
+  # get a mean age for each id
+  group_by(id) |&gt; 
+  mutate(
+    mean_age = mean(age, na.rm = TRUE)
+  ) |&gt; 
+  ungroup() |&gt; 
+  # get BMI
+  mutate(
+    bmi = weight_yr / ( (height_yr / 100)^2 )
+  )|&gt;
+  # convert NaN to NA
+  mutate(
+    across(c(avg_weight, avg_height), 
+           ~ if_else(is.nan(.), NA_real_, .))
+  ) |&gt; 
+  #this factors variables and also creates &quot;gender abrv&quot;, &quot;education abrv&quot;, &quot;race_category&quot; which are simplified versions of these variables for use in tables, some figures, and regression models later on 
+  mutate(
+    education = str_trim(education),
+    education_abrv = case_when(
+      education == &quot;High school degree or equivalent (e.g. GED)&quot; ~ &quot;High School&quot;,
+      education == &quot;Some university/ post-secondary, no degree&quot; ~ &quot;Some College&quot;,
+      education == &quot;Bachelor&#39;s degree (e.g. BA, BS)&quot; ~ &quot;Bachelors&quot;,
+      education %in% c(&quot;Master&#39;s degree (e.g. MA, MS, MEd)&quot;, &quot;Doctorate or professional degree&quot;) ~ &quot;Graduate Degree&quot;,
+      TRUE ~ &quot;Other&quot;),
+    education_abrv = factor(
+      education_abrv,
+      levels = c(&quot;High School&quot;, &quot;Some College&quot;, &quot;Bachelors&quot;, &quot;Graduate Degree&quot;, &quot;Other&quot;),
+      ordered = TRUE),
+     self_report_menstrual_health_literacy = factor(
+      self_report_menstrual_health_literacy,
+      levels = c(&quot;Non-existent&quot;, &quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;, &quot;Expert&quot;),
+      ordered = TRUE),
+    gender_abrv = case_when(
+      gender %in% c(&quot;Gender Fluid&quot;, &quot;Non-binary&quot;) ~ &quot;Gender Fluid or Non-binary&quot;, 
+      gender %in% c(&quot;Prefer not to say&quot;, &quot;Other&quot;) ~ &quot;Prefer not to say or Other&quot;, 
+      gender == &quot;Woman&quot; ~ &quot;Woman&quot;),
+      gender_abrv = factor(gender_abrv, levels = c(&quot;Woman&quot;, &quot;Gender Fluid or Non-binary&quot;, &quot;Prefer not to say or Other&quot;)), 
+      sexually_active = factor(sexually_active, levels = c(&quot;Yes&quot;, &quot;No&quot;, &quot;Prefer not to say&quot;)),
+    race_category = case_when(
+      ethnicity %in% c(&quot;East Asian&quot;, &quot;South Asian&quot;, &quot;Southeast Asian&quot;) ~ &quot;Asian&quot;,
+      ethnicity == &quot;White&quot; ~ &quot;White&quot;,
+      TRUE ~ &quot;Other&quot;),
+    race_category = factor(
+      race_category, levels = c(&quot;Asian&quot;, &quot;White&quot;, &quot;Other&quot;))) |&gt; 
+  # only need 1 study_interval flag to indicate the study year
+  mutate(study_interval = year) |&gt; 
+  select(-study_2022, -study_2024, year, -study) |&gt; 
+  # rearrange the column order
+  select(
+    id,     
+    study_interval,     
+    everything()
+  )</code></pre>
+</div>
+<div
+id="hormone_symptoms---daily-hormone-and-self-reported-symptom-related-data"
+class="section level3">
+<h3><code>hormone_symptoms</code> - Daily Hormone and Self-Reported
+Symptom-Related Data</h3>
+<p>The <code>hormone_symptoms</code> dataframe contains participants’
+daily hormone data (LH, E3G, PdG) and self-reported symptom-related data
+(e.g., cramps, mood, menstrual flow) on a 6-level Likert-type scale from
+0 (“Not at all”) to 5 (“Very high”), from
+<code>hormones_and_selfreport.csv</code>.</p>
+<p>It contains a total of 5659 observations of 36 variables. Some key
+variables are the following:</p>
+<ul>
+<li><code>id</code>: participant’s unique identifier</li>
+<li><code>study_interval</code>: the year of study that participant
+enrolled in 2022 or 2024)</li>
+<li><code>day_in_study</code>: normalized day index starting from day 1
+of each participant’s study interval</li>
+<li><code>phase</code>: factor menstrual cycle phase label (follicular,
+ovulation, luteal, or fertility)</li>
+<li>Hormone data: <code>lh</code> (luteinizing hormone (mIU/mL) level,
+<code>estrogen</code> (estrone-3-glucuronide level (ng/mL)), and
+<code>pdg</code> (pregnanediol glucuronide (mcg/mL))</li>
+<li>Factor flow data: <code>flow_volume</code> on a Likert scale (Lowest
+= “Not at all” to highest = “Very Heavy”), and <code>flow_color</code>
+(categorical indicator of menstrual flow or discharge color)</li>
+<li>Factor symptoms severity data on Likert scale, such as
+<code>cramps</code>, <code>fatigue</code>, and
+<code>moodswing</code>.</li>
+<li>Numeric symptoms severity data converted from factor symptoms
+severity data, such as <code>cramps_score</code>,
+<code>fatigue_score</code>, and <code>moodswing_score</code>.</li>
+</ul>
+<pre class="r"><code># read in raw csv file
+hormone_symptoms_raw &lt;- 
+  read_csv(&quot;data/hormones_and_selfreport.csv&quot;) |&gt; 
+  janitor::clean_names() 
+
+# factor string values
+likert_level_factor = c(&quot;not at all&quot;, &quot;very low/little&quot;, &quot;low&quot;, &quot;moderate&quot;, &quot;high&quot;, &quot;very high&quot;)
+likert_levels_no_verylowlittle = c(&quot;not at all&quot;, &quot;very low&quot;, &quot;low&quot;, &quot;moderate&quot;, &quot;high&quot;, &quot;very high&quot;)
+# likert_scale for numeric score conversion
+likert_6_levels = c(&quot;not at all&quot; = 0, &quot;very low/little&quot; = 1, &quot;very low&quot; = 1, &quot;low&quot; = 2, &quot;moderate&quot; = 3, &quot;high&quot; = 4, &quot;very high&quot; = 5)
+
+
+hormone_symptoms &lt;- hormone_symptoms_raw |&gt; 
+  # convert all to lower case string for standardization
+  mutate(across(flow_volume:bloating, 
+                ~ ifelse(!is.na(.) &amp; !grepl(&quot;^\\d+$&quot;, .), tolower(.), .))) |&gt; 
+  mutate(across(c(phase), ~ ifelse(!is.na(.) &amp; !grepl(&quot;^\\d+$&quot;, .), tolower(.), .))) |&gt; 
+  # factor variables
+  mutate(
+    phase = factor(phase, levels = c(&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)),
+    flow_volume = factor(flow_volume, 
+                         levels = c(&quot;not at all&quot;, &quot;spotting / very light&quot;,&quot;light&quot;,&quot;moderate&quot;, &quot;somewhat heavy&quot;,&quot;heavy&quot;, &quot;very heavy&quot;)),
+    flow_color = factor(flow_color,
+                        levels = c(&quot;not at all&quot;, &quot;pink&quot;,&quot;bright red&quot;, &quot;dark brown / dark red&quot;, &quot;grey&quot;, &quot;black&quot;,&quot;other&quot;)),
+  ) |&gt; 
+  # factor character values
+  mutate(
+    across(
+    .cols = c(sleepissue, headaches, stress, cramps, foodcravings, indigestion, bloating, moodswing, sorebreasts, fatigue),  
+    .fns = ~ factor(., levels = likert_level_factor),  
+    .names = &quot;{.col}&quot;  
+  )
+  ) |&gt; 
+  mutate(across(
+    .cols = c(appetite, exerciselevel),
+    .fns = ~ factor(., levels = likert_levels_no_verylowlittle), 
+    .names = &quot;{.col}&quot;  
+  )) |&gt; 
+  # convert categorical variable values to numeric intensity scores
+  mutate(across(
+    .cols = appetite:bloating,
+    .fns = ~ recode(., !!!likert_6_levels),
+    .names = &quot;{.col}_score&quot;
+  )) |&gt; 
+  # special conversion for flow
+  mutate(
+    flow_volume_score = case_when(
+      flow_volume == &quot;not at all&quot; ~ 0,
+      flow_volume == &quot;spotting / very light&quot; ~ 1,
+      flow_volume == &quot;light&quot; ~ 2,
+      flow_volume == &quot;moderate&quot; ~ 3,
+      flow_volume == &quot;somewhat heavy&quot; ~ 4,
+      flow_volume == &quot;heavy&quot; ~ 5,
+      flow_volume == &quot;very heavy&quot; ~ 6,
+      TRUE ~ NA_real_
+    ),
+    flow_color_score = case_when(
+      flow_color == &quot;not at all&quot; ~ 0,
+      flow_color == &quot;pink&quot; ~ 1,
+      flow_color == &quot;bright red&quot; ~ 2,
+      flow_color == &quot;dark brown / dark red&quot; ~ 3,
+      flow_color == &quot;grey&quot; ~ 4,
+      flow_color == &quot;black&quot; ~ 5,
+      flow_color == &quot;other&quot; ~ 6,
+      TRUE ~ NA_real_
+    )
+  )</code></pre>
+</div>
+<div id="sleep_stress_daily---daily-sleep-and-stress-related-data"
+class="section level3">
+<h3><code>sleep_stress_daily</code> - Daily Sleep and Stress Related
+Data</h3>
+<p>The <code>sleep_stress_daily</code> dataframe contains participants’
+daily sleep and stress data from 3 csv files (<code>sleep.csv</code>,
+<code>sleep_score.csv</code> and <code>stress_score.csv</code>).</p>
+<p>It contains a total of 5400 observations of 7 variables. Some key
+variables are the following:</p>
+<ul>
+<li><code>id</code>: participant’s unique identifier</li>
+<li><code>study_interval</code>: the year of study that participant
+enrolled in 2022 or 2024)</li>
+<li><code>day_in_study</code>: normalized day index starting from day 1
+of each participant’s study interval</li>
+<li>Sleep session logs data like <code>timeinbed_mean</code> (average
+minutes in bed) and <code>deep_sleep_in_minutes</code> (minutes spent in
+deep sleep)</li>
+<li><code>sleep_score</code>: overall sleep score out of 100, the higher
+the better</li>
+<li><code>stress_score</code>: overall sleep score out of 100, the
+higher the better</li>
+</ul>
+<pre class="r"><code># load raw data from csv files
+sleep_score_raw &lt;- read_csv(&quot;data/sleep_score.csv&quot;) |&gt;
+  janitor::clean_names()
+sleep_raw       &lt;- read_csv(&quot;data/sleep.csv&quot;) |&gt;
+  janitor::clean_names()
+stress_score_raw &lt;- read_csv(&quot;data/stress_score.csv&quot;) |&gt;
+  janitor::clean_names()
+
+# combine the sleep and stress score
+sleep_score &lt;- sleep_score_raw |&gt;
+  select(id,study_interval, day_in_study, overall_score, deep_sleep_in_minutes) |&gt; 
+  mutate(sleep_score = overall_score) |&gt; 
+  select(-overall_score) |&gt; 
+  # remove duplicates by keeping the maximum score
+  group_by(id, study_interval, day_in_study) |&gt; 
+  slice_max(order_by = sleep_score, n = 1, with_ties = FALSE) |&gt; 
+  ungroup()
+
+stress_score &lt;- stress_score_raw |&gt;
+  filter(calculation_failed == &quot;FALSE&quot;)|&gt;
+  select(id, study_interval, day_in_study, stress_score)|&gt;
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+
+sleep_stress_score &lt;- full_join(sleep_score, stress_score, by=c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;))
+
+# working on sleep data
+sleep &lt;- sleep_raw|&gt;
+  select(id,study_interval, sleep_end_day_in_study, timeinbed, mainsleep) |&gt;
+  # changed to sleep_end_day
+  mutate(day_in_study = sleep_end_day_in_study) |&gt;
+  select(-sleep_end_day_in_study) |&gt; 
+  # only keep main sleep = TRUE as mainsleep: boolean indicating whether this is the main sleep session of the day
+  filter(
+    mainsleep == TRUE
+  ) |&gt; 
+# check duplicates &gt;&gt; all duplicates from 2024
+  group_by(id, study_interval, day_in_study) |&gt;
+  summarise(
+    timeinbed_mean = mean(timeinbed, na.rm = TRUE),
+    mainsleep = first(mainsleep),
+    .groups = &quot;drop&quot; 
+  ) |&gt;
+  ungroup() |&gt; 
+  # no need flag
+  select(-mainsleep)
+
+# MERGE
+sleep_stress_daily &lt;- full_join(sleep, sleep_stress_score, by=c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;))</code></pre>
+</div>
+<div id="exercise_daily---daily-exercise-related-data"
+class="section level3">
+<h3><code>exercise_daily</code> - Daily Exercise Related Data</h3>
+<p>The <code>exercise_daily</code> dataframe contains participants’
+daily exercise related data from <code>exercise.csv</code>).</p>
+<p>It contains a total of 1744 observations of 12 variables. Some key
+variables are the following:</p>
+<ul>
+<li><code>id</code>: participant’s unique identifier</li>
+<li><code>study_interval</code>: the year of study that participant
+enrolled in 2022 or 2024)</li>
+<li><code>day_in_study</code>: normalized day index starting from day 1
+of each participant’s study interval</li>
+<li>Exercise session logs data:
+<ul>
+<li>Numeric data like <code>total_duration_min</code> (amount of time
+spent in active movement during the session in minutes),
+<code>total_steps</code> (total number of steps recorded),
+<code>total_calores</code> (total calories burned), heart rate data
+(<code>avg_heartrate</code> and <code>max_heartrate</code>)</li>
+<li>Categorical data like <code>activity_types</code> (e.g. sport,
+walk)</li>
+</ul></li>
+<li><code>n_sessions</code>: numeric indicator of how many exercise
+sessions a participant had per day</li>
+</ul>
+<pre class="r"><code># Read data
+exercise_raw &lt;- read_csv(&quot;data/exercise.csv&quot;) |&gt; 
+  janitor::clean_names() 
+
+exercise_daily &lt;- exercise_raw |&gt; 
+  distinct() |&gt; 
+  # aggregate to daily level
+  group_by(id, study_interval, start_day_in_study) %&gt;%
+  summarise(
+    total_calories = sum(calories, na.rm = TRUE),
+    total_duration_min = sum(duration, na.rm = TRUE) / 60000,
+    total_active_min = sum(activeduration, na.rm = TRUE) / 60000,
+    total_steps = sum(steps, na.rm = TRUE),
+    avg_heartrate = mean(averageheartrate, na.rm = TRUE),
+    max_heartrate = ifelse(all(is.na(averageheartrate)), NA, max(averageheartrate, na.rm = TRUE)),  # Handling -Inf
+    total_elevation = sum(elevationgain, na.rm = TRUE),
+    n_sessions = n(),
+    activity_types = paste(unique(activityname), collapse = &quot;, &quot;),
+    .groups = &quot;drop&quot;
+  ) |&gt; 
+  rename(day_in_study = start_day_in_study) </code></pre>
+</div>
+<div id="all_daily_data---merged-multimodal-daily-data"
+class="section level3">
+<h3><code>all_daily_data</code> - Merged Multimodal Daily Data</h3>
+<p>The <code>all_daily_data</code> is a merged multimodal dataframe that
+contains all <strong>daily-level</strong> data from
+<code>hormone_symptoms</code>, <code>exercise_daily</code>, and
+<code>sleep_stress_daily</code> dataframes, and used
+<code>hormone_symptoms</code> as the anchor dataframe. Each row
+represents a daily data for a person in a specific study year (including
+sleep score, stress score, daily exercise data, hormone and
+self-reported symptoms).</p>
+<p>It contains a total of 5659 observations of 50 variables, with unique
+combination of key identifiers (<code>id</code>,
+<code>study_interval</code>, and <code>day_in_study</code>). Additional
+flag variables that are not in 3 multimodal dataframes are
+<code>exercise_flag</code> and <code>sleep_stress_flag</code> to
+indicate if the observation day had at least one recorded exercise
+session or if both stress and sleep scores are present.</p>
+<pre class="r"><code>all_daily_data &lt;- hormone_symptoms |&gt; 
+  # MERGE exercise &amp; hormone
+  left_join(exercise_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) |&gt;
+  # add flag exercised_flag for easy filtering in the future analyses
+  # only need to keep exercised_flag==1 to have all rows with exercise data
+  mutate(
+    exercised_flag = ifelse(!is.na(n_sessions) &amp; n_sessions &gt; 0, 1, 0),
+    menstruation = factor(if_else(phase == &quot;menstrual&quot;, 1, 0),
+                          levels = c(0, 1),
+                          labels = c(&quot;No&quot;, &quot;Yes&quot;))
+  ) |&gt; 
+  # MERGE sleep &amp; stress score data
+  # noticed hormone_symptoms df has a stress_score column 
+  # drop it
+  select(-stress_score) |&gt; 
+  left_join(sleep_stress_daily, by = c(&quot;id&quot;, &quot;study_interval&quot;, &quot;day_in_study&quot;)) |&gt; 
+  # add flag sleep_stress_flag for easy filtering in the future analyses
+  mutate(
+    sleep_stress_flag = ifelse(
+      !is.na(stress_score) &amp; !is.na(sleep_score),1,0
+    )
+  )  
+  # MERGE demographic data
+  # left_join(subject_info, by = c(&quot;id&quot;, &quot;study_interval&quot;)) </code></pre>
+</div>
+</div>
+</div>
+<div id="exploratory-data-analysis" class="section level1">
+<h1>Exploratory Data Analysis</h1>
+<div id="participant-characteristics" class="section level2">
+<h2>Participant Characteristics</h2>
+<pre class="r"><code>summary_table_gt</code></pre>
+<div id="ikmavegjyt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ikmavegjyt table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ikmavegjyt thead, #ikmavegjyt tbody, #ikmavegjyt tfoot, #ikmavegjyt tr, #ikmavegjyt td, #ikmavegjyt th {
+  border-style: none;
+}
+
+#ikmavegjyt p {
+  margin: 0;
+  padding: 0;
+}
+
+#ikmavegjyt .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ikmavegjyt .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ikmavegjyt .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ikmavegjyt .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ikmavegjyt .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ikmavegjyt .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ikmavegjyt .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ikmavegjyt .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ikmavegjyt .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ikmavegjyt .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ikmavegjyt .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ikmavegjyt .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ikmavegjyt .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ikmavegjyt .gt_row {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ikmavegjyt .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ikmavegjyt .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ikmavegjyt .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ikmavegjyt .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ikmavegjyt .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ikmavegjyt .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ikmavegjyt .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ikmavegjyt .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ikmavegjyt .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ikmavegjyt .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ikmavegjyt .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ikmavegjyt .gt_left {
+  text-align: left;
+}
+
+#ikmavegjyt .gt_center {
+  text-align: center;
+}
+
+#ikmavegjyt .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ikmavegjyt .gt_font_normal {
+  font-weight: normal;
+}
+
+#ikmavegjyt .gt_font_bold {
+  font-weight: bold;
+}
+
+#ikmavegjyt .gt_font_italic {
+  font-style: italic;
+}
+
+#ikmavegjyt .gt_super {
+  font-size: 65%;
+}
+
+#ikmavegjyt .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ikmavegjyt .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ikmavegjyt .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ikmavegjyt .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ikmavegjyt .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ikmavegjyt .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ikmavegjyt .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ikmavegjyt .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ikmavegjyt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="variable"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="subgroup"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="value">Mean (Max-Min) or Count (%)</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Age</td>
+<td headers="subgroup" class="gt_row gt_left"></td>
+<td headers="value" class="gt_row gt_right">21.2 (18–29)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">BMI</td>
+<td headers="subgroup" class="gt_row gt_left"></td>
+<td headers="value" class="gt_row gt_right">23.8 (17.2-39.2)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Age at Menarche</td>
+<td headers="subgroup" class="gt_row gt_left"></td>
+<td headers="value" class="gt_row gt_right">11.9 (10–15)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Ethnicity</td>
+<td headers="subgroup" class="gt_row gt_left">African</td>
+<td headers="value" class="gt_row gt_right">1 (1.6%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Caribbean</td>
+<td headers="value" class="gt_row gt_right">1 (1.6%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">East Asian</td>
+<td headers="value" class="gt_row gt_right">20 (32.3%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Latina</td>
+<td headers="value" class="gt_row gt_right">2 (3.2%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Middle Eastern</td>
+<td headers="value" class="gt_row gt_right">7 (11.3%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">South Asian</td>
+<td headers="value" class="gt_row gt_right">1 (1.6%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Southeast Asian</td>
+<td headers="value" class="gt_row gt_right">16 (25.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">White</td>
+<td headers="value" class="gt_row gt_right">14 (22.6%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="subgroup" class="gt_row gt_left">Woman</td>
+<td headers="value" class="gt_row gt_right">55 (88.7%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Gender Fluid or Non-binary</td>
+<td headers="value" class="gt_row gt_right">3 (4.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Prefer not to say or Other</td>
+<td headers="value" class="gt_row gt_right">4 (6.5%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Education</td>
+<td headers="subgroup" class="gt_row gt_left">High School</td>
+<td headers="value" class="gt_row gt_right">7 (11.3%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Some College</td>
+<td headers="value" class="gt_row gt_right">34 (54.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Bachelors</td>
+<td headers="value" class="gt_row gt_right">16 (25.8%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Graduate Degree</td>
+<td headers="value" class="gt_row gt_right">5 (8.1%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;">Sexually Active</td>
+<td headers="subgroup" class="gt_row gt_left">Yes</td>
+<td headers="value" class="gt_row gt_right">22 (35.5%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">No</td>
+<td headers="value" class="gt_row gt_right">36 (58.1%)</td></tr>
+    <tr><td headers="variable" class="gt_row gt_left" style="font-weight: bold;"></td>
+<td headers="subgroup" class="gt_row gt_left">Prefer not to say</td>
+<td headers="value" class="gt_row gt_right">4 (6.5%)</td></tr>
+  </tbody>
+  
+</table>
+</div>
+<p>The cohort includes 42 participants with a median age of ~21 years
+and a small number of older outliers (ages 27 and 29). This relatively
+narrow, young age range reduces age-related heterogeneity in
+reproductive hormones and symptomatic expression, helping to isolate
+phase-related effects.</p>
+<p>The average age of menarche was 11.9, though some participants
+reported first menstruating as late as age 15. Our participants largely
+identified as women (88.7%) and as Asian (59.7%) or white (22.6%). More
+than 4 in 5 participants had completed at least some college, with 25.8%
+having a college degree and 8.1% having a graduate degree.</p>
+<div id="age-of-first-menarche" class="section level3">
+<h3>Age of first menarche</h3>
+<pre class="r"><code>menarche_plot</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Age of first menarche ranges roughly from 10 to 15 years with a
+median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche
+distribution suggests a relatively standard reproductive development
+history across participants; because very early or very late menarche
+can influence cycle regularity and hormonal profiles, the lack of
+extreme variability here supports attributing observed hormone–symptom
+patterns primarily to current cycle phase rather than developmental
+differences.</p>
+</div>
+<div id="bmi" class="section level3">
+<h3>BMI</h3>
+<pre class="r"><code>bmi_boxplots</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m²
+(IQR ≈ 20–26) with one high outlier (~39). Overall, most participants
+fall in the normal-to-overweight range. Because adiposity influences sex
+steroid metabolism and inflammation, it is important to note that BMI
+variability could contribute to between-person differences in both
+hormone levels and symptom severity; including BMI as a covariate in
+later models may help separate phase effects from adiposity-driven
+variation.</p>
+</div>
+<div id="menstrual-health-literacy-by-education" class="section level3">
+<h3>Menstrual Health Literacy by Education</h3>
+<pre class="r"><code>education_health_lit</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+This figure shows self-reported participant menstrual health literacy by
+educational attainment. While most participants report medium to high
+menstrual health literacy,some reported non-existent, low, or expert
+level knowledge. Generally, educational attainment was not clearly
+visually correlated with greater knowledge about menstrual health.</p>
+</div>
+</div>
+<div id="hormone-and-symptoms" class="section level2">
+<h2>Hormone and Symptoms</h2>
+<div id="lh-estrogen" class="section level3">
+<h3>LH &amp; Estrogen</h3>
+<p>We want to examine average estrogen and LH levels across menstrual
+cycle phases to see if hormonal patterns match biological
+expectations</p>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Estrogen levels are highest in the Fertility (ovulatory) phase,
+second highest in Luteal, and relatively low in Menstrual, gradually
+rising from Follicular to Luteal. LH is much lower than estrogen
+overall, peaking sharply in Fertility and remaining low in the other
+phases.</p>
+</div>
+<div id="mood-swing" class="section level3">
+<h3>Mood Swing</h3>
+<p>Moodswing Distribution Across Phases</p>
+<p>Using violin plots to assess whether menstrual cycle hases influence
+mood swing intensity.</p>
+<pre><code>## Warning: Removed 2339 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment
+##   purposes.</code></pre>
+<pre><code>## Warning: Removed 2925 rows containing missing values or values outside the
+## scale range (`geom_point()`).</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Violin plots show substantial inter-individual variability. Menstrual
+phase has the highest mood swing intensity (right-skewed distribution,
+peak around 1.85), while Luteal phase shows lower values with a wider
+base (more individuals with low mood swing).</p>
+<p>Average Mood Swing Across Phases To visualize general trends, we
+should summarize the average mood swing intensity across phases.</p>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>Average mood swing is highest in Menstrual phase (1.85), lowest in
+Luteal phase (1.41), with intermediate levels in follicular and
+fertility phases.</p>
+</div>
+<div id="flow-volume" class="section level3">
+<h3>Flow Volume</h3>
+<p>Flow Volume Distribution Across Phases</p>
+<p>To assess flow volume distribution patterns, we visualize flow volume
+variation across phases with violin plots.</p>
+<pre><code>## Warning: Removed 2592 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment
+##   purposes.</code></pre>
+<pre><code>## Warning: Removed 3827 rows containing missing values or values outside the
+## scale range (`geom_point()`).</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>Luteal phase shows a right-skewed distribution, indicating most
+low-flow observations but a few high-flow days. Menstrual phase is
+narrow and tall, indicating consistently higher flow intensity.</p>
+<p>Average Flow Volume Across Phases</p>
+<p>Summarize average flow volume to observe general trends across the
+menstrual cycle.
+<img src="report_ebw_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>Menstrual phase has the highest average flow (2.38), luteal is lowest
+(0.03), fertility is 0.07, and follicular is 0.23.</p>
+</div>
+<div id="appetite" class="section level3">
+<h3>Appetite</h3>
+<p>Average Appetite Across Phases</p>
+<p>Summarize average appetite to observe general trends across the
+menstrual cycle.
+<img src="report_ebw_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>Appetite is highest in Fertility (2.96), lowest in Follicular (2.85),
+Luteal 2.95, Menstrual 2.90.</p>
+</div>
+</div>
+<div id="sleep-and-stress" class="section level2">
+<h2>Sleep and stress</h2>
+<pre class="r"><code>sleep_stress_df = all_daily_data|&gt;
+  filter(!is.na(stress_score) &amp; !is.na(sleep_score) &amp; !is.na(timeinbed_mean)) |&gt;
+  filter(stress_score != 0)|&gt;
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |&gt;
+  mutate(
+    phase = fct_relevel(phase,&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))</code></pre>
+<p>Menstruators spent more time in bed during menstrual time but their
+deep sleep hours were lowest. This showed that the physical exhaustion
+during menstrual days requiring them to rest but preventing them from
+having a restorative sleep quality. Follicular time is the when
+menstruators feel most energetic and spent less time in bed but having
+much better deep sleep. We explore the changes of the stress score with
+the menstrual cycle. The participants slept best during the menstrual
+time, probably a good sign to rest well during this time. The lowest
+sleep score were recorded during ovulation/ fertility time in which the
+increased estrogen and lh levels may contribute to this low sleep
+quality. The higher stress score the less stressful people experience.
+In this study, the participants showed the least stressful during
+folicular period , as the bodies are full of energy. The most stressful
+time is during luteal period.</p>
+<pre class="r"><code># plot the sleep vs stress score by phases
+plot_1 = 
+  sleep_stress_df |&gt;
+  group_by(phase) |&gt;
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = &quot;Sleep Score&quot;,
+                    mean_stress_score = &quot;Stress Score&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Score&quot;
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# plot the hormone changes
+coeff = 5.5
+plot_2  =
+  sleep_stress_df |&gt;
+  group_by(phase) |&gt;
+  summarize(
+    mean_lh = mean(lh, na.rm = TRUE),
+    mean_estrogen = mean( estrogen, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_lh           = &quot;LH&quot;,
+                    mean_estrogen     = &quot;Estrogen&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Level&quot;
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+# Plot the time in bed and deep sleep in minutes in phases
+plot_3 = 
+  sleep_stress_df |&gt;
+  group_by(phase)|&gt;
+   summarize(
+     mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
+    mean_deep_sleep_in_minutes = mean((deep_sleep_in_minutes/60)*coeff, na.rm = TRUE)
+             )|&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_timeinbed             = &quot;Time in bed (hours)&quot;,
+                    mean_deep_sleep_in_minutes = &quot;Deep sleep (hours)&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
+    geom_smooth(linewidth= 1) +
+    geom_point(size = 3) +
+    labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
+    labs(
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;Level&quot;
+  ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = &quot;Time in bed (hours)&quot;,
+    # Add a second axis and specify its features
+    sec.axis = sec_axis(~./coeff, name=&quot;Deep sleep (hours)&quot;)
+  ) +
+    theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+plot_1 + plot_2 + plot_3</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code># plot the variation of time in bed by menstrual phases
+timeinbed_plot =
+  sleep_stress_df|&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  group_by(phase, id) |&gt;
+  summarize(
+    timeinbed = mean(timeinbed_mean/60)
+  )|&gt; 
+  ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Time in bed (hrs)&quot;
+  ) +
+    theme(legend.position = &quot;none&quot;) 
+# plot the variation of deep sleep score by menstrual phases
+deep_sleep_plot =
+   sleep_stress_df|&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  group_by(phase, id) |&gt;
+  summarize(
+    mean_deep_sleep = mean(deep_sleep_in_minutes/60)
+  )|&gt; 
+  ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Deep sleep (hrs)&quot;
+  ) +
+    theme(legend.position = &quot;none&quot;) 
+# plot the variation of sleep score by menstrual phases
+sleep_score_boxplot =
+  sleep_stress_df |&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  ggplot(aes(x = phase, y = sleep_score, fill = phase))+
+ geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Sleep score&quot;
+  ) +
+  theme(legend.position = &quot;none&quot;)
+# plot the variation of stress score by menstrual phases
+stress_score_boxplot =
+  sleep_stress_df |&gt;
+  #filter(!is.na(study_interval) &amp; !is.na(phase)) |&gt;
+  filter(stress_score != 0)|&gt;
+    ggplot(aes(x = phase, y = stress_score, fill = phase))+
+  geom_violin(alpha = 0.5, width = 0.5)+
+  geom_boxplot(width = 0.2)+
+  labs(
+    x = &quot; &quot;,
+    y = &quot;Stress score&quot;
+  ) +
+  theme(legend.position = &quot;none&quot;)
+
+(timeinbed_plot|deep_sleep_plot)/
+(sleep_score_boxplot |stress_score_boxplot)</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><strong>View the stress and sleep score across menstrual cycle phases
+for each ethnicity</strong></p>
+<pre class="r"><code>sleep_stress_df |&gt;
+  group_by(phase, ethnicity) |&gt;
+  summarize(
+    mean_sleep_score = mean(sleep_score, na.rm = TRUE),
+    mean_stress_score = mean(stress_score, na.rm = TRUE),
+    .groups = &quot;drop&quot;
+  ) |&gt;
+  pivot_longer(
+    cols = starts_with(&quot;mean_&quot;),
+    names_to = &quot;metric&quot;,
+    values_to = &quot;value&quot;
+  ) |&gt;
+  drop_na()|&gt;
+  mutate(
+    metric = recode(metric,
+                    mean_sleep_score  = &quot;Sleep Score&quot;,
+                    mean_stress_score = &quot;Stress Score&quot;)
+  ) |&gt;
+  ggplot(aes(x = phase, y = value, color = ethnicity, group = ethnicity)) +
+    geom_line(size = 1) +
+    geom_point(size = 3) +
+    facet_grid(~ metric) +
+    labs(color = &quot;Ethnicity&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
+    labs(
+    title = &quot;stress and sleep score Across Menstrual Cycle Phases&quot;,
+    x = &quot;Menstrual Cycle Phase&quot;,
+    y = &quot;score&quot;
+  ) +
+    theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p>Our dataset are from two studies in two different times, year 2022
+and year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
+Therefore the assumptions of independence is violated so we cannot use
+statistical tests that required independence assumptions. Instead, we
+used generalized linear mixed effects model to evaluate the significant
+different of stress score and sleep score between menstrual phases.</p>
+<pre class="r"><code>m1 &lt;- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m1, effects = &quot;fixed&quot;)|&gt;
+  select(term, estimate, std.error,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">76.762</td>
+<td align="right">0.614</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">0.291</td>
+<td align="right">0.213</td>
+<td align="right">0.172</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.594</td>
+<td align="right">0.211</td>
+<td align="right">0.005</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.525</td>
+<td align="right">0.198</td>
+<td align="right">0.008</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>m2 &lt;- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
+tidy(m2, effects = &quot;fixed&quot;)|&gt;
+  select(term, estimate, std.error,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">77.436</td>
+<td align="right">0.709</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.037</td>
+<td align="right">0.283</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-1.342</td>
+<td align="right">0.281</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-1.126</td>
+<td align="right">0.263</td>
+<td align="right">0</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="modelling" class="section level1">
+<h1>Modelling</h1>
+<div id="hormone-and-symtoms-model" class="section level2">
+<h2>Hormone and symtoms model</h2>
+<div id="flow-volume-distribution-across-phases" class="section level3">
+<h3>Flow Volume Distribution Across Phases</h3>
+<p>To assess flow volume distribution patterns, we visualize flow volume
+variation across phases with violin plots.</p>
+<pre><code>## Warning: Removed 2567 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Groups with fewer than two datapoints have been dropped.
+## ℹ Set `drop = FALSE` to consider such groups for position adjustment
+##   purposes.</code></pre>
+<p><img src="report_ebw_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p>Luteal phase shows a right-skewed distribution, indicating most
+low-flow observations but a few high-flow days. Menstrual phase is
+narrow and tall, indicating consistently higher flow intensity.</p>
+</div>
+<div id="appetite-vs-estrogen" class="section level3">
+<h3>Appetite vs Estrogen</h3>
+<p>Explore the relationship between estrogen levels and appetite scores,
+accounting for repeated measures.</p>
+<pre><code>## Linear mixed model fit by REML. t-tests use Satterthwaite&#39;s method [
+## lmerModLmerTest]
+## Formula: appetite_score ~ estrogen + (1 | id)
+##    Data: hormone_symptoms
+## 
+## REML criterion at convergence: 7218.3
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.0223 -0.5805  0.0292  0.5269  3.8879 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 0.1722   0.4150  
+##  Residual             0.5272   0.7261  
+## Number of obs: 3215, groups:  id, 42
+## 
+## Fixed effects:
+##              Estimate Std. Error        df t value Pr(&gt;|t|)    
+## (Intercept) 2.897e+00  6.809e-02 4.769e+01  42.539   &lt;2e-16 ***
+## estrogen    1.137e-04  1.357e-04 3.212e+03   0.838    0.402    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##          (Intr)
+## estrogen -0.276</code></pre>
+<p>Random intercept variance (0.1746) indicates participant-specific
+baseline appetite differences. The fixed effect of estrogen is small
+(0.00013 per unit) and not significant (t = 0.869).</p>
+</div>
+<div id="stress-score-model" class="section level3">
+<h3>Stress score model</h3>
+<pre class="r"><code>#  model
+m4 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
+           timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
+tidy(m4, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
+  select(term, estimate, std.error, conf.low, conf.high,p.value) |&gt;
+  mutate(
+  significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;)) |&gt;
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="27%" />
+<col width="11%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="10%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">73.254</td>
+<td align="right">1.848</td>
+<td align="right">69.591</td>
+<td align="right">76.917</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">phasefollicular</td>
+<td align="right">-1.166</td>
+<td align="right">0.866</td>
+<td align="right">-2.869</td>
+<td align="right">0.536</td>
+<td align="right">0.179</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">phasefertility</td>
+<td align="right">-0.964</td>
+<td align="right">0.854</td>
+<td align="right">-2.643</td>
+<td align="right">0.714</td>
+<td align="right">0.259</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">phaseluteal</td>
+<td align="right">-0.840</td>
+<td align="right">0.753</td>
+<td align="right">-2.321</td>
+<td align="right">0.641</td>
+<td align="right">0.265</td>
+<td align="left">No</td>
+</tr>
+<tr class="odd">
+<td align="left">deep_sleep_in_minutes</td>
+<td align="right">0.032</td>
+<td align="right">0.016</td>
+<td align="right">0.001</td>
+<td align="right">0.063</td>
+<td align="right">0.043</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">timeinbed_mean</td>
+<td align="right">0.009</td>
+<td align="right">0.004</td>
+<td align="right">0.002</td>
+<td align="right">0.016</td>
+<td align="right">0.013</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">total_active_min</td>
+<td align="right">-0.009</td>
+<td align="right">0.008</td>
+<td align="right">-0.024</td>
+<td align="right">0.006</td>
+<td align="right">0.232</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left">moodswing_score</td>
+<td align="right">-0.199</td>
+<td align="right">0.255</td>
+<td align="right">-0.701</td>
+<td align="right">0.303</td>
+<td align="right">0.436</td>
+<td align="left">No</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="multimodel-modeling" class="section level3">
+<h3>Multimodel Modeling</h3>
+<p>This section leverages the same cleaned data set used in other parts
+of this analysis. For further simplification with regression, two new
+variables were created - <code>race_simplified</code>, which collapses
+specific ethnicity categories into broader racial groups (any with a
+count &lt; 3 was put into other if there was not an applicable category
+already). Additionally, for simplicity of running the regression
+focusing on solely menstrual symptoms, a binary variable reporting
+<code>menstruation</code> as “no” (0) or “yes” (1) was created.
+<code>merged_df_model</code> was created to easily run both demographic
+and daily data through a regression model.</p>
+<pre class="r"><code>#Symptom Model Table
+symptom_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-2.8740171</td>
+<td align="right">0.2617332</td>
+<td align="right">-10.9807146</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">fatigue_score</td>
+<td align="right">0.0828354</td>
+<td align="right">0.0393638</td>
+<td align="right">2.1043564</td>
+<td align="right">0.0353474</td>
+</tr>
+<tr class="odd">
+<td align="left">cramps_score</td>
+<td align="right">0.6793594</td>
+<td align="right">0.0390456</td>
+<td align="right">17.3991299</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">sleepissue_score</td>
+<td align="right">-0.0988170</td>
+<td align="right">0.0408318</td>
+<td align="right">-2.4200999</td>
+<td align="right">0.0155162</td>
+</tr>
+<tr class="odd">
+<td align="left">exerciselevel_score</td>
+<td align="right">-0.0361540</td>
+<td align="right">0.0448749</td>
+<td align="right">-0.8056623</td>
+<td align="right">0.4204376</td>
+</tr>
+<tr class="even">
+<td align="left">appetite_score</td>
+<td align="right">0.0213424</td>
+<td align="right">0.0543035</td>
+<td align="right">0.3930204</td>
+<td align="right">0.6943044</td>
+</tr>
+<tr class="odd">
+<td align="left">bloating_score</td>
+<td align="right">0.1999493</td>
+<td align="right">0.0455793</td>
+<td align="right">4.3868400</td>
+<td align="right">0.0000115</td>
+</tr>
+<tr class="even">
+<td align="left">moodswing_score</td>
+<td align="right">0.0239376</td>
+<td align="right">0.0396493</td>
+<td align="right">0.6037320</td>
+<td align="right">0.5460218</td>
+</tr>
+<tr class="odd">
+<td align="left">indigestion_score</td>
+<td align="right">0.0004687</td>
+<td align="right">0.0460565</td>
+<td align="right">0.0101775</td>
+<td align="right">0.9918797</td>
+</tr>
+<tr class="even">
+<td align="left">sorebreasts_score</td>
+<td align="right">0.1716191</td>
+<td align="right">0.0473758</td>
+<td align="right">3.6225016</td>
+<td align="right">0.0002918</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.7640327</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Hormone Model Table
+physiology_model_table</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-0.0847316</td>
+<td align="right">0.1118283</td>
+<td align="right">-0.7576941</td>
+<td align="right">0.4486341</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0107894</td>
+<td align="right">0.0006200</td>
+<td align="right">-17.4031832</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0399830</td>
+<td align="right">0.0076412</td>
+<td align="right">-5.2325618</td>
+<td align="right">0.0000002</td>
+</tr>
+<tr class="even">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.5473710</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>We ran a binomial regression between menstruation and self-reported
+symptoms. The results of our preliminary regression analysis show that
+menstruation was positively associated with <code>fatigue</code>,
+<code>cramps</code>, and <code>bloating</code>. There was a negative
+association between menstruation and reported <code>sleep issues</code>
+and <code>sore breasts</code> as well as measured <code>estrogen</code>
+and <code>luteinizing hormone (lh)</code>.</p>
+</div>
+</div>
+<div id="demographic-and-lifestyle-factors-and-symptoms"
+class="section level2">
+<h2>Demographic and Lifestyle Factors and Symptoms</h2>
+<div
+id="focusing-on-symptoms-that-were-reported-as-statistically-significant"
+class="section level4">
+<h4>Focusing on symptoms that were reported as statistically
+significant</h4>
+<pre class="r"><code>#Fatigue Model Table
+fatigue_model_table</code></pre>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="4%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-0.2604217</td>
+<td align="right">2.1466015</td>
+<td align="right">-0.1213181</td>
+<td align="right">189</td>
+<td align="right">0.9035679</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0002023</td>
+<td align="right">0.0026844</td>
+<td align="right">0.0753474</td>
+<td align="right">189</td>
+<td align="right">0.9400180</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0053336</td>
+<td align="right">0.0140101</td>
+<td align="right">0.3806943</td>
+<td align="right">189</td>
+<td align="right">0.7038576</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">-0.0375512</td>
+<td align="right">0.0183168</td>
+<td align="right">-2.0500948</td>
+<td align="right">189</td>
+<td align="right">0.0417360</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(education_abrv, ordered = FALSE)Some
+College</td>
+<td align="right">-0.3771962</td>
+<td align="right">0.3450844</td>
+<td align="right">-1.0930550</td>
+<td align="right">189</td>
+<td align="right">0.2757609</td>
+</tr>
+<tr class="even">
+<td align="left">factor(education_abrv, ordered = FALSE)Bachelors</td>
+<td align="right">-3.1453540</td>
+<td align="right">0.5981174</td>
+<td align="right">-5.2587573</td>
+<td align="right">189</td>
+<td align="right">0.0000004</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">0.3656198</td>
+<td align="right">0.4647150</td>
+<td align="right">0.7867614</td>
+<td align="right">189</td>
+<td align="right">0.4324069</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-4.4100955</td>
+<td align="right">1.0598369</td>
+<td align="right">-4.1611079</td>
+<td align="right">189</td>
+<td align="right">0.0000480</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.1534302</td>
+<td align="right">0.0631337</td>
+<td align="right">2.4302417</td>
+<td align="right">189</td>
+<td align="right">0.0160230</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.1646671</td>
+<td align="right">0.1115099</td>
+<td align="right">1.4767037</td>
+<td align="right">189</td>
+<td align="right">0.1414193</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0119495</td>
+<td align="right">0.0144548</td>
+<td align="right">-0.8266844</td>
+<td align="right">189</td>
+<td align="right">0.4094584</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">0.0003853</td>
+<td align="right">0.0009437</td>
+<td align="right">0.4083111</td>
+<td align="right">189</td>
+<td align="right">0.6835075</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">1.1950942</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Bloating Model Table
+bloating_model_table</code></pre>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="4%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.9844989</td>
+<td align="right">1.6288484</td>
+<td align="right">-1.2183448</td>
+<td align="right">185</td>
+<td align="right">0.2246444</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">-0.0020409</td>
+<td align="right">0.0020051</td>
+<td align="right">-1.0178424</td>
+<td align="right">185</td>
+<td align="right">0.3100821</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">-0.0077098</td>
+<td align="right">0.0104901</td>
+<td align="right">-0.7349610</td>
+<td align="right">185</td>
+<td align="right">0.4632939</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0195130</td>
+<td align="right">0.0143930</td>
+<td align="right">1.3557218</td>
+<td align="right">185</td>
+<td align="right">0.1768403</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(education_abrv, ordered = FALSE)Some
+College</td>
+<td align="right">0.0726202</td>
+<td align="right">0.2594352</td>
+<td align="right">0.2799167</td>
+<td align="right">185</td>
+<td align="right">0.7798542</td>
+</tr>
+<tr class="even">
+<td align="left">factor(education_abrv, ordered = FALSE)Bachelors</td>
+<td align="right">-1.4396730</td>
+<td align="right">0.4446797</td>
+<td align="right">-3.2375508</td>
+<td align="right">185</td>
+<td align="right">0.0014289</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-1.7936598</td>
+<td align="right">0.3571002</td>
+<td align="right">-5.0228473</td>
+<td align="right">185</td>
+<td align="right">0.0000012</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-3.1112942</td>
+<td align="right">0.8248872</td>
+<td align="right">-3.7717813</td>
+<td align="right">185</td>
+<td align="right">0.0002180</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.2388541</td>
+<td align="right">0.0488082</td>
+<td align="right">4.8937306</td>
+<td align="right">185</td>
+<td align="right">0.0000021</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">-0.0930152</td>
+<td align="right">0.0835520</td>
+<td align="right">-1.1132617</td>
+<td align="right">185</td>
+<td align="right">0.2670405</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">0.0099888</td>
+<td align="right">0.0107001</td>
+<td align="right">0.9335203</td>
+<td align="right">185</td>
+<td align="right">0.3517682</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0014476</td>
+<td align="right">0.0007225</td>
+<td align="right">-2.0036441</td>
+<td align="right">185</td>
+<td align="right">0.0465674</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.8802719</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Sleep Issues Model Table
+sleepissues_model_table</code></pre>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="4%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-2.9237310</td>
+<td align="right">2.0862331</td>
+<td align="right">-1.4014402</td>
+<td align="right">185</td>
+<td align="right">0.1627579</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0031274</td>
+<td align="right">0.0025681</td>
+<td align="right">1.2177770</td>
+<td align="right">185</td>
+<td align="right">0.2248597</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0005158</td>
+<td align="right">0.0134357</td>
+<td align="right">0.0383934</td>
+<td align="right">185</td>
+<td align="right">0.9694154</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0019146</td>
+<td align="right">0.0184347</td>
+<td align="right">0.1038615</td>
+<td align="right">185</td>
+<td align="right">0.9173918</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(education_abrv, ordered = FALSE)Some
+College</td>
+<td align="right">-0.1288965</td>
+<td align="right">0.3322853</td>
+<td align="right">-0.3879092</td>
+<td align="right">185</td>
+<td align="right">0.6985292</td>
+</tr>
+<tr class="even">
+<td align="left">factor(education_abrv, ordered = FALSE)Bachelors</td>
+<td align="right">-2.1971825</td>
+<td align="right">0.5695469</td>
+<td align="right">-3.8577729</td>
+<td align="right">185</td>
+<td align="right">0.0001579</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-0.2658462</td>
+<td align="right">0.4573748</td>
+<td align="right">-0.5812436</td>
+<td align="right">185</td>
+<td align="right">0.5617837</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-5.5682087</td>
+<td align="right">1.0565177</td>
+<td align="right">-5.2703412</td>
+<td align="right">185</td>
+<td align="right">0.0000004</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.2657641</td>
+<td align="right">0.0625136</td>
+<td align="right">4.2512983</td>
+<td align="right">185</td>
+<td align="right">0.0000337</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">-0.0138125</td>
+<td align="right">0.1070136</td>
+<td align="right">-0.1290722</td>
+<td align="right">185</td>
+<td align="right">0.8974408</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0240233</td>
+<td align="right">0.0137048</td>
+<td align="right">-1.7529140</td>
+<td align="right">185</td>
+<td align="right">0.0812732</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">0.0007335</td>
+<td align="right">0.0009254</td>
+<td align="right">0.7926353</td>
+<td align="right">185</td>
+<td align="right">0.4290056</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">1.1274544</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Sore Breasts Model Table
+sorebreasts_model_table</code></pre>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="4%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-3.8604258</td>
+<td align="right">1.6435964</td>
+<td align="right">-2.3487675</td>
+<td align="right">185</td>
+<td align="right">0.0198912</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">-0.0007838</td>
+<td align="right">0.0020232</td>
+<td align="right">-0.3874223</td>
+<td align="right">185</td>
+<td align="right">0.6988889</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">-0.0031126</td>
+<td align="right">0.0105851</td>
+<td align="right">-0.2940582</td>
+<td align="right">185</td>
+<td align="right">0.7690431</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">0.0050235</td>
+<td align="right">0.0145234</td>
+<td align="right">0.3458886</td>
+<td align="right">185</td>
+<td align="right">0.7298194</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(education_abrv, ordered = FALSE)Some
+College</td>
+<td align="right">-0.2022219</td>
+<td align="right">0.2617842</td>
+<td align="right">-0.7724754</td>
+<td align="right">185</td>
+<td align="right">0.4408187</td>
+</tr>
+<tr class="even">
+<td align="left">factor(education_abrv, ordered = FALSE)Bachelors</td>
+<td align="right">0.0043528</td>
+<td align="right">0.4487059</td>
+<td align="right">0.0097007</td>
+<td align="right">185</td>
+<td align="right">0.9922705</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">0.0024793</td>
+<td align="right">0.3603335</td>
+<td align="right">0.0068805</td>
+<td align="right">185</td>
+<td align="right">0.9945176</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-1.0957357</td>
+<td align="right">0.8323560</td>
+<td align="right">-1.3164268</td>
+<td align="right">185</td>
+<td align="right">0.1896594</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.0370000</td>
+<td align="right">0.0492501</td>
+<td align="right">0.7512671</td>
+<td align="right">185</td>
+<td align="right">0.4534465</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.1923219</td>
+<td align="right">0.0843085</td>
+<td align="right">2.2811687</td>
+<td align="right">185</td>
+<td align="right">0.0236779</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0159611</td>
+<td align="right">0.0107970</td>
+<td align="right">-1.4782900</td>
+<td align="right">185</td>
+<td align="right">0.1410307</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0014135</td>
+<td align="right">0.0007290</td>
+<td align="right">-1.9388633</td>
+<td align="right">185</td>
+<td align="right">0.0540395</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.8882421</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Cramps Model Table
+cramps_model_table</code></pre>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="4%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">df</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.3819770</td>
+<td align="right">1.6774184</td>
+<td align="right">-0.8238714</td>
+<td align="right">185</td>
+<td align="right">0.4110735</td>
+</tr>
+<tr class="even">
+<td align="left">total_active_min</td>
+<td align="right">0.0032695</td>
+<td align="right">0.0020649</td>
+<td align="right">1.5834046</td>
+<td align="right">185</td>
+<td align="right">0.1150373</td>
+</tr>
+<tr class="odd">
+<td align="left">sleep_score</td>
+<td align="right">0.0015470</td>
+<td align="right">0.0108029</td>
+<td align="right">0.1432001</td>
+<td align="right">185</td>
+<td align="right">0.8862880</td>
+</tr>
+<tr class="even">
+<td align="left">stress_score</td>
+<td align="right">-0.0096558</td>
+<td align="right">0.0148222</td>
+<td align="right">-0.6514380</td>
+<td align="right">185</td>
+<td align="right">0.5155722</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(education_abrv, ordered = FALSE)Some
+College</td>
+<td align="right">-0.7183578</td>
+<td align="right">0.2671713</td>
+<td align="right">-2.6887541</td>
+<td align="right">185</td>
+<td align="right">0.0078270</td>
+</tr>
+<tr class="even">
+<td align="left">factor(education_abrv, ordered = FALSE)Bachelors</td>
+<td align="right">-0.8894520</td>
+<td align="right">0.4579394</td>
+<td align="right">-1.9422919</td>
+<td align="right">185</td>
+<td align="right">0.0536201</td>
+</tr>
+<tr class="odd">
+<td align="left">race_categoryWhite</td>
+<td align="right">-0.4411321</td>
+<td align="right">0.3677484</td>
+<td align="right">-1.1995486</td>
+<td align="right">185</td>
+<td align="right">0.2318487</td>
+</tr>
+<tr class="even">
+<td align="left">race_categoryOther</td>
+<td align="right">-1.4300749</td>
+<td align="right">0.8494843</td>
+<td align="right">-1.6834625</td>
+<td align="right">185</td>
+<td align="right">0.0939723</td>
+</tr>
+<tr class="odd">
+<td align="left">bmi</td>
+<td align="right">0.0870362</td>
+<td align="right">0.0502636</td>
+<td align="right">1.7315966</td>
+<td align="right">185</td>
+<td align="right">0.0850124</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.0651615</td>
+<td align="right">0.0860434</td>
+<td align="right">0.7573094</td>
+<td align="right">185</td>
+<td align="right">0.4498280</td>
+</tr>
+<tr class="odd">
+<td align="left">lh</td>
+<td align="right">-0.0035349</td>
+<td align="right">0.0110192</td>
+<td align="right">-0.3207978</td>
+<td align="right">185</td>
+<td align="right">0.7487257</td>
+</tr>
+<tr class="even">
+<td align="left">estrogen</td>
+<td align="right">-0.0000529</td>
+<td align="right">0.0007440</td>
+<td align="right">-0.0710404</td>
+<td align="right">185</td>
+<td align="right">0.9434423</td>
+</tr>
+<tr class="odd">
+<td align="left">sd__(Intercept)</td>
+<td align="right">0.0000000</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">sd__Observation</td>
+<td align="right">0.9065204</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>We found that self-reported fatigue was negatively associated (less
+tired) with having the educational attainment of a Bachelor’s degree. We
+also found fatigue was negatively associated with being in the “Other”
+racial category, which was a broad category comprising of hispanic,
+african, and middle eastern participants. (p &lt; 0.001) There was also
+a correlation between higher BMI and greater fatigue (p &lt; 0.05), as
+well as higher stress_score and less fatigue (p &lt; 0.05).</p>
+<p>We found that bloating was negatively associated (less bloated) with
+Race being white (p &lt; 0.001) or other (p &lt; 0.001). We also found
+that bloating was positively associated (more bloated) with educational
+attainment of high school (p &lt; 0.01) or college (p &lt; 0.001).
+Furthermore, we found bloating was positively associated with BMI (p
+&lt; 0.001) and negatively associated with estrogen (p &lt; 0.05).</p>
+<p>We found sleep issues to be negatively associated (fewer sleep
+issues) with an educational attainment of a bachelor’s degree (p &lt;
+0.001). Furthermore, we found that there was a positive association
+between higher BMI and reported sleep issues (p &lt; 0.001). We found
+sleep issues to be negatively associated with being categorized in the
+“other” race category (p &lt; 0.001).</p>
+<p>We found sore breasts to be only positively associated (increased
+sore breasts severity) with older age (p &lt; 0.01). We found cramps to
+be negatively associated (decreased cramp severity) with the educational
+attainment of some college (p &lt; 0.01).</p>
+</div>
+</div>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+<div id="data-handling" class="section level3">
+<h3>Data Handling</h3>
+<ul>
+<li>data quality issues - take hormones &amp; self-reported as an
+example</li>
+</ul>
+<p>regardless the most common missing data (due to self-report), 1)
+integer values in categorical variables; 2) inconsistent likert scale
+(‘very low/little’ vs. ‘very low’) &gt;&gt; give us the tip when we run
+a study to collect different likert scale data, collect them at the same
+scale for easy and consistent future data analyses.</p>
+<ul>
+<li>data entry issues - take sleep.csv as an example</li>
+</ul>
+<p>Yue (The observed hormonal, emotional, and physiological patterns
+across the menstrual cycle are highly consistent with established
+reproductive endocrinology. Estrogen gradually increases through the
+follicular phase, peaks during the fertility (ovulatory) phase, and
+remains at moderate levels in the luteal phase, while luteinizing
+hormone (LH) exhibits a sharp surge at ovulation to trigger follicle
+rupture and ovum release. Both hormones reach their lowest levels during
+menstruation, reflecting the endocrine “reset” following corpus luteum
+regression. Corresponding to these hormonal dynamics, mood swings show
+clear phase-dependent variation. The distribution of mood swing severity
+is most pronounced during menstruation, with average intensity highest
+in the menstrual phase (1.85) and lowest in the luteal phase (1.41),
+with intermediate levels in the follicular and fertility phases. This
+elevated emotional symptom burden during menstruation is biologically
+plausible, as the abrupt withdrawal of both estrogen and progesterone is
+known to disrupt serotonergic signaling and emotional regulation. Linear
+mixed-effects models further confirm significant phase-dependent effects
+on both mood swings and fatigue, with the largest increases occurring
+during menstruation and more moderate elevations during the luteal
+phase. The substantial random intercept variance indicates strong
+inter-individual differences in baseline symptom severity, reinforcing
+the necessity of accounting for repeated measures within
+participants.</p>
+<p>Flow volume patterns also followed classic physiological
+expectations. The menstrual phase exhibited the highest and most
+consistent flow intensity (mean = 2.38), reflecting active endometrial
+shedding. In contrast, the luteal phase showed minimal flow (mean =
+0.03) with a right-skewed distribution, indicating that most
+observations reflect very low flow with only occasional spotting.
+Fertility and follicular phases also remained low (0.07 and 0.23,
+respectively), consistent with the uterine lining being preserved
+outside of menstruation. These results strongly support the biological
+validity of the flow measurements.</p>
+<p>Appetite demonstrated more subtle cycle-related variation, with the
+highest average levels occurring during the fertility phase (2.96), when
+estrogen is maximized, and the lowest during the follicular phase
+(2.85), with relatively stable values during luteal (2.95) and menstrual
+(2.90) phases. This suggests that appetite may be modestly influenced by
+hormonal elevation near ovulation. However, linear mixed-effects
+modeling revealed that estrogen alone was not a statistically
+significant predictor of appetite after accounting for repeated
+measures, with a very small effect size and a non-significant t-value
+(0.869). The random intercept variance indicates that baseline
+individual differences in appetite explain more variability than
+short-term hormonal fluctuations. Together, these findings suggest that
+while appetite may exhibit weak phase-related trends, it is regulated by
+a complex interplay of hormonal, behavioral, and individual-specific
+factors, and may be better modeled using multiple hormonal predictors
+such as LHalongside phase.)</p>
+</div>
+<div id="multimodal-discussion" class="section level3">
+<h3>Multimodal discussion</h3>
+<p>Emily We found several associations between menstrual symptoms and
+lifestyle factors, biometric measurements, and demographic
+characteristics. Interestingly, lifestyle characteristics were
+consistently among the most significant results in our models,
+particularly race, education, and BMI.</p>
+<p>Interestingly, some self-reported that might be expected to be linked
+with related quantitative variables were not positively associated. For
+example, self-reported fatigue and self-reported sleep issues were not
+significantly associated with the quantitative variable sleep score that
+aggregated bio metric data on sleep quality. This could suggest that
+menstruation creates feelings of fatigue that do not reflect true sleep
+quality. Similarly, minutes of activity was not positively associated
+with the reduction of any symptoms in our mixed-modal results.</p>
+</div>
+<div id="limitation" class="section level2">
+<h2>Limitation</h2>
+<p>Yue(Several limitations should be considered when interpreting these
+findings. First, the dataset relies on self-reported symptom scores,
+which may be subject to recall bias or subjective interpretation.
+Second, while repeated measures are accounted for using linear mixed
+models, the sample size for some phases may be limited, reducing
+statistical power to detect subtle effects. Finally, other biological
+and lifestyle factors—such as stress, sleep, diet, and physical
+activity—were not controlled for, which could influence mood, appetite,
+and fatigue. Therefore, the results should be interpreted as suggestive
+of phase-related trends rather than definitive causal effects.)</p>
+<p>Emily(Limitations to this data set as a whole also apply to the
+significance and generalization of this regression analysis. Namely, the
+small sample size is a limitation and could be exaggerating the
+influence of some demographic factors on symptoms. Furthermore, with the
+population being largely comprised of young, white or Asian
+participants, these results may not be generalizable to a more diverse
+population.)</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

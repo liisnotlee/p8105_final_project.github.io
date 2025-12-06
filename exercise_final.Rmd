@@ -1,9 +1,9 @@
 ---
-title: "EXERCISE & MENSTRUAL HEALTH"
+title: "Exercise"
 output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: false
+    toc_float: false
 ---
 
 The following exploratory analysis investigates the relationship between objectively measured exercise (steps, active minutes, calories) metrics and self-reported menstrual symptoms across different menstrual cycle phases. We use data from both study intervals (2022 and 2024) to examine whether physical activity is associated with symptom severity.

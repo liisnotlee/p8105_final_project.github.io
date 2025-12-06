@@ -11,11 +11,11 @@ navbar:
     - text: "Lifestyle Factors Analyses"
       menu:
       - text: "Hormone & Symptoms"
-        href: Hormone_symtoms_final.html
+        href: hormone_symtoms_final.html
       - text: "Sleep & Stress"
-        href: sleep_stress_khue.html
+        href: sleep_stress_final.html
       - text: "Exercise"
-        href: EXERCISE_ANU_FINAL.html
+        href: exercise_final.html
     - text: "Proposal"
       href: p8105_final_project_proposal.html
   right:

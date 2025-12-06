@@ -22,6 +22,7 @@ The original dataset contains 23 structured tables organized by signal category.
     -   `stress_score.csv`: daily Stress Management Score from those who have access to the Stress Management experience
     -   `sleep.csv`: sleep session logs including timestamps, durations, and quality metrics collected by Fitbit
     -   `sleep_score.csv`: daily sleep score breakdowns provided by Fitbit, summarizing overall sleep quality based on multiple contributing factors
+    -  `exercise.csv`: individual logged exercise sessions collected by Fitbit
 
 ------------------------------------------------------------------------
 
@@ -95,7 +96,7 @@ sanity_check <- function(df){
 
 The `subject_info` dataframe contains participants demographics data from `subject_info.csv` and `height_and_weight.csv`, as well as participants study enrollment year (this piece of information is from `hormones_and_selfreport.csv`).
 
-It contains a total of 62 observations of 18 variables. Some key variables are the following:
+It contains a total of 62 observations of 19 variables. Some key variables are the following:
 
 -   `id`: participant's unique identifier
 -   Age relevant variables: `birth_year` and `age_of_first_menarche`
