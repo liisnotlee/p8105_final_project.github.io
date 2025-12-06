@@ -1,5 +1,5 @@
 ---
-title: "HORMONE & SYMPTOMS: EXPLORATORY DATA ANALYSIS"
+title: "HORMONE & SYMPTOMS EDA"
 output:
   html_document:
     code_folding: hide 

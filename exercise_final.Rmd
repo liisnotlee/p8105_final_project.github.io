@@ -1,5 +1,5 @@
 ---
-title: "Exercise Exploratory Data Analysis"
+title: "EXERCISE EDA"
 ---
 <br>
 

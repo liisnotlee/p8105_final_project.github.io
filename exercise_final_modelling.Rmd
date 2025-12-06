@@ -1,6 +1,7 @@
 ---
-title: "Excercise Statistical Modelling"
+title: "EXERCISE STATISTICAL MODELLING"
 ---
+
 ```{r, include = FALSE}
 # Loading libraries
 library(tidyverse)
@@ -20,7 +21,6 @@ exercise_analysis = all_daily_data
 
 ```
 
-
 <br>
 
 This analysis investigates whether daily physical activity predicts menstrual symptom severity. We fit linear mixed-effects models for 10 symptoms, using active exercise minutes as the primary predictor while controlling for menstrual cycle phase.
@@ -33,10 +33,10 @@ We used linear mixed-effects models to test associations between daily physical 
 
 For each of 10 symptoms, we fit models with:
 
-*   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
-*   **Predictor**: Total active exercise minutes per day
-*   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
-*   **Random effects**: Random intercepts for participants (1|id)
+-   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
+-   **Predictor**: Total active exercise minutes per day
+-   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+-   **Random effects**: Random intercepts for participants (1\|id)
 
 The random intercept for participant ID accounts for repeated measures within individuals across both days and study years, including the 20 participants (47.6%) who contributed data in both 2022 and 2024.
 
@@ -45,6 +45,7 @@ Models were fit using the lme4 package in R with REML = FALSE. Statistical signi
 <br>
 
 ## Results
+
 ```{r, results = 'hide'}
 # Model 1: Exercise → cramps
 model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
@@ -140,11 +141,11 @@ kable(results_summary,
 
 Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 10 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0027, SE = 0.0014, p = 0.0493).
 
-For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
+For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale.
 
 The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were insignificant with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
 
-Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = 0, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
+Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = 0, p = 0.9647). The point estimate had wide confidence intervals indicating no evidence of either beneficial or harmful effects.
 
 <br>
 
@@ -174,4 +175,5 @@ qqline(ranef(model_cramps)$id[,1], col = "red", lwd = 2)
 
 par(mfrow = c(1, 1))
 ```
+
 Only the fatigue model showed a statistically significant association, so diagnostic checks were conducted for this model only. The residual vs fitted plot shows diagonal banding typical of ordinal outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying linear models to Likert-scale data. The Q-Q plots indicate that residuals and random effects are approximately normally distributed, supporting the use of mixed-effects models.

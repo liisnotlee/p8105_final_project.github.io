@@ -1,5 +1,5 @@
 ---
-title: "HORMONES & SYMPTOMS: STATISTICAL MODELLING"
+title: "HORMONES & SYMPTOMS STATISTICAL MODELLING"
 output:
   html_document:
     code_folding: hide 

@@ -1,5 +1,5 @@
 ---
-title: "SLEEP & STRESS: STATISTICAL MODELLING"
+title: "SLEEP & STRESS STATISTICAL MODELLING"
 output:
   html_document:
     code_folding: hide 

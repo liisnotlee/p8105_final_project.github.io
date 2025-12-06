@@ -1,8 +1,0 @@
----
-title: "About Us"
----
-
-# Team
-
-- Muying Li
-- Yue Zhao

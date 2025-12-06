@@ -49,32 +49,32 @@ TODO youtube link
 ![](img/menstrual-pants.png)
 
 ### Muying Li, MS, RD
-PhD Candidate, Biomedical Informatics | Vagelos College of Physicians and Surgeons 
+PhD Student, Biomedical Informatics | Vagelos College of Physicians and Surgeons 
 :::
 ::: {.col-md-2}
 
 ![](img/menstrual-cup.png)
 
 ### Emily Brynn Weaver
-PhD Candidate, Environmental Health Sciences | Mailman School of Public Health
+PhD Student, Environmental Health Sciences | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/calendar.png)
 
 ### Yue Zhao
-MS Candidate, Epidemiology | Mailman School of Public Health
+MS Student, Epidemiology | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/medical-checkup.png)
 
 ### Anu Singh
-MS Candidate, Epidemiology | Mailman School of Public Health
+MS Student, Epidemiology | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/pad.png)
 
 ### Khue Nhu Nguyen
-MS Candidate, Biostatistics | Mailman School of Public Health
+MS Student, Biostatistics | Mailman School of Public Health
 :::
 :::
 

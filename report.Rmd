@@ -3,9 +3,6 @@ title: "REPORT"
 output:
   html_document:
     code_folding: hide 
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
 
 ```{r, message=FALSE, warning = FALSE}
@@ -88,6 +85,8 @@ Public health researchers have documented the critical role of menstrual health 
 
 # Data
 
+<br>
+
 ## Data Sources
 
 We utilized the inclusive, multimodal, longitudinal, and de-identified
@@ -160,6 +159,8 @@ and `study_interval`.
 
 ------------------------------------------------------------------------
 ## Dataframes
+
+<br>
 
 ### `subject_info`: Subject-Relevant Data
 
@@ -1875,6 +1876,8 @@ symptom_model = glmer(
 
 summary(symptom_model)
 symptom_model_table = tidy(symptom_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 
@@ -1884,6 +1887,8 @@ physiology_model = glmer(
 
 summary(physiology_model)
 physiology_model_table = tidy(physiology_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 ```
@@ -1901,6 +1906,8 @@ symptom_model_table
 #Hormone Model Table
 physiology_model_table
 ```
+
+<br>
 
 ### Demographic and Lifestyle Factors and Symptoms
 
@@ -1925,11 +1932,13 @@ fatigue_model = lmer(
 
 #summary(fatigue_model)
 tidy(fatigue_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3) 
 ```
 
-//TODO adding summary for this table
+There is no significant associates found between demographic, lifestyle, or hormonal factors with cramps severity (all p > 0.05).
 
 *Effects of Demographics and Lifestyle Factors on Cramps*
 ```{r, message=FALSE}
@@ -1939,6 +1948,8 @@ cramps_model = lmer(
 
 #summary(cramps_model)
 tidy(cramps_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 ```
@@ -1959,6 +1970,8 @@ bloating_model = lmer(
 
 #summary(bloating_model)
 tidy(bloating_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 ```
@@ -1979,6 +1992,8 @@ sleepissues_model = lmer(
 
 #summary(sleepissues_model)
 tidy(sleepissues_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 ```
@@ -1995,6 +2010,8 @@ sorebreasts_model = lmer(
 
 #summary(sorebreasts_model)
 tidy(sorebreasts_model) %>%
+  mutate(
+  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
 ```
@@ -2035,7 +2052,7 @@ We found several associations between menstrual symptoms and lifestyle factors, 
 
 Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Similarly, minutes of activity was not positively associated with the reduction of any symptoms in our mixed-modal results. 
 
-
+<br>
 
 ## Limitation
 
@@ -2047,7 +2064,7 @@ Second, the small sample size is a limitation and could be exaggerating the infl
 
 Finally, substantial individual heterogeneity likely exists in both symptom expression and cycle-related physiological responses; population-level models may therefore obscure meaningful subgroup or person-specific patterns. As a result, these findings should be viewed as indicative of phase-related trends rather than definitive causal effects.
 
-
+<br>
 # References
 1. Cooper, Poppy Alexandra, Emily R. Boniface, Blair G. Darney, et al. “Menstrual Cycle Phase and Its Association with COVID-19 Vaccine Side Effects and Subsequent Infection: A Study of Period Tracking App Users.” Preprint, Sexual and Reproductive Health, November 30, 2025. [Link](https://doi.org/10.1101/2025.11.26.25341088)
 2. Goodale, Brianna Mae, Mohaned Shilaih, Lisa Falco, Franziska Dammeier, Györgyi Hamvas, and Brigitte Leeners. “Wearable Sensors Reveal Menses-Driven Changes in Physiology and Enable Prediction of the Fertile Window: Observational Study.” Journal of Medical Internet Research 21, no. 4 (2019): e13404. [Link](https://doi.org/10.2196/13404)

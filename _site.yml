@@ -11,7 +11,7 @@ navbar:
     - text: "Exploratory Data Analyses"
       menu:
       - text: "Hormone & Symptoms"
-        href: Hormone_symtoms_final.html
+        href: hormone_symtoms_final.html
       - text: "Sleep & Stress"
         href: sleep_stress_final.html
       - text: "Exercise"
@@ -19,7 +19,7 @@ navbar:
     - text: "Statistical Modelling"
       menu:
       - text: "Hormone & Symptoms"
-        href: Hormone_symptoms_final_modelling.html
+        href: hormone_symptoms_final_modelling.html
       - text: "Sleep & Stress"
         href: sleep_stress_final_modelling.html
       - text: "Exercise"
@@ -34,7 +34,7 @@ navbar:
 output:
   html_document:
     theme: readable
-    code_folding: show
+    code_folding: hide
     toc: true
     toc_float: true
     
