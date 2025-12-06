@@ -1,8 +1,5 @@
 ---
 title: "MULTIVARIATE MODELLING"
-output:
-  html_document:
-    code_folding: hide 
 ---
 
 This section leverages the same cleaned data set used in other parts of this analysis. For further simplification with regression, two new variables were created - `race_simplified`, which collapses specific ethnicity categories into broader racial groups (any with a count < 3 was put into other if there was not an applicable category already). Additionally, for simplicity of running the regression focusing on solely menstrual symptoms, a binary variable reporting `menstruation` as "no" (0) or "yes" (1) was created. `merged_df_model` was created to easily run both demographic and daily data through a regression model. 

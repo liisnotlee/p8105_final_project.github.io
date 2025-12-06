@@ -1,8 +1,5 @@
 ---
-title: "EXCERCISE: STATISTICAL MODELLING"
-output:
-  html_document:
-    code_folding: hide 
+title: "Excercise Statistical Modelling"
 ---
 ```{r, include = FALSE}
 # Loading libraries
@@ -15,6 +12,14 @@ library(kableExtra)
 library(patchwork)
 library(scales)
 ```
+
+```{r, message=FALSE}
+all_daily_data = read.csv("./clean_data/all_daily_data.csv") |> 
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+exercise_analysis = all_daily_data
+
+```
+
 
 <br>
 
