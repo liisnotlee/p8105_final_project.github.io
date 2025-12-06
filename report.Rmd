@@ -562,8 +562,8 @@ The average age of menarche was 11.9, though some participants reported first me
 ### Age of first menarche
 
 ```{r, include=FALSE}
-menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche)) +
-  geom_boxplot(fill = "cornflowerblue") +
+menarche_plot = ggplot(subject_info, aes(x = "", y = age_of_first_menarche, fill="Menarche")) +
+  geom_boxplot(show.legend = FALSE) +
   labs(title = "Age of Menarche",
     y = "Age (years)",
     x = "") +
@@ -607,16 +607,16 @@ bmi_all <- subject_info |>
   )
 bmi_study_n <- subject_info |> 
   filter(!is.na(bmi)) |> 
-  count(year, name = "n")
+  count(study_interval, name = "n")
 
 bmi_by_study <- subject_info |> 
   filter(!is.na(bmi)) |> 
-  ggplot(aes(x = factor(year), y = bmi, fill = factor(year))) +
+  ggplot(aes(x = factor(study_interval), y = bmi, fill = factor(study_interval))) +
   geom_boxplot() +
   geom_text(
     data = bmi_study_n,
     aes(
-      x = factor(year),
+      x = factor(study_interval),
       y = 45,
       label = paste0("n = ", n)
     )
