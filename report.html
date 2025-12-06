@@ -461,21 +461,30 @@ concern.</p>
 </div>
 <div id="related-work" class="section level1">
 <h1>Related Work</h1>
-<p>Our project is inspired by new and upcoming research examining how
-lifestyle factors influence menstrual health and the emerging use of
-wearables in this space.</p>
-<p>Studies have established that short sleep duration and both sedentary
-and vigorous physical activity can contribute to the risk of developing
-menstrual disorders <a
-href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10393940/">(PubMed
-Central)</a>, while poorer sleep quality in the premenstrual phase and
-during menstruation is common in women with premenstrual symptoms or
-painful cramps <a
-href="https://pubmed.ncbi.nlm.nih.gov/30098748/">(PubMed)</a>. Regarding
-exercise, it has been found that exercise performed for about 45 to 60
-minutes, three times per week or more, may provide a clinically
-significant reduction in menstrual pain intensity <a
-href="https://pubmed.ncbi.nlm.nih.gov/31538328/">(PubMed)</a>.</p>
+<p>Public health researchers have documented the critical role of
+menstrual health as a vital health indicator, as well as examined the
+way that lifestyle factors and day-to-day activity affect menstruation.
+(Houghton, 2024). A growing body of literature has documented the
+association of lifestyle factors and exposures on menstrual health, as
+well as leveraged the proliferation of technology designed to track
+health symptoms, including smartphone applications or wearable devices
+(watches, rings) or smartphone applications. Several studies have been
+conducted on the use of menstrual cycle tracking applications and/pr
+wearable devices, collecting a range of data to better understand
+menstrual health in young adults. Shea et al. 2023 combined biometric
+with self-reported menstrual cycle symptom analysis using the app clue.
+Gibson et al. 2022 utilized survey data on menstruation and COVID-19
+incidence/vaccination, as well as physiologic data tracked in the app
+clue as well as physiologic data tracked in the apple health app; Cooper
+et al. 2025 conducted similar research, using the app clue. Li et
+al. 2023 relied on data collected by the apple health app, and found
+that menstrual cycle variability was significantly different for white
+and Asian participants, as well as those with a higher BMI. Lyzwinski et
+al 2024 and Goodale et al 2019 leveraged wearables data to track
+fertility using menstrual cycle and biometric data. The mcPHASES dataset
+we utilize combines self-reported symptom data as well as biometric
+tracking via wearable devices, combining two forms of better
+understanding menstrual health symptoms.</p>
 <p><br></p>
 </div>
 <div id="initial-questions" class="section level1">
@@ -581,6 +590,9 @@ stress score, daily exercise data.</li>
 Besides <code>subejct_info</code>, other dataframes can be further
 linked by <code>day_in_study</code> and <code>study_interval</code>.</p>
 <hr />
+</div>
+<div id="dataframes" class="section level2">
+<h2>Dataframes</h2>
 <div id="subject_info-subject-relevant-data" class="section level3">
 <h3><code>subject_info</code>: Subject-Relevant Data</h3>
 <p>The <code>subject_info</code> dataframe contains participants
@@ -995,23 +1007,23 @@ session or if both stress and sleep scores are present.</p>
 <div id="participant-characteristics" class="section level2">
 <h2>Participant Characteristics</h2>
 <pre class="r"><code>summary_table_gt</code></pre>
-<div id="ifkvzbohdw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ifkvzbohdw table {
+<div id="cyxotgmflc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cyxotgmflc table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ifkvzbohdw thead, #ifkvzbohdw tbody, #ifkvzbohdw tfoot, #ifkvzbohdw tr, #ifkvzbohdw td, #ifkvzbohdw th {
+#cyxotgmflc thead, #cyxotgmflc tbody, #cyxotgmflc tfoot, #cyxotgmflc tr, #cyxotgmflc td, #cyxotgmflc th {
   border-style: none;
 }
 
-#ifkvzbohdw p {
+#cyxotgmflc p {
   margin: 0;
   padding: 0;
 }
 
-#ifkvzbohdw .gt_table {
+#cyxotgmflc .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1037,12 +1049,12 @@ session or if both stress and sleep scores are present.</p>
   border-left-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_caption {
+#cyxotgmflc .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ifkvzbohdw .gt_title {
+#cyxotgmflc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1054,7 +1066,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-width: 0;
 }
 
-#ifkvzbohdw .gt_subtitle {
+#cyxotgmflc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1066,7 +1078,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-width: 0;
 }
 
-#ifkvzbohdw .gt_heading {
+#cyxotgmflc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1078,13 +1090,13 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_bottom_border {
+#cyxotgmflc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_col_headings {
+#cyxotgmflc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1099,7 +1111,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_col_heading {
+#cyxotgmflc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1119,7 +1131,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#ifkvzbohdw .gt_column_spanner_outer {
+#cyxotgmflc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1131,15 +1143,15 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 4px;
 }
 
-#ifkvzbohdw .gt_column_spanner_outer:first-child {
+#cyxotgmflc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ifkvzbohdw .gt_column_spanner_outer:last-child {
+#cyxotgmflc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ifkvzbohdw .gt_column_spanner {
+#cyxotgmflc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1151,11 +1163,11 @@ session or if both stress and sleep scores are present.</p>
   width: 100%;
 }
 
-#ifkvzbohdw .gt_spanner_row {
+#cyxotgmflc .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ifkvzbohdw .gt_group_heading {
+#cyxotgmflc .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1181,7 +1193,7 @@ session or if both stress and sleep scores are present.</p>
   text-align: left;
 }
 
-#ifkvzbohdw .gt_empty_group_heading {
+#cyxotgmflc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1196,15 +1208,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: middle;
 }
 
-#ifkvzbohdw .gt_from_md > :first-child {
+#cyxotgmflc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ifkvzbohdw .gt_from_md > :last-child {
+#cyxotgmflc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ifkvzbohdw .gt_row {
+#cyxotgmflc .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -1223,7 +1235,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#ifkvzbohdw .gt_stub {
+#cyxotgmflc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1236,7 +1248,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#ifkvzbohdw .gt_stub_row_group {
+#cyxotgmflc .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1250,15 +1262,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: top;
 }
 
-#ifkvzbohdw .gt_row_group_first td {
+#cyxotgmflc .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ifkvzbohdw .gt_row_group_first th {
+#cyxotgmflc .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ifkvzbohdw .gt_summary_row {
+#cyxotgmflc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1268,16 +1280,16 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#ifkvzbohdw .gt_first_summary_row {
+#cyxotgmflc .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_first_summary_row.thick {
+#cyxotgmflc .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ifkvzbohdw .gt_last_summary_row {
+#cyxotgmflc .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1287,7 +1299,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_grand_summary_row {
+#cyxotgmflc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1297,7 +1309,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#ifkvzbohdw .gt_first_grand_summary_row {
+#cyxotgmflc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1307,7 +1319,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_last_grand_summary_row_top {
+#cyxotgmflc .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1317,11 +1329,11 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_striped {
+#cyxotgmflc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ifkvzbohdw .gt_table_body {
+#cyxotgmflc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1330,7 +1342,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_footnotes {
+#cyxotgmflc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1344,7 +1356,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_footnote {
+#cyxotgmflc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1353,7 +1365,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#ifkvzbohdw .gt_sourcenotes {
+#cyxotgmflc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1367,7 +1379,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#ifkvzbohdw .gt_sourcenote {
+#cyxotgmflc .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1375,72 +1387,72 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#ifkvzbohdw .gt_left {
+#cyxotgmflc .gt_left {
   text-align: left;
 }
 
-#ifkvzbohdw .gt_center {
+#cyxotgmflc .gt_center {
   text-align: center;
 }
 
-#ifkvzbohdw .gt_right {
+#cyxotgmflc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ifkvzbohdw .gt_font_normal {
+#cyxotgmflc .gt_font_normal {
   font-weight: normal;
 }
 
-#ifkvzbohdw .gt_font_bold {
+#cyxotgmflc .gt_font_bold {
   font-weight: bold;
 }
 
-#ifkvzbohdw .gt_font_italic {
+#cyxotgmflc .gt_font_italic {
   font-style: italic;
 }
 
-#ifkvzbohdw .gt_super {
+#cyxotgmflc .gt_super {
   font-size: 65%;
 }
 
-#ifkvzbohdw .gt_footnote_marks {
+#cyxotgmflc .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ifkvzbohdw .gt_asterisk {
+#cyxotgmflc .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ifkvzbohdw .gt_indent_1 {
+#cyxotgmflc .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ifkvzbohdw .gt_indent_2 {
+#cyxotgmflc .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ifkvzbohdw .gt_indent_3 {
+#cyxotgmflc .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ifkvzbohdw .gt_indent_4 {
+#cyxotgmflc .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ifkvzbohdw .gt_indent_5 {
+#cyxotgmflc .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ifkvzbohdw .katex-display {
+#cyxotgmflc .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ifkvzbohdw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#cyxotgmflc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1530,10 +1542,19 @@ reported first menstruating as late as age 15. Our participants largely
 identified as women (88.7%) and as Asian (59.7%) or white (22.6%). More
 than 4 in 5 participants had completed at least some college, with 25.8%
 having a college degree and 8.1% having a graduate degree.</p>
+<p><br></p>
 <div id="age-of-first-menarche" class="section level3">
 <h3>Age of first menarche</h3>
-<pre class="r"><code>menarche_plot</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>menarche_plot = ggplot(subject_info, aes(x = &quot;&quot;, y = age_of_first_menarche, fill=&quot;Menarche&quot;)) +
+  geom_boxplot(show.legend = FALSE) +
+  labs(title = &quot;Age of Menarche&quot;,
+    y = &quot;Age (years)&quot;,
+    x = &quot;&quot;) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+menarche_plot</code></pre>
+<p><img src="report_files/figure-html/=FALSE-1.png" width="480" /></p>
 <p>Age of first menarche ranges roughly from 10 to 15 years with a
 median around 12 and a tight IQR (≈11–12.75). This homogeneous menarche
 distribution suggests a relatively standard reproductive development
@@ -1542,11 +1563,66 @@ can influence cycle regularity and hormonal profiles, the lack of
 extreme variability here supports attributing observed hormone–symptom
 patterns primarily to current cycle phase rather than developmental
 differences.</p>
+<p><br></p>
 </div>
 <div id="bmi" class="section level3">
 <h3>BMI</h3>
-<pre class="r"><code>bmi_boxplots</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>overall_bmi_n &lt;- subject_info |&gt; 
+  filter(!is.na(bmi)) |&gt; 
+  summarize(n = n())
+
+bmi_all &lt;- subject_info |&gt; 
+  filter(!is.na(bmi)) |&gt; 
+  ggplot(aes(x = &quot;All participants&quot;, y = bmi)) +
+  geom_boxplot(fill = &quot;#bcbddc&quot;) +
+  geom_text(
+    data = overall_bmi_n,
+    aes(
+      x = &quot;All participants&quot;,
+      y = 45, 
+      label = paste0(&quot;n = &quot;, n)
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = &quot;BMI (kg/m^2)&quot;,
+    title = &quot;Overall Mean BMI Distribution&quot;
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(size = 10)
+  )
+bmi_study_n &lt;- subject_info |&gt; 
+  filter(!is.na(bmi)) |&gt; 
+  count(study_interval, name = &quot;n&quot;)
+
+bmi_by_study &lt;- subject_info |&gt; 
+  filter(!is.na(bmi)) |&gt; 
+  ggplot(aes(x = factor(study_interval), y = bmi, fill = factor(study_interval))) +
+  geom_boxplot() +
+  geom_text(
+    data = bmi_study_n,
+    aes(
+      x = factor(study_interval),
+      y = 45,
+      label = paste0(&quot;n = &quot;, n)
+    )
+  ) +
+  labs(
+    x = &quot;Year&quot;,
+    y = &quot;BMI (kg/m^2)&quot;,
+    fill = &quot;Year&quot;,
+    title = &quot;BMI Distribution by Study Year&quot;
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = &quot;none&quot; 
+  )
+
+bmi_boxplots &lt;- bmi_all + bmi_by_study
+
+bmi_boxplots</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-8-1.png" width="1152" /></p>
 <p>Among the 26 participants with BMI data, the median BMI ≈ 22.5 kg/m²
 (IQR ≈ 20–26) with one high outlier (~39). Overall, most participants
 fall in the normal-to-overweight range. Because adiposity influences sex
@@ -1588,7 +1664,7 @@ ggplot(hormone_avg, aes(x = phase)) +
     plot.title = element_text(face = &quot;bold&quot;),
     panel.grid.major = element_line(color = &quot;grey90&quot;)
   )</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-13-1.png" width="480" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-10-1.png" width="480" /></p>
 <p>Estrogen levels are highest in the fertility (ovulatory) phase,
 second highest in luteal, and relatively low in menstrual, gradually
 rising from follicular to lluteal. Overall, LH levels are much lower
@@ -1654,7 +1730,7 @@ combined_plot &lt;- p_violin | p_line +
   )
 
 combined_plot</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Mood swing intensity varies across menstrual cycle phases. The violin
 plots (top) show substantial individual variability, with the menstrual
 phase displaying the highest and most right-skewed distribution. The
@@ -1722,7 +1798,7 @@ p_flow_line =
 
 ### ---- Combine (side-by-side) ----
 p_flow_violin | p_flow_line</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Flow volume varies substantially across menstrual cycle phases, with
 clear differences in both distribution and average levels. The violin
 plot shows that menstrual phase has a tall, narrow distribution,
@@ -1759,7 +1835,7 @@ ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
     plot.title = element_text(face = &quot;bold&quot;),
     panel.grid.major = element_line(color = &quot;grey90&quot;)
   )</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="480" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-13-1.png" width="480" /></p>
 <p>Average appetite score was highest in the fertility phase (2.96), a
 pattern that visually paralleled the estrogen trend we saw earlier. This
 warrants formal statistical testing, where we can investigate the
@@ -1894,7 +1970,7 @@ plot_3 =
         legend.title = element_blank(),
     axis.text.x = element_text(angle = 45, hjust = 1))
 plot_1 + plot_2 + plot_3</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code># plot the variation of time in bed by menstrual phases
 timeinbed_plot =
   sleep_stress_df|&gt;
@@ -1955,11 +2031,11 @@ stress_score_boxplot =
 
 (timeinbed_plot|deep_sleep_plot)/
 (sleep_score_boxplot |stress_score_boxplot)</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
-<div id="sleep-and-stress-for-different-ethinicities"
+<div id="sleep-stress-for-different-ethinicities"
 class="section level3">
-<h3>Sleep and stress for different ethinicities</h3>
+<h3>Sleep &amp; Stress for Different Ethinicities</h3>
 <p>The figure illustrates mean sleep and stress scores across menstrual
 cycle phases, stratified by ethnicity. Overall, sleep scores show modest
 fluctuations across phases, with most groups exhibiting slightly higher
@@ -2014,7 +2090,7 @@ well-being.</p>
   ) +
     theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 </div>
 </div>
 <div id="exercise" class="section level2">
@@ -2078,7 +2154,7 @@ p4 = ggplot(exercise_analysis |&gt; filter(n_sessions &gt; 0),
 
 (p1 + p2) / (p3 + p4) + 
   plot_layout(guides = &quot;collect&quot;)</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-21-1.png" width="1344" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-18-1.png" width="1344" /></p>
 <p><strong>Step Count Distribution:</strong> Daily steps on active days
 showed pronounced right-skew with a median of 4,455 steps. The bulk of
 observations fell between 2,000-8,000 steps, with a long tail extending
@@ -2138,7 +2214,7 @@ p2 = ggplot(exercise_analysis |&gt; filter(!is.na(phase), total_active_min &gt; 
         axis.text.x = element_text(angle = 45, hjust = 1))
 
 p1 / p2 + plot_layout(guides = &quot;collect&quot;)</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-22-1.png" width="960" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-19-1.png" width="960" /></p>
 <p><strong>Daily Steps:</strong> In 2022, step counts remained
 relatively stable across all phases, with medians around 3,000-4,000
 steps. In 2024, phase-related differences were more pronounced; the
@@ -2196,7 +2272,7 @@ p4 = ggplot(symptoms_long,
   scale_color_brewer(palette = &quot;Set2&quot;)
 
 p4</code></pre>
-<p><img src="report_files/figure-html/unnamed-chunk-23-1.png" width="960" /></p>
+<p><img src="report_files/figure-html/unnamed-chunk-20-1.png" width="960" /></p>
 <p>The scatterplots examine crude associations between daily activity
 (exercise) and each symptom:</p>
 <p><strong>Negative slopes (potential benefits):</strong></p>
@@ -2245,7 +2321,7 @@ potential confounders.</p>
 <h3>Mood Swing Linear Mixed Models</h3>
 <p>Test whether mood swing differ by menstrual phase, accounting for
 repeated measures.</p>
-<p><em>Association Between Mood Swing and Menstrual Phase</em></p>
+<p><em>Associations Between Mood Swing and Menstrual Phase</em></p>
 <pre class="r"><code>mood_mixed_model &lt;- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms_eda)
 
 
@@ -2362,7 +2438,7 @@ formally test this visual hypothesis. The model was used to determine if
 this apparent inverse relationship was statistically significant when
 rigorously accounting for the repeated measures within each individual
 participant.</p>
-<p><em>Association Between Flow Volume and LH Level</em></p>
+<p><em>Associations Between Flow Volume and LH Level</em></p>
 <pre class="r"><code>flow_volume_model &lt;- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms_eda)
 
 flow_table &lt;- create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;)|&gt;
@@ -2433,7 +2509,7 @@ appeared to follow estrogen patterns, I applied a linear mixed model to
 appetite to formally test whether estrogen levels directly predict its
 changes within individuals.<br />
 </p>
-<p><em>Association Between Appetite and Estrogen Level</em></p>
+<p><em>Associations Between Appetite and Estrogen Level</em></p>
 <pre class="r"><code>appetite_model &lt;- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms_eda)
 appetite_table &lt;- create_model_table(appetite_model, &quot;Appetite ~ Estrogen&quot;)|&gt;
   knitr::kable(digits = 3)
@@ -2526,7 +2602,7 @@ the fertility and luteal phases relative to the menstrual phase.
 Overall, the model suggests meaningful fluctuations in stress across the
 menstrual cycle, with perceived stress notably increased during the
 fertility and luteal phases.</p>
-<p><em>Association Between Stress and Menstrual Phase</em></p>
+<p><em>Associations Between Stress and Menstrual Phase</em></p>
 <pre class="r"><code>m1 &lt;- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m1, effects = &quot;fixed&quot;)|&gt;
   select(term, estimate, std.error,p.value) |&gt;
@@ -2592,7 +2668,7 @@ suggesting that ovulation is associated with the poorest sleep quality.
 Overall, the model demonstrates that sleep quality varies systematically
 across the menstrual cycle, with the menstrual phase representing the
 period of highest sleep quality.</p>
-<p><em>Association Between Sleep and Menstrual Phase</em></p>
+<p><em>Associations Between Sleep and Menstrual Phase</em></p>
 <pre class="r"><code>m2 &lt;- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m2, effects = &quot;fixed&quot;)|&gt;
   select(term, estimate, std.error,p.value) |&gt;
@@ -3750,12 +3826,34 @@ tidy(sorebreasts_model) %&gt;%
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>
+<p>This study examined associations between various factors and
+menstrual symptom severity using multimodal, longitudinal data from a
+cohort of menstruating young adults over two 3-month intervals (2022 and
+2024). The cohort includes 42 participants with a median age of ~21
+years and majorly Asian (59.7%) and White (22.6%). This is a
+well-characterized, quite homogenous cohort, which helps minimize
+background-related heterogeneity (or variability) in reproductive
+hormone profiles and symptomatic presentation, thereby facilitating the
+isolation of phase-related effects.</p>
+<p>We noted that since the dataset are from two studies in two different
+times, year 2022 and year 2024 in which the 2024 cohort is a subset from
+2022 cohorts, the assumptions of independence is violated so we cannot
+use statistical tests that required independence assumptions.
+Mixed-effects models accounted for repeated measures and controlled for
+menstrual cycle phase and individual differences. Our analyses explored
+both overall trends and differences between menstrual phases, with
+particular attention to the menstrual, follicular, fertility, and luteal
+periods. In the following discussion, we interpret these findings in
+relation to known physiological changes across the cycle, highlight
+their implications for understanding menstrual health and daily
+functioning, and contextualize the results alongside the limitations of
+the dataset.</p>
 <div id="hormone-and-symptoms" class="section level3">
-<h3>Hormone and symptoms</h3>
-<p>This analysis explored the relationships between menstrual cycle
-phases, key hormones, and self-reported symptoms. The hormone profiles
-followed expected physiological patterns, with estrogen peaking during
-the fertility phase and luteinizing hormone (LH) spiking sharply at
+<h3>Hormone and Symptoms</h3>
+<p>We explored the association between menstrual cycle phases, key
+hormones, and self-reported symptoms. The hormone profiles followed
+expected physiological patterns, with estrogen peaking during the
+fertility phase and luteinizing hormone (LH) spiking sharply at
 ovulation. Symptom patterns also aligned with common clinical
 observations: mood swing intensity and flow volume were highest during
 the menstrual phase, while appetite showed minimal fluctuation.</p>
@@ -3774,11 +3872,11 @@ hypothesis, the model found no significant relationship between estrogen
 levels and appetite scores (p = 0.402), suggesting other factors drive
 appetite changes across the cycle.</p>
 </div>
-<div id="stress-and-sleep" class="section level3">
-<h3>Stress and sleep</h3>
-<p>This analysis cyclical variations in sleep quality and perceived
-stress across the menstrual cycle using mixed-effects models to account
-for repeated measures within individuals. The findings demonstrate
+<div id="sleep-stress-1" class="section level3">
+<h3>Sleep &amp; Stress</h3>
+<p>We explored cyclical variations in sleep quality and perceived stress
+across the menstrual cycle using mixed-effects models to account for
+repeated measures within individuals. The findings demonstrate
 consistent and meaningful changes in both sleep and stress that align
 with known physiological fluctuations across the menstrual phases.</p>
 <p>Sleep quality was highest during the menstrual phase and decreased
@@ -3805,17 +3903,12 @@ regulation, and sleep quality across the menstrual cycle.</p>
 </div>
 <div id="exercise-1" class="section level3">
 <h3>Exercise</h3>
-<p>This study examined associations between daily physical activity and
-menstrual symptom severity using longitudinal data from 42 total
-participants tracked across 2022 and 2024. Mixed-effects models
-accounted for repeated measures and controlled for menstrual cycle phase
-and individual differences.</p>
-<p>Descriptive analyses revealed substantial differences between study
-years. The 2024 cohort showed markedly higher activity than 2022 (mean
-steps: 13,670 vs. 3,991; active minutes: 73.7 vs. 47.8), along with
-improved tracking (61.4% vs. 14.6% of days with recorded activity).
-Activity type analysis showed that walking dominated exercise routines
-(70-85% of activity days), with minimal representation of
+<p>For exercise, descriptive analyses revealed substantial differences
+between study years. The 2024 cohort showed markedly higher activity
+than 2022 (mean steps: 13,670 vs. 3,991; active minutes: 73.7 vs. 47.8),
+along with improved tracking (61.4% vs. 14.6% of days with recorded
+activity). Activity type analysis showed that walking dominated exercise
+routines (70-85% of activity days), with minimal representation of
 higher-intensity structured exercise.</p>
 <p>Physical activity showed modest variation across menstrual cycle
 phases, with 2024 participants displaying more pronounced patterns
@@ -3840,8 +3933,8 @@ symptomatic phases. Finally, daily variations in light-to-moderate
 activity may genuinely have minimal influence on symptom severity at the
 population level.</p>
 </div>
-<div id="multivariate-discussion" class="section level3">
-<h3>Multivariate discussion</h3>
+<div id="multivariate-associations" class="section level3">
+<h3>Multivariate Associations</h3>
 <p>We found several associations between menstrual symptoms and
 lifestyle factors, biometric measurements, and demographic
 characteristics. Interestingly, lifestyle characteristics were
@@ -3858,23 +3951,10 @@ with the reduction of any symptoms in our mixed-modal results.</p>
 </div>
 <div id="limitation" class="section level2">
 <h2>Limitation</h2>
-<div id="data-handling" class="section level3">
-<h3>Data Handling</h3>
-<ul>
-<li>data quality issues - take hormones &amp; self-reported as an
-example</li>
-</ul>
-<p>regardless the most common missing data (due to self-report), 1)
-integer values in categorical variables; 2) inconsistent likert scale
-(‘very low/little’ vs. ‘very low’) &gt;&gt; give us the tip when we run
-a study to collect different likert scale data, collect them at the same
-scale for easy and consistent future data analyses.</p>
-<ul>
-<li>data entry issues - take sleep.csv as an example</li>
-</ul>
 <p>Several limitations should be considered when interpreting these
-findings. First,the dataset relies on self-reported symptom scores,
-which may be subject to recall bias or subjective interpretation. The
+findings.</p>
+<p>First, the dataset relies on self-reported symptom scores, which may
+be subject to recall bias or subjective interpretation. The
 observational design precludes causal inference, and unmeasured
 confounders may influence both activity and symptoms. Sleep and stress
 scores were derived from self-reported or device-based composite
@@ -3883,18 +3963,19 @@ processes such as sleep architecture or cortisol variation. Activity was
 predominantly walking (70-85% of exercise days), limiting
 generalizability to structured or higher-intensity exercise programs.
 High individual heterogeneity in exercise-symptom relationships may
-obscure subgroup effects averaged in population-level models. Second,
-the small sample size is a limitation and could be exaggerating the
-influence of some demographic factors on symptoms. While repeated
-measures are accounted for using linear mixed models, the sample size
-for some phases may be limited, reducing statistical power to detect
-subtle effects. In addition, with the population being largely comprised
-of young, white or Asian participants, these results may not be
-generalizable to a more diverse population. Incomplete symptom reporting
-resulted in substantial missing data (many observations recorded as
-N/A), reducing effective sample sizes and potentially introducing
-selection bias. Same-day measurement may miss lagged or cumulative
-effects of sustained exercise.</p>
+obscure subgroup effects averaged in population-level models. Data entry
+was not easy to handled, for example, the sleep data has</p>
+<p>Second, the small sample size is a limitation and could be
+exaggerating the influence of some demographic factors on symptoms.
+While repeated measures are accounted for using linear mixed models, the
+sample size for some phases may be limited, reducing statistical power
+to detect subtle effects. In addition, with the population being largely
+comprised of young, white or Asian participants, these results may not
+be generalizable to a more diverse population. Incomplete symptom
+reporting resulted in substantial missing data (many observations
+recorded as N/A), reducing effective sample sizes and potentially
+introducing selection bias. Same-day measurement may miss lagged or
+cumulative effects of sustained exercise.</p>
 <p>Finally, substantial individual heterogeneity likely exists in both
 symptom expression and cycle-related physiological responses;
 population-level models may therefore obscure meaningful subgroup or
@@ -3903,6 +3984,35 @@ as indicative of phase-related trends rather than definitive causal
 effects.</p>
 </div>
 </div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Cooper, Poppy Alexandra, Emily R. Boniface, Blair G. Darney, et
+al. “Menstrual Cycle Phase and Its Association with COVID-19 Vaccine
+Side Effects and Subsequent Infection: A Study of Period Tracking App
+Users.” Preprint, Sexual and Reproductive Health, November 30, 2025. <a
+href="https://doi.org/10.1101/2025.11.26.25341088">Link</a></li>
+<li>Goodale, Brianna Mae, Mohaned Shilaih, Lisa Falco, Franziska
+Dammeier, Györgyi Hamvas, and Brigitte Leeners. “Wearable Sensors Reveal
+Menses-Driven Changes in Physiology and Enable Prediction of the Fertile
+Window: Observational Study.” Journal of Medical Internet Research 21,
+no. 4 (2019): e13404. <a
+href="https://doi.org/10.2196/13404">Link</a></li>
+<li>Houghton, Lauren C., and Paris B. Adkins-Jackson. “Mixed-Method,
+Multilevel Clustered-Randomized Control Trial for Menstrual Health
+Disparities.” Prevention Science 25, no. S3 (2024): 459–73. <a
+href="https://doi.org/10.1007/s11121-024-01646-1">Link</a></li>
+<li>Lyzwinski, Lynnette, Mohamed Elgendi, and Carlo Menon. “Innovative
+Approaches to Menstruation and Fertility Tracking Using Wearable
+Reproductive Health Technology: Systematic Review.” Journal of Medical
+Internet Research 26 (February 2024): e45139. <a
+href="https://doi.org/10.2196/45139">Link</a></li>
+<li>Shea, Amanda A., Fiorella Wever, Cécile Ventola, Jonathan Thornburg,
+and Virginia J. Vitzthum. “More than Blood: App-Tracking Reveals
+Variability in Heavy Menstrual Bleeding Construct.” BMC Women’s Health
+23, no. 1 (2023): 170. <a
+href="https://doi.org/10.1186/s12905-023-02312-4">Link</a></li>
+</ol>
 </div>
 
 
