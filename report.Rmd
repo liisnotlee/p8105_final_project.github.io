@@ -783,6 +783,7 @@ Appetite was highest in the Fertility phase (2.96), a pattern that visually para
 
 ## Sleep and stress
 
+Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase—when individuals typically experience higher energy levels—participants spent less time in bed but obtained greater amounts of deep sleep.
 ```{r, message=FALSE, warning= FALSE}
 sleep_stress_df = all_daily_data|>
   filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
@@ -794,10 +795,7 @@ sleep_stress_df = all_daily_data|>
 sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
 ```
 
-Menstruators spent more time in bed during menstrual time but their deep sleep hours were lowest. This showed that the physical exhaustion during menstrual days requiring them to rest but preventing them from having a restorative sleep quality. Follicular time is the when menstruators feel most energetic and spent less time in bed but having much better deep sleep. 
-We explore the changes of the stress score with the menstrual cycle. The participants slept best during the menstrual time, probably a good sign to rest well during this time. The lowest sleep score were recorded during ovulation/ fertility time in which the increased estrogen and lh levels may contribute to this low sleep quality. 
-The higher stress score the less stressful people experience. In this study, the participants showed the least stressful during folicular period , as the bodies are full of energy. The most stressful time is during luteal period. 
-
+We further examined variations in stress scores across the menstrual cycle. Overall sleep quality scores were highest during the menstrual phase, indicating that participants may benefit from prioritizing rest during this time. The lowest sleep scores were observed during the ovulatory (fertile) window, a period characterized by elevated estrogen and luteinizing hormone (LH) concentrations, which may contribute to reduced sleep quality. In this scoring system, higher values indicate lower perceived stress. Participants exhibited the lowest stress levels during the follicular phase, consistent with increased energy and improved well-being. Conversely, the highest stress levels were recorded during the luteal phase.
 
 ```{r, warning= FALSE, message=FALSE}
 # plot the sleep vs stress score by phases
@@ -969,6 +967,11 @@ stress_score_boxplot =
 
 
 **View the stress and sleep score across menstrual cycle phases for each ethnicity** 
+The figure illustrates mean sleep and stress scores across menstrual cycle phases, stratified by ethnicity. Overall, sleep scores show modest fluctuations across phases, with most groups exhibiting slightly higher sleep quality during the menstrual phase and lower scores during the fertility (ovulatory) phase. This pattern is most pronounced in the Middle Eastern group, which demonstrates a steady decline in sleep score from the menstrual to the luteal phase. Other groups, including East Asian, Southeast Asian, Latina, and White participants, show relatively stable sleep scores with minor dips during the fertility phase.
+
+Stress scores follow a similar cyclical pattern, with most ethnic groups reporting lower perceived stress (higher stress scores) during the follicular phase and higher perceived stress (lower stress scores) during the luteal phase. The Latina group shows the most pronounced fluctuation, with a peak in stress score during the follicular phase and a marked decline during the luteal phase. East Asian, Southeast Asian, and White participants show smaller but consistent shifts that align with expected hormonal changes across the menstrual cycle.
+
+Together, these trends suggest that both sleep quality and perceived stress vary systematically across menstrual phases, with ovulation associated with reduced sleep quality and the luteal phase associated with increased stress. While the magnitude of these changes differs across ethnic groups, the overall pattern remains consistent, highlighting a cyclical relationship between physiological rhythms and well-being.
 
 ```{r, message=FALSE, warning=FALSE}
 sleep_stress_df |>
@@ -1006,6 +1009,9 @@ sleep_stress_df |>
 
 Our dataset are from two studies in two different times, year 2022 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts. Therefore the assumptions of independence is violated so we cannot use statistical tests that required independence assumptions. 
 Instead, we used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
+A linear mixed-effects model was fitted to examine the association between menstrual cycle phase and stress score, with menstrual phase as the reference category and participant included as a random intercept. The results showed that stress scores during the follicular phase did not differ significantly from the menstrual phase (estimate = 0.291, SE = 0.213, p = 0.172). In contrast, stress scores were significantly lower during the fertility (ovulatory) phase (estimate = –0.594, SE = 0.211, p = 0.005) and the luteal phase (estimate = –0.525, SE = 0.198, p = 0.008) compared with the menstrual phase.
+
+Because higher scores reflect lower perceived stress, these negative estimates indicate that participants experienced more stress during both the fertility and luteal phases relative to the menstrual phase. Overall, the model suggests meaningful fluctuations in stress across the menstrual cycle, with perceived stress notably increased during the fertility and luteal phases.
 
 ```{r,message=FALSE, warning=FALSE}
 m1 <- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
@@ -1015,7 +1021,9 @@ tidy(m1, effects = "fixed")|>
   significant = ifelse(p.value < 0.05, "Yes", "No")) |>
   knitr::kable(digits = 3)
 ```
+A linear mixed-effects model was used to evaluate differences in sleep scores across menstrual cycle phases, with the menstrual phase serving as the reference category and participant modeled as a random intercept. The results showed significant reductions in sleep score during all non-menstrual phases. Compared with the menstrual phase, sleep scores were significantly lower during the follicular phase (estimate = –1.037, SE = 0.283), the fertility (ovulatory) phase (estimate = –1.342, SE = 0.281), and the luteal phase (estimate = –1.126, SE = 0.263), with all effects statistically significant (p < 0.001).
 
+Because higher scores reflect better sleep quality, these negative estimates indicate that participants slept worse during the follicular, fertility, and luteal phases compared with the menstrual phase. The largest decrease in sleep score occurred during the fertility phase, suggesting that ovulation is associated with the poorest sleep quality. Overall, the model demonstrates that sleep quality varies systematically across the menstrual cycle, with the menstrual phase representing the period of highest sleep quality.
 
 ```{r,message=FALSE, warning=FALSE}
 m2 <- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
@@ -1270,6 +1278,8 @@ Based on the linear mixed-effects model, the analysis finds no statistically sig
 
 ### Stress score model
 
+With an estimate of 0.032 and a p-value of 0.043 (which is less than the typical significance level of 0.05), deep_sleep_in_minutes is a significant positive predictor of stress score. This suggests that, on average, for every additional minute of deep sleep, the stress score is predicted to increase by 0.032 points, assuming other variables are constant. Time in bed is a is a significant positive predictor of stress score ( p = 0.013) For every additional minute in bed (mean), the stress score is predicted to increase by 0.009 points, holding all other variables constant. The 95% confidence intervals for the significant predictors (deep_sleep_in_minutes and timeinbed_mean) do not contain zero, further supporting their statistical significance. When we explore more variables, the menstrual phases do not affect the stress score significantly. But we can see the strong association between stress and sleep. 
+
 ```{r, message=FALSE, warning=FALSE}
 #  model
 m4 <- lmer(stress_score ~ phase + deep_sleep_in_minutes +
@@ -1515,6 +1525,13 @@ This analysis explored the relationships between menstrual cycle phases, key hor
 
 The linear mixed model for mood swings confirmed a statistically significant association with cycle phase but revealed that the individual differences between participants (random intercept SD = 0.98) accounted for variation comparable to the model's residual error. This underscores that baseline predisposition is a critical factor in symptom experience, often outweighing the phase effect itself. Similarly, the model testing the observed inverse relationship between LH and flow volume found a statistically significant result (β = -0.011, p = 0.001), but the effect size was very small. The substantial residual variation (SD = 1.19) indicates that LH levels alone explain only a minor portion of the daily variation in perceived flow. Contrary to the initial visual hypothesis, the model found no significant relationship between estrogen levels and appetite scores (p = 0.402), suggesting other factors drive appetite changes across the cycle.
 
+### Stress and sleep 
+This analysis cyclical variations in sleep quality and perceived stress across the menstrual cycle using mixed-effects models to account for repeated measures within individuals. The findings demonstrate consistent and meaningful changes in both sleep and stress that align with known physiological fluctuations across the menstrual phases.
+
+Sleep quality was highest during the menstrual phase and decreased significantly during the follicular, fertility, and luteal phases. Notably, the fertility (ovulatory) phase showed the largest decline in sleep score, suggesting that the hormonal surge—particularly in estrogen and luteinizing hormone—may disrupt restorative sleep. This pattern aligns with previous research indicating that ovulation can be associated with increased physiological arousal and thermoregulatory changes, which may impair sleep continuity and depth. Despite spending more time in bed during menstruation, participants achieved better sleep quality during this phase, possibly reflecting a compensatory physiological need for rest.
+
+Stress scores followed a complementary pattern: participants experienced the lowest stress (i.e., highest stress scores) during the menstrual phase and the highest stress during the fertility and luteal phases. The increase in stress during the luteal phase is consistent with known premenstrual symptoms such as mood fluctuations, irritability, and heightened emotional sensitivity. The elevated stress during the ovulatory window may reflect endocrine-driven changes that influence emotional reactivity or cognitive load. Together, these results underscore the interconnected nature of hormonal rhythms, stress regulation, and sleep quality across the menstrual cycle.
+
 
 ### Multimodal discussion 
 
@@ -1546,3 +1563,4 @@ Yue(Several limitations should be considered when interpreting these findings. F
 Emily(Limitations to this data set as a whole also apply to the significance and generalization of this regression analysis. Namely, the small sample size is a limitation and could be exaggerating the influence of some demographic factors on symptoms. Furthermore, with the population being largely comprised of young, white or Asian participants, these results may not be generalizable to a more diverse population.)
 
 Anu: Several limitations are to be acknowledged. The observational design precludes causal inference, and unmeasured confounders may influence both activity and symptoms. Activity was predominantly walking (70-85% of exercise days), limiting generalizability to structured or higher-intensity exercise programs. Incomplete symptom reporting resulted in substantial missing data (many observations recorded as N/A), reducing effective sample sizes and potentially introducing selection bias. Same-day measurement may miss lagged or cumulative effects of sustained exercise. Symptom scales were ordinal (0-5 Likert) rather than truly continuous. While ordinal mixed models would be theoretically more appropriate, linear models are standard practice for Likert scales with 6+ levels and provide more interpretable estimates. High individual heterogeneity in exercise-symptom relationships may obscure subgroup effects averaged in population-level models. 
+Khue : The sample size and ethnic distribution may limit generalizability; some ethnic groups were represented by fewer participants, potentially affecting the stability of subgroup trends. In addition, leep and stress scores were derived from self-reported or device-based composite measures, which may not capture the full complexity of physiological processes such as sleep architecture or cortisol variation. 

@@ -399,12 +399,14 @@ library(dplyr)
 library(tidyr)
 library(patchwork)
 library(lme4)
-library(lmerTest)
-library(gt)
+library(lmerTest)</code></pre>
+<pre><code>## Warning: package &#39;lmerTest&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(gt)
 library(ggsci)
 library(knitr)
-library(broom.mixed) # for tidy
-library(scales)
+library(broom.mixed) # for tidy</code></pre>
+<pre><code>## Warning: package &#39;broom.mixed&#39; was built under R version 4.5.2</code></pre>
+<pre class="r"><code>library(scales)
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
@@ -945,23 +947,23 @@ session or if both stress and sleep scores are present.</p>
 <div id="participant-characteristics" class="section level2">
 <h2>Participant Characteristics</h2>
 <pre class="r"><code>summary_table_gt</code></pre>
-<div id="kttzqlejog" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kttzqlejog table {
+<div id="fnbyfvnfvh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#fnbyfvnfvh table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kttzqlejog thead, #kttzqlejog tbody, #kttzqlejog tfoot, #kttzqlejog tr, #kttzqlejog td, #kttzqlejog th {
+#fnbyfvnfvh thead, #fnbyfvnfvh tbody, #fnbyfvnfvh tfoot, #fnbyfvnfvh tr, #fnbyfvnfvh td, #fnbyfvnfvh th {
   border-style: none;
 }
 
-#kttzqlejog p {
+#fnbyfvnfvh p {
   margin: 0;
   padding: 0;
 }
 
-#kttzqlejog .gt_table {
+#fnbyfvnfvh .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -987,12 +989,12 @@ session or if both stress and sleep scores are present.</p>
   border-left-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_caption {
+#fnbyfvnfvh .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kttzqlejog .gt_title {
+#fnbyfvnfvh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1004,7 +1006,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-width: 0;
 }
 
-#kttzqlejog .gt_subtitle {
+#fnbyfvnfvh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1016,7 +1018,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-width: 0;
 }
 
-#kttzqlejog .gt_heading {
+#fnbyfvnfvh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1028,13 +1030,13 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_bottom_border {
+#fnbyfvnfvh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_col_headings {
+#fnbyfvnfvh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1049,7 +1051,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_col_heading {
+#fnbyfvnfvh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1069,7 +1071,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#kttzqlejog .gt_column_spanner_outer {
+#fnbyfvnfvh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1081,15 +1083,15 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 4px;
 }
 
-#kttzqlejog .gt_column_spanner_outer:first-child {
+#fnbyfvnfvh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kttzqlejog .gt_column_spanner_outer:last-child {
+#fnbyfvnfvh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kttzqlejog .gt_column_spanner {
+#fnbyfvnfvh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1101,11 +1103,11 @@ session or if both stress and sleep scores are present.</p>
   width: 100%;
 }
 
-#kttzqlejog .gt_spanner_row {
+#fnbyfvnfvh .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kttzqlejog .gt_group_heading {
+#fnbyfvnfvh .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1131,7 +1133,7 @@ session or if both stress and sleep scores are present.</p>
   text-align: left;
 }
 
-#kttzqlejog .gt_empty_group_heading {
+#fnbyfvnfvh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1146,15 +1148,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: middle;
 }
 
-#kttzqlejog .gt_from_md > :first-child {
+#fnbyfvnfvh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kttzqlejog .gt_from_md > :last-child {
+#fnbyfvnfvh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kttzqlejog .gt_row {
+#fnbyfvnfvh .gt_row {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 5px;
@@ -1173,7 +1175,7 @@ session or if both stress and sleep scores are present.</p>
   overflow-x: hidden;
 }
 
-#kttzqlejog .gt_stub {
+#fnbyfvnfvh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1186,7 +1188,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#kttzqlejog .gt_stub_row_group {
+#fnbyfvnfvh .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1200,15 +1202,15 @@ session or if both stress and sleep scores are present.</p>
   vertical-align: top;
 }
 
-#kttzqlejog .gt_row_group_first td {
+#fnbyfvnfvh .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kttzqlejog .gt_row_group_first th {
+#fnbyfvnfvh .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kttzqlejog .gt_summary_row {
+#fnbyfvnfvh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1218,16 +1220,16 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#kttzqlejog .gt_first_summary_row {
+#fnbyfvnfvh .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_first_summary_row.thick {
+#fnbyfvnfvh .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kttzqlejog .gt_last_summary_row {
+#fnbyfvnfvh .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1237,7 +1239,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_grand_summary_row {
+#fnbyfvnfvh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1247,7 +1249,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#kttzqlejog .gt_first_grand_summary_row {
+#fnbyfvnfvh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1257,7 +1259,7 @@ session or if both stress and sleep scores are present.</p>
   border-top-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_last_grand_summary_row_top {
+#fnbyfvnfvh .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1267,11 +1269,11 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_striped {
+#fnbyfvnfvh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kttzqlejog .gt_table_body {
+#fnbyfvnfvh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1280,7 +1282,7 @@ session or if both stress and sleep scores are present.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_footnotes {
+#fnbyfvnfvh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1294,7 +1296,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_footnote {
+#fnbyfvnfvh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1303,7 +1305,7 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#kttzqlejog .gt_sourcenotes {
+#fnbyfvnfvh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1317,7 +1319,7 @@ session or if both stress and sleep scores are present.</p>
   border-right-color: #D3D3D3;
 }
 
-#kttzqlejog .gt_sourcenote {
+#fnbyfvnfvh .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1325,72 +1327,72 @@ session or if both stress and sleep scores are present.</p>
   padding-right: 5px;
 }
 
-#kttzqlejog .gt_left {
+#fnbyfvnfvh .gt_left {
   text-align: left;
 }
 
-#kttzqlejog .gt_center {
+#fnbyfvnfvh .gt_center {
   text-align: center;
 }
 
-#kttzqlejog .gt_right {
+#fnbyfvnfvh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kttzqlejog .gt_font_normal {
+#fnbyfvnfvh .gt_font_normal {
   font-weight: normal;
 }
 
-#kttzqlejog .gt_font_bold {
+#fnbyfvnfvh .gt_font_bold {
   font-weight: bold;
 }
 
-#kttzqlejog .gt_font_italic {
+#fnbyfvnfvh .gt_font_italic {
   font-style: italic;
 }
 
-#kttzqlejog .gt_super {
+#fnbyfvnfvh .gt_super {
   font-size: 65%;
 }
 
-#kttzqlejog .gt_footnote_marks {
+#fnbyfvnfvh .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kttzqlejog .gt_asterisk {
+#fnbyfvnfvh .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kttzqlejog .gt_indent_1 {
+#fnbyfvnfvh .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kttzqlejog .gt_indent_2 {
+#fnbyfvnfvh .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kttzqlejog .gt_indent_3 {
+#fnbyfvnfvh .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kttzqlejog .gt_indent_4 {
+#fnbyfvnfvh .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kttzqlejog .gt_indent_5 {
+#fnbyfvnfvh .gt_indent_5 {
   text-indent: 25px;
 }
 
-#kttzqlejog .katex-display {
+#fnbyfvnfvh .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#kttzqlejog div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#fnbyfvnfvh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1710,6 +1712,14 @@ their relationship using a linear mixed model.</p>
 </div>
 <div id="sleep-and-stress" class="section level2">
 <h2>Sleep and stress</h2>
+<p>Menstruators spent more time in bed during the menstrual phase;
+however, their deep-sleep duration was lowest during this period. This
+pattern suggests that although increased physical fatigue during
+menstruation may prompt individuals to rest longer, it may
+simultaneously impair the ability to achieve restorative sleep. In
+contrast, during the follicular phase—when individuals typically
+experience higher energy levels—participants spent less time in bed but
+obtained greater amounts of deep sleep.</p>
 <pre class="r"><code>sleep_stress_df = all_daily_data|&gt;
   filter(!is.na(stress_score) &amp; !is.na(sleep_score) &amp; !is.na(timeinbed_mean)) |&gt;
   filter(stress_score != 0)|&gt;
@@ -1718,20 +1728,17 @@ their relationship using a linear mixed model.</p>
     phase = fct_relevel(phase,&quot;menstrual&quot;, &quot;follicular&quot;, &quot;fertility&quot;, &quot;luteal&quot;)
   )
 sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))</code></pre>
-<p>Menstruators spent more time in bed during menstrual time but their
-deep sleep hours were lowest. This showed that the physical exhaustion
-during menstrual days requiring them to rest but preventing them from
-having a restorative sleep quality. Follicular time is the when
-menstruators feel most energetic and spent less time in bed but having
-much better deep sleep. We explore the changes of the stress score with
-the menstrual cycle. The participants slept best during the menstrual
-time, probably a good sign to rest well during this time. The lowest
-sleep score were recorded during ovulation/ fertility time in which the
-increased estrogen and lh levels may contribute to this low sleep
-quality. The higher stress score the less stressful people experience.
-In this study, the participants showed the least stressful during
-folicular period , as the bodies are full of energy. The most stressful
-time is during luteal period.</p>
+<p>We further examined variations in stress scores across the menstrual
+cycle. Overall sleep quality scores were highest during the menstrual
+phase, indicating that participants may benefit from prioritizing rest
+during this time. The lowest sleep scores were observed during the
+ovulatory (fertile) window, a period characterized by elevated estrogen
+and luteinizing hormone (LH) concentrations, which may contribute to
+reduced sleep quality. In this scoring system, higher values indicate
+lower perceived stress. Participants exhibited the lowest stress levels
+during the follicular phase, consistent with increased energy and
+improved well-being. Conversely, the highest stress levels were recorded
+during the luteal phase.</p>
 <pre class="r"><code># plot the sleep vs stress score by phases
 plot_1 = 
   sleep_stress_df |&gt;
@@ -1896,7 +1903,31 @@ stress_score_boxplot =
 (sleep_score_boxplot |stress_score_boxplot)</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p><strong>View the stress and sleep score across menstrual cycle phases
-for each ethnicity</strong></p>
+for each ethnicity</strong> The figure illustrates mean sleep and stress
+scores across menstrual cycle phases, stratified by ethnicity. Overall,
+sleep scores show modest fluctuations across phases, with most groups
+exhibiting slightly higher sleep quality during the menstrual phase and
+lower scores during the fertility (ovulatory) phase. This pattern is
+most pronounced in the Middle Eastern group, which demonstrates a steady
+decline in sleep score from the menstrual to the luteal phase. Other
+groups, including East Asian, Southeast Asian, Latina, and White
+participants, show relatively stable sleep scores with minor dips during
+the fertility phase.</p>
+<p>Stress scores follow a similar cyclical pattern, with most ethnic
+groups reporting lower perceived stress (higher stress scores) during
+the follicular phase and higher perceived stress (lower stress scores)
+during the luteal phase. The Latina group shows the most pronounced
+fluctuation, with a peak in stress score during the follicular phase and
+a marked decline during the luteal phase. East Asian, Southeast Asian,
+and White participants show smaller but consistent shifts that align
+with expected hormonal changes across the menstrual cycle.</p>
+<p>Together, these trends suggest that both sleep quality and perceived
+stress vary systematically across menstrual phases, with ovulation
+associated with reduced sleep quality and the luteal phase associated
+with increased stress. While the magnitude of these changes differs
+across ethnic groups, the overall pattern remains consistent,
+highlighting a cyclical relationship between physiological rhythms and
+well-being.</p>
 <pre class="r"><code>sleep_stress_df |&gt;
   group_by(phase, ethnicity) |&gt;
   summarize(
@@ -1933,7 +1964,22 @@ and year 2024 in which the 2024 cohort is a subset from 2022 cohorts.
 Therefore the assumptions of independence is violated so we cannot use
 statistical tests that required independence assumptions. Instead, we
 used generalized linear mixed effects model to evaluate the significant
-different of stress score and sleep score between menstrual phases.</p>
+different of stress score and sleep score between menstrual phases. A
+linear mixed-effects model was fitted to examine the association between
+menstrual cycle phase and stress score, with menstrual phase as the
+reference category and participant included as a random intercept. The
+results showed that stress scores during the follicular phase did not
+differ significantly from the menstrual phase (estimate = 0.291, SE =
+0.213, p = 0.172). In contrast, stress scores were significantly lower
+during the fertility (ovulatory) phase (estimate = –0.594, SE = 0.211, p
+= 0.005) and the luteal phase (estimate = –0.525, SE = 0.198, p = 0.008)
+compared with the menstrual phase.</p>
+<p>Because higher scores reflect lower perceived stress, these negative
+estimates indicate that participants experienced more stress during both
+the fertility and luteal phases relative to the menstrual phase.
+Overall, the model suggests meaningful fluctuations in stress across the
+menstrual cycle, with perceived stress notably increased during the
+fertility and luteal phases.</p>
 <pre class="r"><code>m1 &lt;- lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m1, effects = &quot;fixed&quot;)|&gt;
   select(term, estimate, std.error,p.value) |&gt;
@@ -1981,6 +2027,24 @@ tidy(m1, effects = &quot;fixed&quot;)|&gt;
 </tr>
 </tbody>
 </table>
+<p>A linear mixed-effects model was used to evaluate differences in
+sleep scores across menstrual cycle phases, with the menstrual phase
+serving as the reference category and participant modeled as a random
+intercept. The results showed significant reductions in sleep score
+during all non-menstrual phases. Compared with the menstrual phase,
+sleep scores were significantly lower during the follicular phase
+(estimate = –1.037, SE = 0.283), the fertility (ovulatory) phase
+(estimate = –1.342, SE = 0.281), and the luteal phase (estimate =
+–1.126, SE = 0.263), with all effects statistically significant (p &lt;
+0.001).</p>
+<p>Because higher scores reflect better sleep quality, these negative
+estimates indicate that participants slept worse during the follicular,
+fertility, and luteal phases compared with the menstrual phase. The
+largest decrease in sleep score occurred during the fertility phase,
+suggesting that ovulation is associated with the poorest sleep quality.
+Overall, the model demonstrates that sleep quality varies systematically
+across the menstrual cycle, with the menstrual phase representing the
+period of highest sleep quality.</p>
 <pre class="r"><code>m2 &lt;- lmer(sleep_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m2, effects = &quot;fixed&quot;)|&gt;
   select(term, estimate, std.error,p.value) |&gt;
@@ -2345,6 +2409,20 @@ significant portion of that within-person fluctuation.</p>
 </div>
 <div id="stress-score-model" class="section level3">
 <h3>Stress score model</h3>
+<p>With an estimate of 0.032 and a p-value of 0.043 (which is less than
+the typical significance level of 0.05), deep_sleep_in_minutes is a
+significant positive predictor of stress score. This suggests that, on
+average, for every additional minute of deep sleep, the stress score is
+predicted to increase by 0.032 points, assuming other variables are
+constant. Time in bed is a is a significant positive predictor of stress
+score ( p = 0.013) For every additional minute in bed (mean), the stress
+score is predicted to increase by 0.009 points, holding all other
+variables constant. The 95% confidence intervals for the significant
+predictors (deep_sleep_in_minutes and timeinbed_mean) do not contain
+zero, further supporting their statistical significance. When we explore
+more variables, the menstrual phases do not affect the stress score
+significantly. But we can see the strong association between stress and
+sleep.</p>
 <pre class="r"><code>#  model
 m4 &lt;- lmer(stress_score ~ phase + deep_sleep_in_minutes +
            timeinbed_mean + total_active_min + moodswing_score +(1 | id), data = sleep_stress_df)
@@ -2477,77 +2555,77 @@ symptom_model_table</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">-2.8740211</td>
-<td align="right">0.2617355</td>
-<td align="right">-10.9806335</td>
+<td align="right">-2.8740063</td>
+<td align="right">0.2617214</td>
+<td align="right">-10.9811667</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">fatigue_score</td>
-<td align="right">0.0828352</td>
-<td align="right">0.0393638</td>
-<td align="right">2.1043502</td>
-<td align="right">0.0353479</td>
+<td align="right">0.0828337</td>
+<td align="right">0.0393637</td>
+<td align="right">2.1043197</td>
+<td align="right">0.0353506</td>
 </tr>
 <tr class="odd">
 <td align="left">cramps_score</td>
-<td align="right">0.6793600</td>
-<td align="right">0.0390456</td>
-<td align="right">17.3991598</td>
+<td align="right">0.6793591</td>
+<td align="right">0.0390455</td>
+<td align="right">17.3991514</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">sleepissue_score</td>
-<td align="right">-0.0988157</td>
+<td align="right">-0.0988167</td>
 <td align="right">0.0408318</td>
-<td align="right">-2.4200679</td>
-<td align="right">0.0155176</td>
+<td align="right">-2.4200929</td>
+<td align="right">0.0155165</td>
 </tr>
 <tr class="odd">
 <td align="left">exerciselevel_score</td>
-<td align="right">-0.0361540</td>
-<td align="right">0.0448749</td>
-<td align="right">-0.8056622</td>
-<td align="right">0.4204377</td>
+<td align="right">-0.0361530</td>
+<td align="right">0.0448746</td>
+<td align="right">-0.8056439</td>
+<td align="right">0.4204482</td>
 </tr>
 <tr class="even">
 <td align="left">appetite_score</td>
-<td align="right">0.0213428</td>
-<td align="right">0.0543040</td>
-<td align="right">0.3930237</td>
-<td align="right">0.6943020</td>
+<td align="right">0.0213400</td>
+<td align="right">0.0543029</td>
+<td align="right">0.3929812</td>
+<td align="right">0.6943334</td>
 </tr>
 <tr class="odd">
 <td align="left">bloating_score</td>
-<td align="right">0.1999467</td>
+<td align="right">0.1999499</td>
 <td align="right">0.0455794</td>
-<td align="right">4.3867754</td>
+<td align="right">4.3868442</td>
 <td align="right">0.0000115</td>
 </tr>
 <tr class="even">
 <td align="left">moodswing_score</td>
-<td align="right">0.0239386</td>
-<td align="right">0.0396494</td>
-<td align="right">0.6037568</td>
-<td align="right">0.5460054</td>
+<td align="right">0.0239383</td>
+<td align="right">0.0396493</td>
+<td align="right">0.6037511</td>
+<td align="right">0.5460091</td>
 </tr>
 <tr class="odd">
 <td align="left">indigestion_score</td>
-<td align="right">0.0004684</td>
+<td align="right">0.0004675</td>
 <td align="right">0.0460566</td>
-<td align="right">0.0101706</td>
-<td align="right">0.9918851</td>
+<td align="right">0.0101495</td>
+<td align="right">0.9919020</td>
 </tr>
 <tr class="even">
 <td align="left">sorebreasts_score</td>
-<td align="right">0.1716188</td>
-<td align="right">0.0473759</td>
-<td align="right">3.6224898</td>
-<td align="right">0.0002918</td>
+<td align="right">0.1716200</td>
+<td align="right">0.0473757</td>
+<td align="right">3.6225284</td>
+<td align="right">0.0002917</td>
 </tr>
 <tr class="odd">
 <td align="left">sd__(Intercept)</td>
-<td align="right">0.7640288</td>
+<td align="right">0.7640276</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -2569,28 +2647,28 @@ physiology_model_table</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">-0.0847347</td>
-<td align="right">0.1118339</td>
-<td align="right">-0.7576829</td>
-<td align="right">0.4486408</td>
+<td align="right">-0.0847353</td>
+<td align="right">0.1118287</td>
+<td align="right">-0.7577244</td>
+<td align="right">0.4486160</td>
 </tr>
 <tr class="even">
 <td align="left">estrogen</td>
 <td align="right">-0.0107894</td>
 <td align="right">0.0006200</td>
-<td align="right">-17.4029663</td>
+<td align="right">-17.4031601</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="odd">
 <td align="left">lh</td>
-<td align="right">-0.0399827</td>
+<td align="right">-0.0399829</td>
 <td align="right">0.0076412</td>
-<td align="right">-5.2325334</td>
+<td align="right">-5.2325559</td>
 <td align="right">0.0000002</td>
 </tr>
 <tr class="even">
 <td align="left">sd__(Intercept)</td>
-<td align="right">0.5473770</td>
+<td align="right">0.5473760</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
@@ -3681,7 +3759,7 @@ summary(model_indigestion)</code></pre>
 ## 
 ## Fixed effects:
 ##                    Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)        1.769395   0.244309  32.741431   7.242 2.75e-08 ***
+## (Intercept)        1.769395   0.244309  32.741430   7.242 2.75e-08 ***
 ## total_active_min  -0.001599   0.001182 467.608774  -1.353   0.1766    
 ## phasefollicular   -0.186153   0.135431 469.771507  -1.375   0.1699    
 ## phasefertility    -0.312394   0.136794 469.868346  -2.284   0.0228 *  
@@ -3879,6 +3957,35 @@ hypothesis, the model found no significant relationship between estrogen
 levels and appetite scores (p = 0.402), suggesting other factors drive
 appetite changes across the cycle.</p>
 </div>
+<div id="stress-and-sleep" class="section level3">
+<h3>Stress and sleep</h3>
+<p>This analysis cyclical variations in sleep quality and perceived
+stress across the menstrual cycle using mixed-effects models to account
+for repeated measures within individuals. The findings demonstrate
+consistent and meaningful changes in both sleep and stress that align
+with known physiological fluctuations across the menstrual phases.</p>
+<p>Sleep quality was highest during the menstrual phase and decreased
+significantly during the follicular, fertility, and luteal phases.
+Notably, the fertility (ovulatory) phase showed the largest decline in
+sleep score, suggesting that the hormonal surge—particularly in estrogen
+and luteinizing hormone—may disrupt restorative sleep. This pattern
+aligns with previous research indicating that ovulation can be
+associated with increased physiological arousal and thermoregulatory
+changes, which may impair sleep continuity and depth. Despite spending
+more time in bed during menstruation, participants achieved better sleep
+quality during this phase, possibly reflecting a compensatory
+physiological need for rest.</p>
+<p>Stress scores followed a complementary pattern: participants
+experienced the lowest stress (i.e., highest stress scores) during the
+menstrual phase and the highest stress during the fertility and luteal
+phases. The increase in stress during the luteal phase is consistent
+with known premenstrual symptoms such as mood fluctuations,
+irritability, and heightened emotional sensitivity. The elevated stress
+during the ovulatory window may reflect endocrine-driven changes that
+influence emotional reactivity or cognitive load. Together, these
+results underscore the interconnected nature of hormonal rhythms, stress
+regulation, and sleep quality across the menstrual cycle.</p>
+</div>
 <div id="multimodal-discussion" class="section level3">
 <h3>Multimodal discussion</h3>
 <p>Emily We found several associations between menstrual symptoms and
@@ -3964,7 +4071,13 @@ rather than truly continuous. While ordinal mixed models would be
 theoretically more appropriate, linear models are standard practice for
 Likert scales with 6+ levels and provide more interpretable estimates.
 High individual heterogeneity in exercise-symptom relationships may
-obscure subgroup effects averaged in population-level models.</p>
+obscure subgroup effects averaged in population-level models. Khue : The
+sample size and ethnic distribution may limit generalizability; some
+ethnic groups were represented by fewer participants, potentially
+affecting the stability of subgroup trends. In addition, leep and stress
+scores were derived from self-reported or device-based composite
+measures, which may not capture the full complexity of physiological
+processes such as sleep architecture or cortisol variation.</p>
 </div>
 </div>
 
