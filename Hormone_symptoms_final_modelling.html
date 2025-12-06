@@ -36,6 +36,8 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
@@ -409,265 +411,394 @@ MODELLING</h1>
 </div>
 
 
-<div id="hormone-and-symptoms" class="section level1">
-<h1>Hormone and Symptoms</h1>
-<div id="mood-swing-linear-mixed-models" class="section level2">
-<h2>Mood Swing Linear Mixed Models</h2>
-<p>Test whether mood swing differ by menstrual phase, accounting for
-repeated measures.</p>
+<p><br></p>
+<p>This analysis examines whether hormone levels predict menstrual
+symptom severity.</p>
+<p><br></p>
+<div id="mood-swings-by-menstrual-phase" class="section level2">
+<h2>Mood Swings by Menstrual Phase</h2>
+<p>We tested whether mood swing severity differs by menstrual phase,
+accounting for repeated measures within individuals. We chose to fit
+linear mixed-effects models with random intercepts, as our data violates
+the independence assumption for standard linear regression, and to
+account for repeated measures within participants.</p>
 <pre class="r"><code>mood_mixed_model &lt;- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
 
 
-create_model_table &lt;- function(model, model_name) {
-  # Get tidy output
-  tidy_output &lt;- tidy(model, effects = &quot;fixed&quot;, conf.int = TRUE)
-  
-  # Extract p-values from model summary
-  p_values &lt;- summary(model)$coefficients[, ncol(summary(model)$coefficients)]
-  
-  # Create the table
-  table &lt;- tidy_output %&gt;%
-    select(term, estimate, std.error, conf.low, conf.high) %&gt;%
-    mutate(
-      p.value = p_values[match(term, names(p_values))],
-      significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;),
-      model = model_name
-    ) %&gt;%
-    select(model, everything())
-  
-  return(table)
-}
-mood_table = create_model_table(mood_mixed_model, &quot;Mood Swing ~ Phase&quot;)|&gt;
-  knitr::kable(digits = 3)
-mood_table</code></pre>
-<table>
-<colgroup>
-<col width="20%" />
-<col width="17%" />
-<col width="9%" />
-<col width="10%" />
-<col width="9%" />
-<col width="10%" />
-<col width="8%" />
-<col width="12%" />
-</colgroup>
+create_model_table(mood_mixed_model, &quot;Mood Swing ~ Phase&quot;) |&gt;
+  kable(digits = 3,
+        col.names = c(&quot;Model&quot;, &quot;Term&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;CI Lower&quot;, &quot;CI Upper&quot;, &quot;p-value&quot;, &quot;Significant&quot;),
+        caption = &quot;Linear Mixed Model: Mood Swing by Menstrual Phase&quot;) |&gt;
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Linear Mixed Model: Mood Swing by Menstrual Phase
+</caption>
 <thead>
-<tr class="header">
-<th align="left">model</th>
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">conf.low</th>
-<th align="right">conf.high</th>
-<th align="right">p.value</th>
-<th align="left">significant</th>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+CI Lower
+</th>
+<th style="text-align:right;">
+CI Upper
+</th>
+<th style="text-align:right;">
+p-value
+</th>
+<th style="text-align:left;">
+Significant
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Mood Swing ~ Phase</td>
-<td align="left">(Intercept)</td>
-<td align="right">1.428</td>
-<td align="right">0.157</td>
-<td align="right">1.112</td>
-<td align="right">1.743</td>
-<td align="right">0.000</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Mood Swing ~ Phase
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.428
+</td>
+<td style="text-align:right;">
+0.157
+</td>
+<td style="text-align:right;">
+1.112
+</td>
+<td style="text-align:right;">
+1.743
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
-<tr class="even">
-<td align="left">Mood Swing ~ Phase</td>
-<td align="left">phasefollicular</td>
-<td align="right">-0.024</td>
-<td align="right">0.056</td>
-<td align="right">-0.134</td>
-<td align="right">0.085</td>
-<td align="right">0.662</td>
-<td align="left">No</td>
+<tr>
+<td style="text-align:left;">
+Mood Swing ~ Phase
+</td>
+<td style="text-align:left;">
+phasefollicular
+</td>
+<td style="text-align:right;">
+-0.024
+</td>
+<td style="text-align:right;">
+0.056
+</td>
+<td style="text-align:right;">
+-0.134
+</td>
+<td style="text-align:right;">
+0.085
+</td>
+<td style="text-align:right;">
+0.662
+</td>
+<td style="text-align:left;">
+No
+</td>
 </tr>
-<tr class="odd">
-<td align="left">Mood Swing ~ Phase</td>
-<td align="left">phaseluteal</td>
-<td align="right">0.104</td>
-<td align="right">0.053</td>
-<td align="right">0.001</td>
-<td align="right">0.208</td>
-<td align="right">0.047</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Mood Swing ~ Phase
+</td>
+<td style="text-align:left;">
+phaseluteal
+</td>
+<td style="text-align:right;">
+0.104
+</td>
+<td style="text-align:right;">
+0.053
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:right;">
+0.208
+</td>
+<td style="text-align:right;">
+0.047
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
-<tr class="even">
-<td align="left">Mood Swing ~ Phase</td>
-<td align="left">phasemenstrual</td>
-<td align="right">0.345</td>
-<td align="right">0.061</td>
-<td align="right">0.224</td>
-<td align="right">0.465</td>
-<td align="right">0.000</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Mood Swing ~ Phase
+</td>
+<td style="text-align:left;">
+phasemenstrual
+</td>
+<td style="text-align:right;">
+0.345
+</td>
+<td style="text-align:right;">
+0.061
+</td>
+<td style="text-align:right;">
+0.224
+</td>
+<td style="text-align:right;">
+0.465
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
 </tbody>
 </table>
-<p>Based on the model results, the average mood swing score during the
-menstrual phase (the model intercept) is 1.77. Compared to this,
-symptoms are modestly lower in other phases, with the follicular phase
-showing the largest reduction of 0.37 points, followed by the fertility
-window at 0.34 points lower, and the luteal phase at 0.24 points lower.
-However, the analysis reveals that individual differences between
-participants are substantial; the random effects standard deviation of
-0.98 for participant baselines is nearly identical to the residual
-standard deviation of 1.00, indicating that the unique baseline score of
-an individual accounts for as much variance in the data as all other
-unmeasured factors and the cycle phases combined. Therefore, while a
-statistically significant pattern links the menstrual phase to higher
-symptom reports, the predominant finding is the extensive variability
-from person to person, underscoring that the experience of cycle-related
-mood swings is highly individual.</p>
+<p>The average mood swing score during the menstrual phase (intercept)
+is 1.77. Compared to menstruation, symptoms are modestly lower in other
+phases: the follicular phase shows the largest reduction (-0.37 points),
+followed by the fertility window (-0.34 points) and the luteal phase
+(-0.24 points). However, individual differences between participants are
+substantial — the random effects standard deviation (0.98) is nearly
+identical to the residual standard deviation (1.00), indicating that
+individual baseline differences account for as much variance as all
+other factors combined. While a statistically significant pattern links
+the menstrual phase to higher mood swing reports, the predominant
+finding is extensive person-to-person variability.</p>
+<p><br></p>
 </div>
-<div id="flow-volume-vs-lh" class="section level2">
-<h2>Flow volume vs LH</h2>
-<p>Observing in exploratory scatter plots that self-reported flow volume
-scores appeared to follow an inverse pattern relative to luteinizing
-hormone (LH) levels, I conducted a linear mixed model analysis to
-formally test this visual hypothesis. The model was used to determine if
-this apparent inverse relationship was statistically significant when
-rigorously accounting for the repeated measures within each individual
-participant.</p>
+<div id="flow-volume-luteinizing-hormone-lh" class="section level2">
+<h2>Flow Volume &amp; Luteinizing Hormone (LH)</h2>
+<p>Exploratory scatter plots suggested an inverse relationship between
+self-reported flow volume and LH levels. We fit a linear mixed model to
+formally test this association.</p>
 <pre class="r"><code>flow_volume_model &lt;- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms)
 
-flow_table &lt;- create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;)|&gt;
-  knitr::kable(digits = 3)
-flow_table</code></pre>
-<table>
-<colgroup>
-<col width="19%" />
-<col width="13%" />
-<col width="10%" />
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="9%" />
-<col width="13%" />
-</colgroup>
+
+create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;) |&gt;
+  kable(digits = 3,
+        col.names = c(&quot;Model&quot;, &quot;Term&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;CI Lower&quot;, &quot;CI Upper&quot;, &quot;p-value&quot;, &quot;Significant&quot;),
+        caption = &quot;Linear Mixed Model: Flow Volume by LH Level&quot;) |&gt;
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Linear Mixed Model: Flow Volume by LH Level
+</caption>
 <thead>
-<tr class="header">
-<th align="left">model</th>
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">conf.low</th>
-<th align="right">conf.high</th>
-<th align="right">p.value</th>
-<th align="left">significant</th>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+CI Lower
+</th>
+<th style="text-align:right;">
+CI Upper
+</th>
+<th style="text-align:right;">
+p-value
+</th>
+<th style="text-align:left;">
+Significant
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Flow Volume ~ LH</td>
-<td align="left">(Intercept)</td>
-<td align="right">0.641</td>
-<td align="right">0.077</td>
-<td align="right">0.486</td>
-<td align="right">0.797</td>
-<td align="right">0.000</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Flow Volume ~ LH
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.641
+</td>
+<td style="text-align:right;">
+0.077
+</td>
+<td style="text-align:right;">
+0.486
+</td>
+<td style="text-align:right;">
+0.797
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
-<tr class="even">
-<td align="left">Flow Volume ~ LH</td>
-<td align="left">lh</td>
-<td align="right">-0.011</td>
-<td align="right">0.004</td>
-<td align="right">-0.018</td>
-<td align="right">-0.004</td>
-<td align="right">0.001</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Flow Volume ~ LH
+</td>
+<td style="text-align:left;">
+lh
+</td>
+<td style="text-align:right;">
+-0.011
+</td>
+<td style="text-align:right;">
+0.004
+</td>
+<td style="text-align:right;">
+-0.018
+</td>
+<td style="text-align:right;">
+-0.004
+</td>
+<td style="text-align:right;">
+0.001
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
 </tbody>
 </table>
-<p>Based on the linear mixed model, a significant but modest
-relationship exists between luteinizing hormone (LH) levels and
-perceived menstrual flow volume. For every one-unit increase in LH, the
-flow volume score is estimated to decrease by -0.01138 points (p =
-0.00129). While statistically significant, this effect is small in
-magnitude. The model indicates substantial individual differences, as
-the variation in scores within a single person over time (residual SD =
-1.19) is much greater than the average differences between individuals’
-baselines (intercept SD = 0.45). Therefore, while LH shows a significant
-inverse association with flow volume, within-person biological and
-measurement variability remains the dominant feature of the data.</p>
+<p>A significant but modest inverse relationship exists between LH
+levels and perceived flow volume. For every one-unit increase in LH,
+flow volume score decreases by 0.011 points (p = 0.001). While
+statistically significant, this effect is small in magnitude. The model
+indicates substantial individual differences — within-person variability
+(residual SD = 1.19) is much greater than between-person differences
+(intercept SD = 0.45). Therefore, while LH shows a significant inverse
+association with flow volume, within-person biological and measurement
+variability remains the dominant feature.</p>
+<p><br></p>
 </div>
-<div id="appetite-vs-estrogen" class="section level2">
-<h2>Appetite vs Estrogen</h2>
-<p>After observing in a scatter plot that average moodswing scores
-appeared to follow estrogen patterns, I applied a linear mixed model to
-appetite to formally test whether estrogen levels directly predict its
-changes within individuals.</p>
+<div id="appetite-estrogen" class="section level2">
+<h2>Appetite &amp; Estrogen</h2>
+<p>Based on exploratory visualizations suggesting appetite patterns may
+follow estrogen levels, we tested whether estrogen directly predicts
+appetite changes within individuals.</p>
 <pre class="r"><code>appetite_model &lt;- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
-appetite_table &lt;- create_model_table(appetite_model, &quot;Appetite ~ Estrogen&quot;)|&gt;
-  knitr::kable(digits = 3)
-appetite_table</code></pre>
-<table style="width:100%;">
-<colgroup>
-<col width="22%" />
-<col width="13%" />
-<col width="10%" />
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="8%" />
-<col width="13%" />
-</colgroup>
+
+create_model_table(appetite_model, &quot;Appetite ~ Estrogen&quot;) |&gt;
+  kable(digits = 3,
+        col.names = c(&quot;Model&quot;, &quot;Term&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;CI Lower&quot;, &quot;CI Upper&quot;, &quot;p-value&quot;, &quot;Significant&quot;),
+        caption = &quot;Linear Mixed Model: Appetite by Estrogen Level&quot;) |&gt;
+  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
+<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Linear Mixed Model: Appetite by Estrogen Level
+</caption>
 <thead>
-<tr class="header">
-<th align="left">model</th>
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">conf.low</th>
-<th align="right">conf.high</th>
-<th align="right">p.value</th>
-<th align="left">significant</th>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+CI Lower
+</th>
+<th style="text-align:right;">
+CI Upper
+</th>
+<th style="text-align:right;">
+p-value
+</th>
+<th style="text-align:left;">
+Significant
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Appetite ~ Estrogen</td>
-<td align="left">(Intercept)</td>
-<td align="right">2.894</td>
-<td align="right">0.069</td>
-<td align="right">2.754</td>
-<td align="right">3.033</td>
-<td align="right">0.000</td>
-<td align="left">Yes</td>
+<tr>
+<td style="text-align:left;">
+Appetite ~ Estrogen
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+2.894
+</td>
+<td style="text-align:right;">
+0.069
+</td>
+<td style="text-align:right;">
+2.754
+</td>
+<td style="text-align:right;">
+3.033
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:left;">
+Yes
+</td>
 </tr>
-<tr class="even">
-<td align="left">Appetite ~ Estrogen</td>
-<td align="left">estrogen</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.000</td>
-<td align="right">0.385</td>
-<td align="left">No</td>
+<tr>
+<td style="text-align:left;">
+Appetite ~ Estrogen
+</td>
+<td style="text-align:left;">
+estrogen
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.385
+</td>
+<td style="text-align:left;">
+No
+</td>
 </tr>
 </tbody>
 </table>
-<p>Based on the linear mixed-effects model, the analysis finds no
-statistically significant relationship between measured estrogen levels
-and self-reported appetite scores in this dataset. The model estimates
-that for every one-unit increase in estrogen, the appetite score
-increases by a mere 0.0001137 points, an effect size so small as to be
-negligible. This relationship is not reliable, as indicated by a p-value
-of 0.402, which is far above the conventional threshold for
-significance. The model estimates the average appetite score when
-estrogen is zero to be 2.897 points. More notably, the random effects
-structure reveals that differences between individuals account for
-meaningful variation; the standard deviation of individual baseline
-scores is 0.415, while the standard deviation of the within-person
-residuals is 0.726. This indicates that while people have different
-typical appetite levels, the unexplained variation within a person’s own
-measurements over time is nearly twice as large as the differences
-between individuals, and estrogen, as modeled here, does not explain a
-significant portion of that within-person fluctuation.</p>
-</div>
+<p>The model finds no statistically significant relationship between
+estrogen levels and appetite scores (p = 0.402). The estimated effect is
+negligible; for every one-unit increase in estrogen, appetite score
+increases by only 0.0001 points. The random effects structure reveals
+that within-person residual variation (SD = 0.73) is nearly twice as
+large as between-person differences (SD = 0.42), and estrogen does not
+explain a significant portion of within-person fluctuation.</p>
 </div>
 
 

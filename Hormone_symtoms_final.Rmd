@@ -20,8 +20,11 @@ options(
 )
 ```
 
+<br>
+
 This analysis explores how hormone levels (estrogen and LH) and self-reported symptoms (mood swings, flow volume, and appetite) vary across menstrual cycle.
 
+<br>
 
 ```{r, warning= FALSE, include=FALSE}
 hormone_symptoms_eda=
