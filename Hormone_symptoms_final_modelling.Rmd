@@ -4,7 +4,58 @@ output:
   html_document:
     code_folding: hide 
 ---
+```{r, include=FALSE}
+library(tidyverse)
+library(broom)
+library(broom.mixed)
+library(lme4)
+# Set plot theme
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.discrete.colour = function(...) scale_colour_brewer(..., palette = "Pastel2"),
+  ggplot2.discrete.fill   = function(...) scale_fill_brewer(..., palette = "Pastel2"),
 
+  ggplot2.continuous.colour = function(...) scale_colour_distiller(..., palette = "PuRd"),
+  ggplot2.continuous.fill   = function(...) scale_fill_distiller(..., palette = "PuRd")
+)
+```
+
+Mood SwingLinear Mixed Models
+
+Test whether mood swing and fatigue differ by menstrual phase, accounting for repeated measures.
+```{r, echo=FALSE}
+mood_mixed_model <- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
+
+
+create_model_table <- function(model, model_name) {
+  # Get tidy output
+  tidy_output <- tidy(model, effects = "fixed", conf.int = TRUE)
+  
+  # Extract p-values from model summary
+  p_values <- summary(model)$coefficients[, ncol(summary(model)$coefficients)]
+  
+  # Create the table
+  table <- tidy_output %>%
+    select(term, estimate, std.error, conf.low, conf.high) %>%
+    mutate(
+      p.value = p_values[match(term, names(p_values))],
+      significant = ifelse(p.value < 0.05, "Yes", "No"),
+      model = model_name
+    ) %>%
+    select(model, everything())
+  
+  return(table)
+}
+
+
+mood_table <- create_model_table(mood_mixed_model, "Mood Swing ~ Phase")|>
+  knitr::kable(digits = 3)
+mood_table
+
+
+```
+
+Mood swings are lowest near ovulation, slightly higher in Luteal, and peak during Menstrual phase. Fatigue shows a similar pattern: lowest near ovulation, increasing through Luteal, highest during Menstrual phase. Random effects indicate that some individuals are chronically more fatigued or mood-sensitive than others, while residual variance captures day-to-day variability.
 Linear Mixed Model
 
 Flow volume vs lh

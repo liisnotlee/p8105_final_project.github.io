@@ -774,7 +774,7 @@ Menstrual phase has the highest average flow (2.38), whereas luteal is the lowes
 <br>
 
 #### Average Appetite Across Phases
-We looked at average appetite to observe general trends across the menstrual cycle.
+Here, we looked at average appetite to observe general trends across the menstrual cycle.
 ```{r, warning= FALSE, fig.height = 7}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
