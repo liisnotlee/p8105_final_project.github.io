@@ -19,12 +19,12 @@ navbar:
     - text: "Statistical Modelling"
       menu:
       - text: "Hormone & Symptoms"
-        href: Hormone_symtoms_final.html
+        href: Hormone_symtoms_final_modelling.html
       - text: "Sleep & Stress"
         href: sleep_stress_final_modelling.html
       - text: "Exercise"
         href: exercise_final_modelling.html
-      - text: "Overall Model"
+      - text: "Multimodal Models"
         href: report.html
     - text: "Proposal"
       href: p8105_final_project_proposal.html
