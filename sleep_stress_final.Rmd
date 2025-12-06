@@ -2,8 +2,7 @@
 title: "Sleep and Stress"
 output:
   html_document:
-    toc: false
-    toc_float: false
+    code_folding: hide 
 ---
 
 ```{r setup , include = FALSE}

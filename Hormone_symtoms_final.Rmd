@@ -2,8 +2,7 @@
 title: "HORMONE & SYMPTOMS: EXPLORATORY DATA ANALYSIS"
 output:
   html_document:
-    toc: false
-    toc_float: false
+    code_folding: hide 
 ---
 ```{r, include=FALSE}
 library(tidyverse)
@@ -21,10 +20,14 @@ options(
 )
 ```
 
+This analysis explores how hormone levels (estrogen and LH) and self-reported symptoms (mood swings, flow volume, and appetite) vary across menstrual cycle.
 
 
 ```{r, warning= FALSE}
-hormone_symptoms_eda=
+
+hormone_symptoms = read.csv("./clean_data/hormone_symptoms.csv")
+
+hormone_symptoms_eda =
   hormone_symptoms|>
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
@@ -83,7 +86,7 @@ The violin plots show significant inter-individual variability. Menstrual phase 
 
 <br>
 
-#### Average Mood Swing Across Phases
+### Average Mood Swing Across Phases
 
 To understand general moodswing trends, we can summarize the average mood swing intensity across phases.
 ```{r, warning= FALSE}
@@ -122,7 +125,7 @@ Average mood swing intensity is highest in menstrual phase (1.85), lowest in lut
 
 <br>
 
-#### Flow Volume Distribution Across Phases
+## Flow Volume Distribution Across Phases
 Here, we assessed flow volume distribution patterns, and visualize flow volume variation across phases with violin plots.
 
 ```{r, warning= FALSE}
@@ -147,7 +150,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 <br>
 
-#### Average Flow Volume Across Phases
+## Average Flow Volume Across Phases
 We looked at average flow volume to observe general trends across the menstrual cycle.
 ```{r, warning= FALSE, fig.height = 7}
 cycle_avg <- hormone_symptoms_eda |>
@@ -182,7 +185,7 @@ Menstrual phase has the highest average flow (2.38), whereas luteal is the lowes
 
 <br>
 
-#### Average Appetite Across Phases
+## Average Appetite Across Phases
 Here, we look at average appetite to observe general trends across the menstrual cycle.
 ```{r, warning= FALSE, fig.height = 7}
 # Appetite
