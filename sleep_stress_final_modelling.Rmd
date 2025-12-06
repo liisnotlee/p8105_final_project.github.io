@@ -5,6 +5,12 @@ output:
     code_folding: hide 
 ---
 
+<br>
+
+In this analysis, we examine how sleep quality and stress levels fluctuate across menstrual cycle phases, and whether sleep metrics predict stress.
+
+<br>
+
 ```{r setup , include = FALSE}
 library(tidyverse)
 library(ggplot2)
@@ -45,22 +51,6 @@ Because higher scores reflect lower perceived stress, these negative estimates i
 
 
 ```{r,message=FALSE, warning=FALSE}
-
-all_data_df = 
-  read_csv("clean_data/all_daily_data.csv") |>
-  janitor::clean_names()
-subject_info = 
-  read_csv("clean_data/subject_info.csv") |>
-  janitor::clean_names() |>
-  select(id, ethnicity, education_abrv)
-sleep_stress_df = all_data_df|>
-  filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
-  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
-  mutate(
-    phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
-  )
-sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
-
 m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
 tidy(m1, effects = "fixed", conf.int = TRUE)|>
   select(term, estimate, std.error,p.value, conf.low, conf.high) |>
@@ -114,5 +104,6 @@ This analysis cyclical variations in sleep quality and perceived stress across t
 Sleep quality was highest during the menstrual phase and decreased significantly during the follicular, fertility, and luteal phases. Notably, the fertility (ovulatory) phase showed the largest decline in sleep score, suggesting that the hormonal surge—particularly in estrogen and luteinizing hormone—may disrupt restorative sleep. This pattern aligns with previous research indicating that ovulation can be associated with increased physiological arousal and thermoregulatory changes, which may impair sleep continuity and depth. Despite spending more time in bed during menstruation, participants achieved better sleep quality during this phase, possibly reflecting a compensatory physiological need for rest.
 
 Stress scores followed a complementary pattern: participants experienced the lowest stress (i.e., highest stress scores) during the menstrual phase and the highest stress during the fertility and luteal phases. The increase in stress during the luteal phase is consistent with known premenstrual symptoms such as mood fluctuations, irritability, and heightened emotional sensitivity. The elevated stress during the ovulatory window may reflect endocrine-driven changes that influence emotional reactivity or cognitive load. Together, these results underscore the interconnected nature of hormonal rhythms, stress regulation, and sleep quality across the menstrual cycle.
+
 **Limitation**
 The sample size and ethnic distribution may limit generalizability; some ethnic groups were represented by fewer participants, potentially affecting the stability of subgroup trends. In addition, leep and stress scores were derived from self-reported or device-based composite measures, which may not capture the full complexity of physiological processes such as sleep architecture or cortisol variation. 
