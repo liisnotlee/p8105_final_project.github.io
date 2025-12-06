@@ -89,6 +89,7 @@ sanity_check <- function(df){
 }
 ```
 
+4. After cleaned all dataframes, we exported them into csv files into a `clean_data` folder for reuse. For single lifestyle factor analyses (under the menu of lifestyle factor analyses), we used data from these cleaned csv files. 
 
 ## `subject_info` - Subject-Relevant Data
 
