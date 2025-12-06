@@ -1,5 +1,5 @@
 ---
-title: "Sleep and Stress"
+title: "SLEEP & STRESS: EXPLORATORY DATA ANALYSIS"
 output:
   html_document:
     code_folding: hide 
@@ -53,7 +53,14 @@ sleep_stress_df = all_data_df|>
 sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
 ```
 
-**View the sleep time for different participants in each study interval**
+<br>
+
+This page examines how sleep quality, time in bed, deep sleep, and stress levels vary across menstrual cycle phases, with additional comparisons across ethnic groups.
+
+<br>
+
+## Sleep Time Across Participants and Year
+
 The average sleep time for each person is different each study interval and varied across participants.  In 2022, some participants slept less than 5 hours and some slept more than 8 hours. In 2024, most participants have better sleep length, 7-8 hours. 
 ```{r, message=FALSE, warning=FALSE}
 # plot the mean timein bed in hour
@@ -69,8 +76,12 @@ The average sleep time for each person is different each study interval and vari
 
 ```
 
+<br>
+
+## Sleep & Stress Metrics
+
 The dataset has some stress score values equal zero which could be from an input error. This skewed the stress score histogram. We then remove the zero value for further analysis. Other continuous variables of our interest are normally distributed. 
-```{r}
+```{r, warning = FALSE}
 sleep_stress_df |> 
   select(stress_score,sleep_score, timeinbed_mean, deep_sleep_in_minutes) |> 
   pivot_longer(everything()) |> 
@@ -85,6 +96,9 @@ sleep_stress_df =
 ```
 Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase—when individuals typically experience higher energy levels—participants spent less time in bed but obtained greater amounts of deep sleep.
 
+<br>
+
+### Sleep & Stress Metrics Across Menstrual Phases
 ```{r,message=FALSE, warning=FALSE}
 # plot the variation of time in bed by menstrual phases
 timeinbed_plot =
@@ -254,8 +268,10 @@ plot_3 =
 plot_1 + plot_2 + plot_3
 ```
 
+<br>
 
-**View the stress and sleep score across menstrual cycle phases for each ethnicity** 
+### Sleep & Stress Metrics Across Menstrual Phases & Ethnicites 
+
 The figure illustrates mean sleep and stress scores across menstrual cycle phases, stratified by ethnicity. Overall, sleep scores show modest fluctuations across phases, with most groups exhibiting slightly higher sleep quality during the menstrual phase and lower scores during the fertility (ovulatory) phase. This pattern is most pronounced in the Middle Eastern group, which demonstrates a steady decline in sleep score from the menstrual to the luteal phase. Other groups, including East Asian, Southeast Asian, Latina, and White participants, show relatively stable sleep scores with minor dips during the fertility phase.
 
 Stress scores follow a similar cyclical pattern, with most ethnic groups reporting lower perceived stress (higher stress scores) during the follicular phase and higher perceived stress (lower stress scores) during the luteal phase. The Latina group shows the most pronounced fluctuation, with a peak in stress score during the follicular phase and a marked decline during the luteal phase. East Asian, Southeast Asian, and White participants show smaller but consistent shifts that align with expected hormonal changes across the menstrual cycle.
