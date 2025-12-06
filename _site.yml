@@ -11,7 +11,7 @@ navbar:
     - text: "Lifestyle Factors Analyses"
       menu:
       - text: "Hormone & Symptoms"
-        href: hormone_final.html
+        href: Hormone_symtoms_final.html
       - text: "Sleep & Stress"
         href: sleep_stress_khue.html
       - text: "Exercise"
