@@ -11,7 +11,7 @@
 
 
 
-<title>Hormone and Symptoms Analysis</title>
+<title>HORMONES &amp; SYMPTOMS: STATISTICAL MODELLING</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -29,6 +29,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
@@ -225,6 +228,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -232,6 +298,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -327,53 +403,43 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Hormone and Symptoms Analysis</h1>
+<h1 class="title toc-ignore">HORMONES &amp; SYMPTOMS: STATISTICAL
+MODELLING</h1>
 
 </div>
 
 
-<div id="hormone-and-symptoms" class="section level2">
-<h2>Hormone and Symptoms</h2>
-<div id="lh-estrogen" class="section level3">
-<h3>LH &amp; Estrogen</h3>
-<p>We want to examine average estrogen and LH levels across menstrual
-cycle phases to see if hormonal patterns match biological
-expectations</p>
-<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
-Estrogen levels are highest in the Fertility (ovulatory) phase, second
-highest in Luteal, and relatively low in Menstrual, gradually rising
-from Follicular to Luteal. LH is much lower than estrogen overall,
-peaking sharply in Fertility and remaining low in the other phases.</p>
-</div>
-</div>
-<div id="life-factors" class="section level2">
-<h2>Life factors</h2>
-<div id="mood-swing" class="section level3">
-<h3>Mood Swing</h3>
-<p>Moodswing Distribution Across Phases</p>
-<p>Using violin plots to assess whether menstrual cycle hases influence
-mood swing intensity.</p>
-<pre><code>## Warning: Removed 464 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
-<p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-4-1.png" width="672" />
-Violin plots show substantial inter-individual variability. Menstrual
-phase has the highest mood swing intensity (right-skewed distribution,
-peak around 1.85), while Luteal phase shows lower values with a wider
-base (more individuals with low mood swing).</p>
-<p>Average Mood Swing Across Phases To visualize general trends, we
-should summarize the average mood swing intensity across phases.
-<img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>Average mood swing is highest in Menstrual phase (1.85), lowest in
-Luteal phase (1.41), with intermediate levels in follicular and
-fertility phases.</p>
-<p>Mood SwingLinear Mixed Models</p>
-<p>Test whether mood swing and fatigue differ by menstrual phase,
-accounting for repeated measures.</p>
+<div id="hormone-and-symptoms" class="section level1">
+<h1>Hormone and Symptoms</h1>
+<div id="mood-swing-linear-mixed-models" class="section level2">
+<h2>Mood Swing Linear Mixed Models</h2>
+<p>Test whether mood swing differ by menstrual phase, accounting for
+repeated measures.</p>
+<pre class="r"><code>mood_mixed_model &lt;- lmer(moodswing_score ~ phase + (1 | id), data = hormone_symptoms)
+
+
+create_model_table &lt;- function(model, model_name) {
+  # Get tidy output
+  tidy_output &lt;- tidy(model, effects = &quot;fixed&quot;, conf.int = TRUE)
+  
+  # Extract p-values from model summary
+  p_values &lt;- summary(model)$coefficients[, ncol(summary(model)$coefficients)]
+  
+  # Create the table
+  table &lt;- tidy_output %&gt;%
+    select(term, estimate, std.error, conf.low, conf.high) %&gt;%
+    mutate(
+      p.value = p_values[match(term, names(p_values))],
+      significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;),
+      model = model_name
+    ) %&gt;%
+    select(model, everything())
+  
+  return(table)
+}
+mood_table = create_model_table(mood_mixed_model, &quot;Mood Swing ~ Phase&quot;)|&gt;
+  knitr::kable(digits = 3)
+mood_table</code></pre>
 <table>
 <colgroup>
 <col width="20%" />
@@ -403,10 +469,10 @@ accounting for repeated measures.</p>
 <td align="left">(Intercept)</td>
 <td align="right">1.428</td>
 <td align="right">0.157</td>
-<td align="right">1.120</td>
-<td align="right">1.735</td>
-<td align="right">9.108</td>
-<td align="left">No</td>
+<td align="right">1.112</td>
+<td align="right">1.743</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Mood Swing ~ Phase</td>
@@ -415,8 +481,8 @@ accounting for repeated measures.</p>
 <td align="right">0.056</td>
 <td align="right">-0.134</td>
 <td align="right">0.085</td>
-<td align="right">-0.437</td>
-<td align="left">Yes</td>
+<td align="right">0.662</td>
+<td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">Mood Swing ~ Phase</td>
@@ -425,8 +491,8 @@ accounting for repeated measures.</p>
 <td align="right">0.053</td>
 <td align="right">0.001</td>
 <td align="right">0.208</td>
-<td align="right">1.985</td>
-<td align="left">No</td>
+<td align="right">0.047</td>
+<td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Mood Swing ~ Phase</td>
@@ -435,42 +501,179 @@ accounting for repeated measures.</p>
 <td align="right">0.061</td>
 <td align="right">0.224</td>
 <td align="right">0.465</td>
-<td align="right">5.607</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Based on the model results, the average mood swing score during the
+menstrual phase (the model intercept) is 1.77. Compared to this,
+symptoms are modestly lower in other phases, with the follicular phase
+showing the largest reduction of 0.37 points, followed by the fertility
+window at 0.34 points lower, and the luteal phase at 0.24 points lower.
+However, the analysis reveals that individual differences between
+participants are substantial; the random effects standard deviation of
+0.98 for participant baselines is nearly identical to the residual
+standard deviation of 1.00, indicating that the unique baseline score of
+an individual accounts for as much variance in the data as all other
+unmeasured factors and the cycle phases combined. Therefore, while a
+statistically significant pattern links the menstrual phase to higher
+symptom reports, the predominant finding is the extensive variability
+from person to person, underscoring that the experience of cycle-related
+mood swings is highly individual.</p>
+</div>
+<div id="flow-volume-vs-lh" class="section level2">
+<h2>Flow volume vs LH</h2>
+<p>Observing in exploratory scatter plots that self-reported flow volume
+scores appeared to follow an inverse pattern relative to luteinizing
+hormone (LH) levels, I conducted a linear mixed model analysis to
+formally test this visual hypothesis. The model was used to determine if
+this apparent inverse relationship was statistically significant when
+rigorously accounting for the repeated measures within each individual
+participant.</p>
+<pre class="r"><code>flow_volume_model &lt;- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms)
+
+flow_table &lt;- create_model_table(flow_volume_model, &quot;Flow Volume ~ LH&quot;)|&gt;
+  knitr::kable(digits = 3)
+flow_table</code></pre>
+<table>
+<colgroup>
+<col width="19%" />
+<col width="13%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="9%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Flow Volume ~ LH</td>
+<td align="left">(Intercept)</td>
+<td align="right">0.641</td>
+<td align="right">0.077</td>
+<td align="right">0.486</td>
+<td align="right">0.797</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">Flow Volume ~ LH</td>
+<td align="left">lh</td>
+<td align="right">-0.011</td>
+<td align="right">0.004</td>
+<td align="right">-0.018</td>
+<td align="right">-0.004</td>
+<td align="right">0.001</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Based on the linear mixed model, a significant but modest
+relationship exists between luteinizing hormone (LH) levels and
+perceived menstrual flow volume. For every one-unit increase in LH, the
+flow volume score is estimated to decrease by -0.01138 points (p =
+0.00129). While statistically significant, this effect is small in
+magnitude. The model indicates substantial individual differences, as
+the variation in scores within a single person over time (residual SD =
+1.19) is much greater than the average differences between individuals’
+baselines (intercept SD = 0.45). Therefore, while LH shows a significant
+inverse association with flow volume, within-person biological and
+measurement variability remains the dominant feature of the data.</p>
+</div>
+<div id="appetite-vs-estrogen" class="section level2">
+<h2>Appetite vs Estrogen</h2>
+<p>After observing in a scatter plot that average moodswing scores
+appeared to follow estrogen patterns, I applied a linear mixed model to
+appetite to formally test whether estrogen levels directly predict its
+changes within individuals.</p>
+<pre class="r"><code>appetite_model &lt;- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
+appetite_table &lt;- create_model_table(appetite_model, &quot;Appetite ~ Estrogen&quot;)|&gt;
+  knitr::kable(digits = 3)
+appetite_table</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="22%" />
+<col width="13%" />
+<col width="10%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="8%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="right">p.value</th>
+<th align="left">significant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Appetite ~ Estrogen</td>
+<td align="left">(Intercept)</td>
+<td align="right">2.894</td>
+<td align="right">0.069</td>
+<td align="right">2.754</td>
+<td align="right">3.033</td>
+<td align="right">0.000</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">Appetite ~ Estrogen</td>
+<td align="left">estrogen</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.385</td>
 <td align="left">No</td>
 </tr>
 </tbody>
 </table>
-<p>Mood swings are lowest near ovulation, slightly higher in Luteal, and
-peak during Menstrual phase. Fatigue shows a similar pattern: lowest
-near ovulation, increasing through Luteal, highest during Menstrual
-phase. Random effects indicate that some individuals are chronically
-more fatigued or mood-sensitive than others, while residual variance
-captures day-to-day variability.</p>
-</div>
-<div id="flow-volume" class="section level3">
-<h3>Flow Volume</h3>
-<p>Flow Volume Distribution Across Phases</p>
-<p>To assess flow volume distribution patterns, we visualize flow volume
-variation across phases with violin plots.</p>
-<pre><code>## Warning: Removed 24 rows containing non-finite outside the scale range
-## (`stat_ydensity()`).</code></pre>
-<pre><code>## Warning: Removed 1146 rows containing missing values or values outside the scale range
-## (`geom_point()`).</code></pre>
-<p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-7-1.png" width="672" />
-Luteal phase shows a right-skewed distribution, indicating most low-flow
-observations but a few high-flow days. Menstrual phase is narrow and
-tall, indicating consistently higher flow intensity.</p>
-<p>Average Flow Volume Across Phases</p>
-<p>Summarize average flow volume to observe general trends across the
-menstrual cycle.
-<img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-8-1.png" width="672" />
-Menstrual phase has the highest average flow (2.38), luteal is lowest
-(0.03), fertility is 0.07, and follicular is 0.23.</p>
+<p>Based on the linear mixed-effects model, the analysis finds no
+statistically significant relationship between measured estrogen levels
+and self-reported appetite scores in this dataset. The model estimates
+that for every one-unit increase in estrogen, the appetite score
+increases by a mere 0.0001137 points, an effect size so small as to be
+negligible. This relationship is not reliable, as indicated by a p-value
+of 0.402, which is far above the conventional threshold for
+significance. The model estimates the average appetite score when
+estrogen is zero to be 2.897 points. More notably, the random effects
+structure reveals that differences between individuals account for
+meaningful variation; the standard deviation of individual baseline
+scores is 0.415, while the standard deviation of the within-person
+residuals is 0.726. This indicates that while people have different
+typical appetite levels, the unexplained variation within a person’s own
+measurements over time is nearly twice as large as the differences
+between individuals, and estrogen, as modeled here, does not explain a
+significant portion of that within-person fluctuation.</p>
 </div>
 </div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -504,10 +707,39 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
