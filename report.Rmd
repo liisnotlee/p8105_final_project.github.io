@@ -1051,7 +1051,7 @@ tidy(m2, effects = "fixed")|>
   knitr::kable(digits = 3)
 ```
 
-### EXERCISE
+### Exericse
 #### Distribution of Key Exercise Metrics
 ```{r, fig.width = 13, fig.height = 12}
 
