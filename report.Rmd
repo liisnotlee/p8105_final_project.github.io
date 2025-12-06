@@ -801,7 +801,7 @@ Average appetite score was highest in the fertility phase (2.96), a pattern that
 ### Sleep & Stress
 
 Menstruators spent more time in bed during the menstrual phase; however, their deep-sleep duration was lowest during this period. This pattern suggests that although increased physical fatigue during menstruation may prompt individuals to rest longer, it may simultaneously impair the ability to achieve restorative sleep. In contrast, during the follicular phase, when individuals typically experience higher energy levels, participants spent less time in bed but obtained greater amounts of deep sleep.
-```{r, message=FALSE, warning= FALSE}
+```{r, message=FALSE, warning= FALSE, include=FALSE}
 sleep_stress_df = all_daily_data|>
   filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
   filter(stress_score != 0)|>
