@@ -21,6 +21,7 @@ library(ggsci)
 library(knitr)
 library(broom.mixed) # for tidy
 library(scales)
+library(kableExtra)
 
 # Set plot theme
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -648,6 +649,7 @@ lh_estro_plot =
   )
 ```
 Estrogen levels are highest in the fertility (ovulatory) phase, second highest in luteal, and relatively low in menstrual, gradually rising from follicular to lluteal. Overall, LH levels are much lower than estrogen, peaking sharply during fertility phase, and remaining low in the other phases.
+
 #### Average Appetite Across Phases
 We looked at average appetite to observe general trends across the menstrual cycle. Average appetite score was highest in the fertility phase (2.96), a pattern that visually paralleled the estrogen trend we saw earlier. This warrants formal statistical testing, where we can investigate the relationship between the two (using a linear mixed model).
 ```{r, warning= FALSE, fig.height = 7}
@@ -778,7 +780,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 #### Average Flow Volume Across Phases
 We looked at average flow volume to observe general trends across the menstrual cycle.
-```{r, warning= FALSE, fig.height = 7}
+```{r, warning= FALSE, fig.height = 8, fig.wdith = 6}
  
 # Flow Volume
 flow_plot2 =
@@ -1033,8 +1035,9 @@ sleep_stress_df |>
 
 
 ### Exercise
-#### Distribution of Key Exercise Metrics
-```{r, fig.width = 13, fig.height = 12}
+
+#### Distribution of Exercise Metrics
+```{r, fig.width = 14, fig.height = 13}
 
 exercise_analysis = all_daily_data
 
@@ -1095,6 +1098,7 @@ p4 = ggplot(exercise_analysis |> filter(n_sessions > 0),
   plot_layout(guides = "collect")
 
 ```
+
 **Step Count Distribution:** Daily steps on active days showed pronounced right-skew 
 with a median of 4,455 steps. The bulk of 
 observations fell between 2,000-8,000 steps, with a long tail extending beyond 20,000 steps. 
@@ -1118,10 +1122,12 @@ clear mode at 2 sessions. The 2024 cohort showed higher frequencies of 2+ sessio
 to 2022, suggesting either improved activity tracking or genuinely more structured exercise 
 routines.
 
-These distributions collectively demonstrate substantial right-skew, high between-person 
+These distributions collectively demonstrate substantial right-skew, and high 
 variability.
 
-#### Exercise patterns across menstrual cycle phases
+<br>
+
+#### Exercise Patterns Across Menstrual Cycle Phases
 ```{r, fig.width = 10, fig.height = 10}
 
 p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0, total_steps < 50000), 
@@ -1152,11 +1158,13 @@ p2 = ggplot(exercise_analysis |> filter(!is.na(phase), total_active_min > 0),
 
 p1 / p2 + plot_layout(guides = "collect")
 ```
+**Daily Steps:** In 2022, step counts remained relatively stable across all phases, with medians around 3,000-4,000 steps. In 2024, phase-related differences were more pronounced; the fertility phase showed higher median step counts (~6,000 steps), while the luteal and menstrual phases showed lower activity (~5,000 steps). The 2024 cohort demonstrated consistently higher step counts across all phases compared to 2022. Five extreme observations (≥50,000 steps) were excluded from this visualization as they distorted the scale and were obvious data errors.
 
-Physical activity varied across menstrual cycle phases, with patterns differing by year. In 2022, activity levels remained relatively stable across phases, with only slight differences between fertility, follicular, luteal, and menstrual phases. In contrast, 2024 showed more pronounced phase-related patterns, with the fertility phase demonstrating highest activity levels, followed by the follicular phase, and lower activity during luteal and menstrual phases. Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns. The 2024 cohort showed consistently higher activity across all phases compared to 2022, confirming the year differences observed in overall descriptive statistics. 
+**Active Minutes:** Similar patterns emerged for active minutes. In 2022, all phases showed comparable median active time (~30-40 minutes). In 2024, the fertility phase showed higher active minutes (~ 70 minutes), while follicular, luteal and menstrual phases were lower (~50-60 minutes). Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns. 
 
-#### Exercise vs. menstrual symptoms
+<br>
 
+#### Exercise and Symptom Associations
 ```{r, fig.width = 10, fig.height = 10, warning = FALSE, message = FALSE}
 symptoms_long = exercise_analysis |> 
   filter(total_active_min > 0) |> 
@@ -1183,39 +1191,41 @@ symptoms_long = exercise_analysis |>
 p4 = ggplot(symptoms_long, 
              aes(x = total_active_min, y = severity, color = symptom)) +
   geom_jitter(alpha = 0.2, size = 0.5, height = 0.1) +
-  geom_smooth(method = "lm", se = TRUE, linewidth = 1.5, alpha = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.0, alpha = 0.2) +
   facet_wrap(~symptom, ncol = 2) +
   labs(title = "Daily Activity vs Individual Symptoms",
        x = "Total Daily Activity (mins)",
        y = "Symptom Severity (0-5)") +
   scale_x_continuous(labels = comma) +
   scale_y_continuous(breaks = 0:5) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  scale_color_brewer(palette = "Set2")
 
 p4
 ```
 The scatterplots examine crude associations between daily  activity (exercise) and each symptom:
 
 **Negative slopes (potential benefits):**
-- **Bloating**: Modest downward trend suggests higher activity associates with reduced bloating
-- **Food cravings**: Slight negative association, though relationship appears weak
-- **Indigestion**: Minimal negative slope with high variability
+
+* **Bloating**: Considerable downward trend suggests higher activity level is associated with reduced bloating
+* **Fatigue**: Considerable downward trend suggests higher activity is level associated with reduced fatigue
+* **Food cravings**: Considerable downward trend suggests higher activity level is associated with fewer food cravings
+* **Head aches**: Slight downward trend suggests higher activity level is associated with fewer headaches
+* **Indigestion**: Considerable downward trend suggests higher activity level is associated with lower indigestion
 
 **Flat relationships (no clear association):**
-- **Cramps**: Near-horizontal line despite being primary outcome
-- **Appetite, headaches, sleep issues, sore breasts**: Essentially flat with wide confidence bands
-- **Mood swings**: Slight positive but nearly flat, high uncertainty
 
-**Positive slope (likely reverse causation):**
-- **Fatigue**: Higher fatigue appears to reduce exercise, not vice versa
+* **Appetite, headaches, sleep issues, sore breasts, moodswings**: Nearly flat line
+* **Cramps**: Near-horizontal line despite often being referred as one of the primary symptoms of menstruation
 
 **Sleep issues** and **sore breasts** exhibited insufficient data spread to estimate reliable trends
 
-Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, the considerable scatter reveals that individual-level associations vary widely, i.e., some participants show strong exercise-symptom relationships while others show none. Third, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Fourth, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.
+Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Third, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.Given the observable trends between daily activity and symptom severity, formal statistical modeling would be beneficial to quantify these associations and determine whether these relationships are statistically significant after accounting for potential confounders.
 
+<br>
 
 ## Modelling
-### Hormone and Symptoms
+### Hormone & Symptoms Modelling
 #### Mood Swing Linear Mixed Models
 
 
@@ -1279,7 +1289,9 @@ appetite_table
 
 Based on the linear mixed-effects model, the analysis finds no statistically significant relationship between measured estrogen levels and self-reported appetite scores in this dataset. The model estimates that for every one-unit increase in estrogen, the appetite score increases by a mere 0.0001137 points, an effect size so small as to be negligible. This relationship is not reliable, as indicated by a p > 0.05. The model estimates the average appetite score when estrogen is zero to be 2.897 points. More notably, the random effects structure reveals that differences between individuals account for meaningful variation; the standard deviation of individual baseline scores is 0.415, while the standard deviation of the within-person residuals is 0.726. This indicates that while people have different typical appetite levels, the unexplained variation within a person's own measurements over time is nearly twice as large as the differences between individuals, and estrogen, as modeled here, does not explain a significant portion of that within-person fluctuation.
 
-#### Stress score model
+<br>
+
+### Sleep & Stress Modelling
 Our dataset are from two studies in two different times, year 2022 and year 2024 in which the 2024 cohort is a subset from 2022 cohorts. Therefore the assumptions of independence is violated so we cannot use statistical tests that required independence assumptions. 
 Instead, we used generalized linear mixed effects model to evaluate the significant different of stress score and sleep score between menstrual phases. 
 A linear mixed-effects model was fitted to examine the association between menstrual cycle phase and stress score, with menstrual phase as the reference category and participant included as a random intercept. The results showed that stress scores during the follicular phase did not differ significantly from the menstrual phase (estimate = 0.291, SE = 0.213, p> 0.05). In contrast, stress scores were significantly lower during the fertility (ovulatory) phase (estimate = –0.594, SE = 0.211, p < 0.01) and the luteal phase (estimate = –0.525, SE = 0.198, p <0.01) compared with the menstrual phase.
@@ -1321,7 +1333,126 @@ tidy(m4, effects = "fixed", conf.int = TRUE)|>
   knitr::kable(digits = 3)
 ```
 
-### Multimodel Modeling 
+<br>
+
+### Exercise Modelling
+We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. However, mixed-effects models explicitly account for this hierarchical data structure through random effects.
+
+For each of 10 symptoms, we fit models with:
+
+*   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
+*   **Predictor**: Total active exercise minutes per day
+*   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+*   **Random effects**: Random intercepts for participants (1|id)
+
+The random intercept for participant ID accounts for repeated measures within individuals across both days and study years, including the 20 participants (47.6%) who contributed data in both 2022 and 2024.
+
+Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
+
+```{r, results = 'hide'}
+# Model 1: Exercise → cramps
+model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_cramps)
+
+# Model 2: Exercise → fatigue
+model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_fatigue)
+
+# Model 3: Exercise → headaches
+model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_headaches)
+
+# Model 4: Exercise → mood swings
+model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_mood)
+
+# Model 5: Exercise → sleep issues
+model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sleep)
+
+# Model 6: Exercise → bloating
+model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_bloating)
+
+# Model 7: Exercise → appetite
+model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_appetite)
+
+# Model 8: Exercise → sore breasts
+model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sorebreasts)
+
+# Model 9: Exercise → food cravings
+model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_foodcravings)
+
+# Model 10: Exercise → indigestion
+model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_indigestion)
+
+```
+
+```{r}
+# Extracting coefficients for exercise effect
+results_summary = bind_rows(
+  tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
+  tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
+  tidy(model_headaches, effects = "fixed") %>% mutate(outcome = "Head Aches"),
+  tidy(model_mood, effects = "fixed") %>% mutate(outcome = "Mood Swings"),
+  tidy(model_sleep, effects = "fixed") %>% mutate(outcome = "Sleep Issues"),
+  tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
+  tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite"),
+  tidy(model_indigestion, effects = "fixed") %>% mutate(outcome = "Indigestion"),
+  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore Breasts"),
+  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food Cravings")
+) %>%
+  filter(term == "total_active_min") %>%
+  select(outcome, estimate, std.error, statistic, p.value) %>%
+  arrange(outcome) %>%
+  mutate(
+    significant = ifelse(p.value < 0.05, "Yes", "No"),
+    across(c(estimate, std.error, statistic), ~round(.x, 4)),
+    p.value = format.pval(p.value, digits = 3, eps = 0.001)
+  )
+
+kable(results_summary,
+      col.names = c("Symptom", "Estimate", "SE", "t-statistic", "p-value", "Significant"),
+      caption = "Effect of Daily Active Minutes on Symptom Severity",
+      align = c("l", "r", "r", "r", "r", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 10 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0027, SE = 0.0014, p = 0.0493).
+
+For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
+
+The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were insignificant with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
+
+Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = 0, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
+
+<br>
+
+### Multivariate Modelling 
 This section leverages the same cleaned data set used in other parts of this analysis. For further simplification with regression, two new variables were created - `race_simplified`, which collapses specific ethnicity categories into broader racial groups (any with a count < 3 was put into other if there was not an applicable category already). Additionally, for simplicity of running the regression focusing on solely menstrual symptoms, a binary variable reporting `menstruation` as "no" (0) or "yes" (1) was created. `merged_df_model` was created to easily run both demographic and daily data through a regression model. 
 ```{r, include=FALSE}
 merged_df_model = all_daily_data %>%
@@ -1428,119 +1559,14 @@ We found sleep issues to be positively associated with an educational attainment
 
 We found sore breasts to be only positively associated with older age (p < 0.01). We did not find cramping symptoms to be associated with any biometric or demographic characteristic. 
 
-### EXERCISE MODELLING
-
-We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. Mixed-effects models explicitly account for this hierarchical data structure through random effects.
-
-For each of 11 symptoms, we fit models with:
-
--   **Outcome**: Symptom severity (0-5 scale)
--   **Predictor**: Total active exercise minutes per day
--   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
--   **Random effects**: Random intercepts for participants (1|id)
-
-The random intercept structure accounts for repeated measures within individuals, including the 20 participants (47.6%) who contributed data in both 2022 and 2024 study intervals. Each participant's random intercept captures their baseline symptom tendency, allowing the model to distinguish between-person effects (do people who exercise more generally have fewer symptoms?) from within-person effects (on days when a person exercises more, do they experience fewer symptoms?). 
-
-Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
-```{r}
-
-# Model 1: Exercise → cramps
-model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_cramps)
-
-# Model 2: Exercise → fatigue
-model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_fatigue)
-
-# Model 3: Exercise → headaches
-model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_headaches)
-
-# Model 4: Exercise → mood swings
-model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_mood)
-
-# Model 5: Exercise → sleep issues
-model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_sleep)
-
-# Model 6: Exercise → bloating
-model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_bloating)
-
-# Model 7: Exercise → appetite
-model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_appetite)
-
-# Model 8: Exercise → sore breasts
-model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_sorebreasts)
-
-# Model 9: Exercise → food cravings
-model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_foodcravings)
-
-# Model 10: Exercise → indigestion
-model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_indigestion)
-
-```
+<br>
 
 
-```{r}
-# Cleaning results:
-# Extracting coefficients for exercise effect
-results_summary = bind_rows(
-  tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
-  tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
-  tidy(model_headaches, effects = "fixed") %>% mutate(outcome = "Head Aches"),
-  tidy(model_mood, effects = "fixed") %>% mutate(outcome = "Mood Swings"),
-  tidy(model_sleep, effects = "fixed") %>% mutate(outcome = "Sleep Issues"),
-  tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
-  tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite"),
-  tidy(model_indigestion, effects = "fixed") %>% mutate(outcome = "Indigestion"),
-  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore breasts"),
-  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food cravings")
-) %>%
-  filter(term == "total_active_min") %>%
-  select(outcome, estimate, std.error, statistic, p.value) %>%
-  mutate(
-    significant = ifelse(p.value < 0.05, "Yes", "No"),
-    p.value = format.pval(p.value, digits = 3, eps = 0.001)
-  )
+## Conclusion
 
-knitr::kable(results_summary)
-```
-Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 11 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0026819	, SE = 0.0013608, p = 0.0493).
+### Discussion
 
-For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
-
-The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were near-zero with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
-
-Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = -0.00005, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
-
-
-## Discussion
+### Limitations
 
 ### Data Handling
 
@@ -1574,7 +1600,7 @@ Contrary to expectations, mixed-effects models revealed minimal evidence for dai
 
 Several factors may explain these null findings. First, the predominance of walking-based activity may be insufficient to produce detectable symptom changes. Prior research demonstrating exercise benefits typically involves structured, moderate-to-vigorous intensity programs rather than daily walking variations. Second, individual heterogeneity was substantial; some participants may benefit from exercise while others do not, with population-level models averaging across these diverse responses and obscuring subgroup effects. Third, reverse causation is plausible: symptoms may reduce exercise more than exercise reduces symptoms, as evidenced by activity decreasing during symptomatic phases. Finally, daily variations in light-to-moderate activity may genuinely have minimal influence on symptom severity at the population level.
 
-### Multimodal discussion 
+### Multivariate discussion 
 
 We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. Interestingly, lifestyle characteristics were consistently among the most significant results in our models, particularly race, education, and BMI. 
 

@@ -1,5 +1,5 @@
 ---
-title: "MULTIMODAL MODELLING"
+title: "MULTIVARIATE MODELLING"
 output:
   html_document:
     code_folding: hide 
