@@ -150,7 +150,9 @@ create_model_table <- function(model, model_name) {
 }
 
 
-mood_table <- create_model_table(mood_mixed_model, "Mood Swing ~ Phase")
+mood_table <- create_model_table(mood_mixed_model, "Mood Swing ~ Phase")|>
+  knitr::kable(digits = 3)
+mood_table
 
 
 ```
@@ -216,7 +218,8 @@ Observing in exploratory scatter plots that self-reported flow volume scores app
 
 ```{r}
 flow_volume_model <- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms)
-flow_table <- create_model_table(flow_volume_model, "Flow Volume ~ LH")
+flow_table <- create_model_table(flow_volume_model, "Flow Volume ~ LH")|>
+  knitr::kable(digits = 3)
 flow_table
 ```
 
@@ -250,7 +253,8 @@ Explore the relationship between estrogen levels and appetite scores, accounting
 ```{r, echo=FALSE}
 
 appetite_model <- lmer(appetite_score ~ estrogen + (1 | id), data = hormone_symptoms)
-appetite_table <- create_model_table(appetite_model, "Appetite ~ Estrogen")
+appetite_table <- create_model_table(appetite_model, "Appetite ~ Estrogen")|>
+  knitr::kable(digits = 3)
 appetite_table
 ```
 Random intercept variance (0.1746) indicates participant-specific baseline appetite differences. The fixed effect of estrogen is small (0.00013 per unit) and not significant (t = 0.869).
