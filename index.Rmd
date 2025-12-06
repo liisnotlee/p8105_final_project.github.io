@@ -12,19 +12,20 @@ output:
 ::: {.row}
 ::: {.col-md-8}
 # Unlocking the Cycle
-Not just a monthly event, menstruation is a critical, often-overlooked indicator that impacts the productivity, mental well-being, and overall health of hundreds of millions of women globally. However, its symptoms often remain a complex, frustrating mystery. 
+Not just a monthly event, menstruation is a critical, often-overlooked indicator that impacts the productivity, mental well-being, and overall health of hundreds of millions of menstruators globally. However, its symptoms often remain a complex, frustrating mystery. 
 
 In this project, we seek to uncover the correlations driving common menstruation symptoms by applying advanced analytical techniques to comprehensive lifestyle datasets, including detailed records of sleep sessions, stress levels, physical activity, and hormone fluctuations. 
 
-At its core, this project is dedicated to advancing the understanding and optimization of health for all women through the power of data.
+At its core, this project is dedicated to advancing the understanding and optimization of health for all menstruators through the power of data.
 
 --------
 
 Website content:
 
 - **Report**: Access our final comprehensive research report
-- **Data**: Dive into the complete dataset used for our analysis, including a detailed outline of all data cleaning steps.
-- **Lifestyle Factor Analyses**: Navigate through sections covering our specific analysis of different factors' correlations with symptoms.
+- **Data**: Dive into the complete dataset used for our analyses, including a detailed outline of all data cleaning steps.
+- **Exploratory Data Analyses**: Navigate through sections covering our specific analyses of different lifestyle factors and menstrual health.
+- **Statistical Modelling**: Check out our formal statistical modelling, where we investigate associations between lifestyle factors and menstrual symptoms.
 - **Proposal**: Review the project's initial proposal and foundational design.
 
 ----------
@@ -48,34 +49,32 @@ TODO youtube link
 ![](img/menstrual-pants.png)
 
 ### Muying Li, MS, RD
-PhD Student in the Department of Biomedical Informatics
-
+PhD Candidate, Biomedical Informatics | Vagelos College of Physicians and Surgeons 
 :::
 ::: {.col-md-2}
 
 ![](img/menstrual-cup.png)
 
 ### Emily Brynn Weaver
-PhD Student in the Environmental Health Sciences Department
+PhD Candidate, Environmental Health Sciences | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/calendar.png)
 
 ### Yue Zhao
-
-Master Student in Epidemiology 
+MS Candidate, Epidemiology | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/medical-checkup.png)
 
 ### Anu Singh
-Master student in Epidemiology
+MS Candidate, Epidemiology | Mailman School of Public Health
 :::
 ::: {.col-md-2}
 ![](img/pad.png)
 
 ### Khue Nhu Nguyen
-Master student in Biostatistics
+MS Candidate, Biostatistics | Mailman School of Public Health
 :::
 :::
 

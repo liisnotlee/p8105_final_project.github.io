@@ -24,6 +24,8 @@ navbar:
         href: sleep_stress_final.html
       - text: "Exercise"
         href: exercise_final_modelling.html
+      - text: "Overall Model"
+        href: report.html
     - text: "Proposal"
       href: p8105_final_project_proposal.html
   right:
