@@ -11,7 +11,7 @@
 
 
 
-<title>EXCERCISE</title>
+<title>EXCERCISE: EXPLORATORY DATA ANALYSIS</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -340,7 +340,7 @@ div.tocify {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Lifestyle Factors Analyses
+    Exploratory Data Analyses
      
     <span class="caret"></span>
   </a>
@@ -353,6 +353,24 @@ div.tocify {
     </li>
     <li>
       <a href="exercise_final.html">Exercise</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Statistical Modelling
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+    </li>
+    <li>
+      <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_final_modelling.html">Exercise</a>
     </li>
   </ul>
 </li>
@@ -384,18 +402,16 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EXCERCISE</h1>
+<h1 class="title toc-ignore">EXCERCISE: EXPLORATORY DATA ANALYSIS</h1>
 
 </div>
 
 
 <p><br></p>
-<p>The following exploratory analysis investigates the relationship
-between objectively measured exercise (steps, active minutes, calories)
-metrics and self-reported menstrual symptoms across different menstrual
-cycle phases. We use data from both study intervals (2022 and 2024) to
-examine whether physical activity is associated with symptom
-severity.</p>
+<p>This analysis investigates the relationship between objectively
+measured exercise (steps, active minutes, calories) metrics and
+self-reported menstrual symptoms across different menstrual cycle
+phases. We use data from both study intervals (2022 and 2024).</p>
 <p><br></p>
 <div id="data-quality-assessment" class="section level2">
 <h2>Data Quality Assessment</h2>
@@ -1333,397 +1349,6 @@ activity and symptom severity, formal statistical modeling would be
 beneficial to quantify these associations and determine whether these
 relationships are statistically significant after accounting for
 potential confounders.</p>
-</div>
-</div>
-<div id="modelling-and-inferential-analysis" class="section level2">
-<h2>Modelling and inferential analysis</h2>
-<p>We used linear mixed-effects models to test associations between
-daily physical activity and menstrual symptom severity. This modeling
-approach was necessary because our data violate the independence
-assumption of standard linear regression. However, mixed-effects models
-explicitly account for this hierarchical data structure through random
-effects.</p>
-<p>For each of 10 symptoms, we fit models with:</p>
-<ul>
-<li><strong>Outcome</strong>: Symptom severity (Scale: 0 = None, 5 =
-Very High)</li>
-<li><strong>Predictor</strong>: Total active exercise minutes per
-day</li>
-<li><strong>Covariate</strong>: Menstrual cycle phase (Menstrual,
-Follicular, Fertility, Luteal)</li>
-<li><strong>Random effects</strong>: Random intercepts for participants
-(1|id)</li>
-</ul>
-<p>The random intercept for participant ID accounts for repeated
-measures within individuals across both days and study years, including
-the 20 participants (47.6%) who contributed data in both 2022 and
-2024.</p>
-<p>Models were fit using the lme4 package in R with REML = FALSE.
-Statistical significance was assessed at α = 0.05.</p>
-<pre class="r"><code># Model 1: Exercise → cramps
-model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_cramps)
-
-# Model 2: Exercise → fatigue
-model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_fatigue)
-
-# Model 3: Exercise → headaches
-model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_headaches)
-
-# Model 4: Exercise → mood swings
-model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_mood)
-
-# Model 5: Exercise → sleep issues
-model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_sleep)
-
-# Model 6: Exercise → bloating
-model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_bloating)
-
-# Model 7: Exercise → appetite
-model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_appetite)
-
-# Model 8: Exercise → sore breasts
-model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_sorebreasts)
-
-# Model 9: Exercise → food cravings
-model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_foodcravings)
-
-# Model 10: Exercise → indigestion
-model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
-                     data = exercise_analysis,
-                     REML = FALSE)
-summary(model_indigestion)</code></pre>
-<pre class="r"><code># Extracting coefficients for exercise effect
-results_summary = bind_rows(
-  tidy(model_cramps, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Cramps&quot;),
-  tidy(model_fatigue, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Fatigue&quot;),
-  tidy(model_headaches, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Head Aches&quot;),
-  tidy(model_mood, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Mood Swings&quot;),
-  tidy(model_sleep, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Sleep Issues&quot;),
-  tidy(model_bloating, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Bloating&quot;),
-  tidy(model_appetite, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Appetite&quot;),
-  tidy(model_indigestion, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Indigestion&quot;),
-  tidy(model_sorebreasts, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Sore Breasts&quot;),
-  tidy(model_foodcravings, effects = &quot;fixed&quot;) %&gt;% mutate(outcome = &quot;Food Cravings&quot;)
-) %&gt;%
-  filter(term == &quot;total_active_min&quot;) %&gt;%
-  select(outcome, estimate, std.error, statistic, p.value) %&gt;%
-  arrange(outcome) %&gt;%
-  mutate(
-    significant = ifelse(p.value &lt; 0.05, &quot;Yes&quot;, &quot;No&quot;),
-    across(c(estimate, std.error, statistic), ~round(.x, 4)),
-    p.value = format.pval(p.value, digits = 3, eps = 0.001)
-  )
-
-kable(results_summary,
-      col.names = c(&quot;Symptom&quot;, &quot;Estimate&quot;, &quot;SE&quot;, &quot;t-statistic&quot;, &quot;p-value&quot;, &quot;Significant&quot;),
-      caption = &quot;Effect of Daily Active Minutes on Symptom Severity&quot;,
-      align = c(&quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;, &quot;c&quot;)) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;), full_width = FALSE)</code></pre>
-<table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>
-Effect of Daily Active Minutes on Symptom Severity
-</caption>
-<thead>
-<tr>
-<th style="text-align:left;">
-Symptom
-</th>
-<th style="text-align:right;">
-Estimate
-</th>
-<th style="text-align:right;">
-SE
-</th>
-<th style="text-align:right;">
-t-statistic
-</th>
-<th style="text-align:right;">
-p-value
-</th>
-<th style="text-align:center;">
-Significant
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Appetite
-</td>
-<td style="text-align:right;">
-0.0003
-</td>
-<td style="text-align:right;">
-0.0009
-</td>
-<td style="text-align:right;">
-0.3699
-</td>
-<td style="text-align:right;">
-0.7116
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Bloating
-</td>
-<td style="text-align:right;">
--0.0003
-</td>
-<td style="text-align:right;">
-0.0011
-</td>
-<td style="text-align:right;">
--0.2266
-</td>
-<td style="text-align:right;">
-0.8209
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Cramps
-</td>
-<td style="text-align:right;">
-0.0000
-</td>
-<td style="text-align:right;">
-0.0011
-</td>
-<td style="text-align:right;">
--0.0443
-</td>
-<td style="text-align:right;">
-0.9647
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Fatigue
-</td>
-<td style="text-align:right;">
--0.0027
-</td>
-<td style="text-align:right;">
-0.0014
-</td>
-<td style="text-align:right;">
--1.9709
-</td>
-<td style="text-align:right;">
-0.0493
-</td>
-<td style="text-align:center;">
-Yes
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Food Cravings
-</td>
-<td style="text-align:right;">
--0.0013
-</td>
-<td style="text-align:right;">
-0.0014
-</td>
-<td style="text-align:right;">
--0.9429
-</td>
-<td style="text-align:right;">
-0.3462
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Head Aches
-</td>
-<td style="text-align:right;">
--0.0023
-</td>
-<td style="text-align:right;">
-0.0013
-</td>
-<td style="text-align:right;">
--1.8395
-</td>
-<td style="text-align:right;">
-0.0665
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Indigestion
-</td>
-<td style="text-align:right;">
--0.0016
-</td>
-<td style="text-align:right;">
-0.0012
-</td>
-<td style="text-align:right;">
--1.3533
-</td>
-<td style="text-align:right;">
-0.1766
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Mood Swings
-</td>
-<td style="text-align:right;">
--0.0011
-</td>
-<td style="text-align:right;">
-0.0012
-</td>
-<td style="text-align:right;">
--0.9191
-</td>
-<td style="text-align:right;">
-0.3585
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Sleep Issues
-</td>
-<td style="text-align:right;">
--0.0004
-</td>
-<td style="text-align:right;">
-0.0013
-</td>
-<td style="text-align:right;">
--0.3033
-</td>
-<td style="text-align:right;">
-0.7618
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Sore Breasts
-</td>
-<td style="text-align:right;">
-0.0004
-</td>
-<td style="text-align:right;">
-0.0009
-</td>
-<td style="text-align:right;">
-0.4592
-</td>
-<td style="text-align:right;">
-0.6463
-</td>
-<td style="text-align:center;">
-No
-</td>
-</tr>
-</tbody>
-</table>
-<p>Linear mixed-effects models showed limited evidence for associations
-between daily physical activity and menstrual symptom severity after
-controlling for cycle phase and individual differences. Of the 10
-symptoms examined, only fatigue showed statistically significant
-relationships with exercise at α = 0.05: fatigue (β = -0.0027, SE =
-0.0014, p = 0.0493).</p>
-<p>For fatigue, the negative coefficient indicates that each additional
-minute of daily active exercise was associated with a 0.0027 point
-decrease in fatigue severity on the 0-5 scale.</p>
-<p>The remaining 9 symptoms showed no significant associations with
-exercise. Effect estimates for these symptoms were insignificant with
-confidence intervals spanning positive and negative values, indicating
-no detectable relationship between daily exercise and symptom severity
-after controlling for menstrual cycle phase.</p>
-<p>Interestingly, cramps, the primary outcome of interest given its
-prominence in menstrual symptom research, showed essentially no
-association with exercise (β = 0, p = 0.9647). The point estimate had
-wide confidence intervals indicating no evidence of either beneficial or
-harmful effects.</p>
-<div id="model-diagnostics" class="section level3">
-<h3>Model Diagnostics</h3>
-<pre class="r"><code># Three essential plots
-par(mfrow = c(1, 3))
-
-# 1. Residuals vs Fitted (linearity + homoscedasticity)
-plot(fitted(model_fatigue), resid(model_fatigue),
-     xlab = &quot;Fitted Values&quot;, ylab = &quot;Residuals&quot;,
-     main = &quot;Residuals vs Fitted&quot;,
-     pch = 16, col = rgb(0, 0, 0, 0.3))
-abline(h = 0, col = &quot;red&quot;, lty = 2, lwd = 2)
-
-# 2. Q-Q Plot (normality of residuals)
-qqnorm(resid(model_cramps), main = &quot;Q-Q Plot: Residuals&quot;,
-       pch = 16, col = rgb(0, 0, 0, 0.3))
-qqline(resid(model_cramps), col = &quot;red&quot;, lwd = 2)
-
-# 3. Q-Q Plot (normality of random effects)
-qqnorm(ranef(model_cramps)$id[,1], main = &quot;Q-Q Plot: Random Effects&quot;,
-       pch = 16, col = rgb(0, 0, 0, 0.5))
-qqline(ranef(model_cramps)$id[,1], col = &quot;red&quot;, lwd = 2)</code></pre>
-<p><img src="exercise_final_files/figure-html/unnamed-chunk-12-1.png" width="960" /></p>
-<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
-<p>Only the fatigue model showed a statistically significant
-association, so diagnostic checks were conducted for this model only.
-The residual vs fitted plot shows diagonal banding typical of ordinal
-outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is
-expected when applying linear models to Likert-scale data. The Q-Q plots
-indicate that residuals and random effects are approximately normally
-distributed, supporting the use of mixed-effects models.</p>
 </div>
 </div>
 

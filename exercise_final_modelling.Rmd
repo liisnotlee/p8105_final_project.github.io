@@ -1,0 +1,158 @@
+---
+title: "EXCERCISE: STATISTICAL MODELLING"
+output: html_document
+---
+<br>
+
+This analysis investigates whether daily physical activity predicts menstrual symptom severity. We fit linear mixed-effects models for 10 symptoms, using active exercise minutes as the primary predictor while controlling for menstrual cycle phase.
+
+<br>
+
+## Model Specifications
+
+We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. However, mixed-effects models explicitly account for this hierarchical data structure through random effects.
+
+For each of 10 symptoms, we fit models with:
+
+*   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
+*   **Predictor**: Total active exercise minutes per day
+*   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
+*   **Random effects**: Random intercepts for participants (1|id)
+
+The random intercept for participant ID accounts for repeated measures within individuals across both days and study years, including the 20 participants (47.6%) who contributed data in both 2022 and 2024.
+
+Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
+
+<br>
+
+## Results
+```{r, results = 'hide'}
+# Model 1: Exercise → cramps
+model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_cramps)
+
+# Model 2: Exercise → fatigue
+model_fatigue = lmer(fatigue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_fatigue)
+
+# Model 3: Exercise → headaches
+model_headaches = lmer(headaches_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_headaches)
+
+# Model 4: Exercise → mood swings
+model_mood = lmer(moodswing_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_mood)
+
+# Model 5: Exercise → sleep issues
+model_sleep = lmer(sleepissue_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sleep)
+
+# Model 6: Exercise → bloating
+model_bloating = lmer(bloating_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_bloating)
+
+# Model 7: Exercise → appetite
+model_appetite = lmer(appetite_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_appetite)
+
+# Model 8: Exercise → sore breasts
+model_sorebreasts = lmer(sorebreasts_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_sorebreasts)
+
+# Model 9: Exercise → food cravings
+model_foodcravings = lmer(foodcravings_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_foodcravings)
+
+# Model 10: Exercise → indigestion
+model_indigestion = lmer(indigestion_score ~ total_active_min + phase + (1|id), 
+                     data = exercise_analysis,
+                     REML = FALSE)
+summary(model_indigestion)
+
+```
+
+```{r}
+# Extracting coefficients for exercise effect
+results_summary = bind_rows(
+  tidy(model_cramps, effects = "fixed") %>% mutate(outcome = "Cramps"),
+  tidy(model_fatigue, effects = "fixed") %>% mutate(outcome = "Fatigue"),
+  tidy(model_headaches, effects = "fixed") %>% mutate(outcome = "Head Aches"),
+  tidy(model_mood, effects = "fixed") %>% mutate(outcome = "Mood Swings"),
+  tidy(model_sleep, effects = "fixed") %>% mutate(outcome = "Sleep Issues"),
+  tidy(model_bloating, effects = "fixed") %>% mutate(outcome = "Bloating"),
+  tidy(model_appetite, effects = "fixed") %>% mutate(outcome = "Appetite"),
+  tidy(model_indigestion, effects = "fixed") %>% mutate(outcome = "Indigestion"),
+  tidy(model_sorebreasts, effects = "fixed") %>% mutate(outcome = "Sore Breasts"),
+  tidy(model_foodcravings, effects = "fixed") %>% mutate(outcome = "Food Cravings")
+) %>%
+  filter(term == "total_active_min") %>%
+  select(outcome, estimate, std.error, statistic, p.value) %>%
+  arrange(outcome) %>%
+  mutate(
+    significant = ifelse(p.value < 0.05, "Yes", "No"),
+    across(c(estimate, std.error, statistic), ~round(.x, 4)),
+    p.value = format.pval(p.value, digits = 3, eps = 0.001)
+  )
+
+kable(results_summary,
+      col.names = c("Symptom", "Estimate", "SE", "t-statistic", "p-value", "Significant"),
+      caption = "Effect of Daily Active Minutes on Symptom Severity",
+      align = c("l", "r", "r", "r", "r", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+Linear mixed-effects models showed limited evidence for associations between daily physical activity and menstrual symptom severity after controlling for cycle phase and individual differences. Of the 10 symptoms examined, only fatigue showed statistically significant relationships with exercise at α = 0.05: fatigue (β = -0.0027, SE = 0.0014, p = 0.0493).
+
+For fatigue, the negative coefficient indicates that each additional minute of daily active exercise was associated with a 0.0027 point decrease in fatigue severity on the 0-5 scale. 
+
+The remaining 9 symptoms showed no significant associations with exercise. Effect estimates for these symptoms were insignificant with confidence intervals spanning positive and negative values, indicating no detectable relationship between daily exercise and symptom severity after controlling for menstrual cycle phase.
+
+Interestingly, cramps, the primary outcome of interest given its prominence in menstrual symptom research, showed essentially no association with exercise (β = 0, p = 0.9647). The point estimate had wide confidence intervals indicating  no evidence of either beneficial or harmful effects.
+
+<br>
+
+## Model Diagnostics
+
+```{r, fig.width=10, fig.height=4}
+
+# Three essential plots
+par(mfrow = c(1, 3))
+
+# 1. Residuals vs Fitted (linearity + homoscedasticity)
+plot(fitted(model_fatigue), resid(model_fatigue),
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residuals vs Fitted",
+     pch = 16, col = rgb(0, 0, 0, 0.3))
+abline(h = 0, col = "red", lty = 2, lwd = 2)
+
+# 2. Q-Q Plot (normality of residuals)
+qqnorm(resid(model_cramps), main = "Q-Q Plot: Residuals",
+       pch = 16, col = rgb(0, 0, 0, 0.3))
+qqline(resid(model_cramps), col = "red", lwd = 2)
+
+# 3. Q-Q Plot (normality of random effects)
+qqnorm(ranef(model_cramps)$id[,1], main = "Q-Q Plot: Random Effects",
+       pch = 16, col = rgb(0, 0, 0, 0.5))
+qqline(ranef(model_cramps)$id[,1], col = "red", lwd = 2)
+
+par(mfrow = c(1, 1))
+```
+Only the fatigue model showed a statistically significant association, so diagnostic checks were conducted for this model only. The residual vs fitted plot shows diagonal banding typical of ordinal outcome data (symptom scores are discrete: 0, 1, 2, 3, 4, 5). This is expected when applying linear models to Likert-scale data. The Q-Q plots indicate that residuals and random effects are approximately normally distributed, supporting the use of mixed-effects models.

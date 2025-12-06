@@ -262,7 +262,7 @@ $(document).ready(function () {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Lifestyle Factors Analyses
+    Exploratory Data Analyses
      
     <span class="caret"></span>
   </a>
@@ -275,6 +275,24 @@ $(document).ready(function () {
     </li>
     <li>
       <a href="exercise_final.html">Exercise</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Statistical Modelling
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="hormone_symtoms_final.html">Hormone &amp; Symptoms</a>
+    </li>
+    <li>
+      <a href="sleep_stress_final.html">Sleep &amp; Stress</a>
+    </li>
+    <li>
+      <a href="exercise_final_modelling.html">Exercise</a>
     </li>
   </ul>
 </li>
@@ -318,12 +336,10 @@ $(document).ready(function () {
 <p>We want to examine average estrogen and LH levels across menstrual
 cycle phases to see if hormonal patterns match biological
 expectations</p>
-<pre><code>## Warning: Using `size` aesthetic for lines was
-## deprecated in ggplot2 3.4.0.
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ## ℹ Please use `linewidth` instead.
 ## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to
-## see where this warning was generated.</code></pre>
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 Estrogen levels are highest in the Fertility (ovulatory) phase, second
 highest in Luteal, and relatively low in Menstrual, gradually rising
@@ -338,9 +354,8 @@ peaking sharply in Fertility and remaining low in the other phases.</p>
 <p>Moodswing Distribution Across Phases</p>
 <p>Using violin plots to assess whether menstrual cycle hases influence
 mood swing intensity.</p>
-<pre><code>## Warning: Removed 488 rows containing missing values or
-## values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 467 rows containing missing values or values outside the scale
+## range (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 Violin plots show substantial inter-individual variability. Menstrual
 phase has the highest mood swing intensity (right-skewed distribution,
@@ -367,11 +382,10 @@ captures day-to-day variability.</p>
 <p>Flow Volume Distribution Across Phases</p>
 <p>To assess flow volume distribution patterns, we visualize flow volume
 variation across phases with violin plots.</p>
-<pre><code>## Warning: Removed 24 rows containing non-finite outside
-## the scale range (`stat_ydensity()`).</code></pre>
-<pre><code>## Warning: Removed 1184 rows containing missing values or
-## values outside the scale range
-## (`geom_point()`).</code></pre>
+<pre><code>## Warning: Removed 24 rows containing non-finite outside the scale range
+## (`stat_ydensity()`).</code></pre>
+<pre><code>## Warning: Removed 1145 rows containing missing values or values outside the
+## scale range (`geom_point()`).</code></pre>
 <p><img src="Hormone_symtoms_final_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 Luteal phase shows a right-skewed distribution, indicating most low-flow
 observations but a few high-flow days. Menstrual phase is narrow and
