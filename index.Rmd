@@ -5,9 +5,11 @@ output:
     toc: false
     toc_float: false
 ---
+<br>
 
 ## Data Science I Fall 2025 Final Project
 
+<br>
 
 ::: {.row}
 ::: {.col-md-8}
@@ -36,12 +38,13 @@ Website content:
 ::: 
 :::
 
+<br>
 
 # Screencast: Take a Tour of Our Website!
 
 TODO youtube link
 
-
+<br>
 
 # Powered by Women: Meet the All-Female Team
 ::: {.row}
