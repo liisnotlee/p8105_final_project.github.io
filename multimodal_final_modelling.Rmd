@@ -7,6 +7,49 @@ output:
 
 This section leverages the same cleaned data set used in other parts of this analysis. For further simplification with regression, two new variables were created - `race_simplified`, which collapses specific ethnicity categories into broader racial groups (any with a count < 3 was put into other if there was not an applicable category already). Additionally, for simplicity of running the regression focusing on solely menstrual symptoms, a binary variable reporting `menstruation` as "no" (0) or "yes" (1) was created. `merged_df_model` was created to easily run both demographic and daily data through a regression model. 
 ```{r, include=FALSE}
+# Loading libraries
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(broom.mixed)
+library(knitr)
+
+sleep_stress_daily <- read.csv("./clean_data/sleep_stress_daily.csv")
+hormone_symptoms <- read.csv("./clean_data/hormone_symptoms.csv")
+exercise_daily <- read.csv("./clean_data/exercise_daily.csv")
+
+subject_info <- read.csv("./clean_data/subject_info.csv") |>
+  mutate(
+    race_category = case_when(
+      ethnicity %in% c("East Asian", "South Asian", "Southeast Asian") ~ "Asian",
+      ethnicity == "White" ~ "White",
+      TRUE ~ "Other"),
+    race_category = factor(race_category, levels = c("Asian", "White", "Other"))
+  )
+
+all_daily_data <- hormone_symptoms |> 
+  # MERGE exercise & hormone
+  left_join(exercise_daily, by = c("id", "study_interval", "day_in_study")) |>
+  # add flag exercised_flag for easy filtering in the future analyses
+  # only need to keep exercised_flag==1 to have all rows with exercise data
+  mutate(
+    exercised_flag = ifelse(!is.na(n_sessions) & n_sessions > 0, 1, 0),
+    menstruation = factor(if_else(phase == "menstrual", 1, 0),
+                          levels = c(0, 1),
+                          labels = c("No", "Yes"))
+  ) |> 
+  # MERGE sleep & stress score data
+  # noticed hormone_symptoms df has a stress_score column 
+  # drop it
+  select(-stress_score) |> 
+  left_join(sleep_stress_daily, by = c("id", "study_interval", "day_in_study")) |> 
+  # add flag sleep_stress_flag for easy filtering in the future analyses
+  mutate(
+    sleep_stress_flag = ifelse(
+      !is.na(stress_score) & !is.na(sleep_score),1,0
+    )
+  )
+
 merged_df_model = all_daily_data %>%
   left_join(subject_info, by = "id", relationship = "many-to-many")
 

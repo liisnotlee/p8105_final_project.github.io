@@ -45,6 +45,22 @@ Because higher scores reflect lower perceived stress, these negative estimates i
 
 
 ```{r,message=FALSE, warning=FALSE}
+
+all_data_df = 
+  read_csv("clean_data/all_daily_data.csv") |>
+  janitor::clean_names()
+subject_info = 
+  read_csv("clean_data/subject_info.csv") |>
+  janitor::clean_names() |>
+  select(id, ethnicity, education_abrv)
+sleep_stress_df = all_data_df|>
+  filter(!is.na(stress_score) & !is.na(sleep_score) & !is.na(timeinbed_mean)) |>
+  select(id, study_interval, day_in_study, phase, lh, estrogen, sleep_score, stress_score, timeinbed_mean, deep_sleep_in_minutes, total_active_min, moodswing_score) |>
+  mutate(
+    phase = fct_relevel(phase,"menstrual", "follicular", "fertility", "luteal")
+  )
+sleep_stress_df = full_join(subject_info, sleep_stress_df, join_by(id))
+
 m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
 tidy(m1, effects = "fixed", conf.int = TRUE)|>
   select(term, estimate, std.error,p.value, conf.low, conf.high) |>
