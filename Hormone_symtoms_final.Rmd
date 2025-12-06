@@ -24,11 +24,16 @@ This analysis explores how hormone levels (estrogen and LH) and self-reported sy
 
 
 ```{r, warning= FALSE}
+<<<<<<< HEAD
 
 hormone_symptoms = read.csv("./clean_data/hormone_symptoms.csv")
 
 hormone_symptoms_eda =
   hormone_symptoms|>
+=======
+hormone_symptoms_eda=
+  read_csv("clean_data/hormone_symptoms.csv")|>
+>>>>>>> a9d4ec63f8daa17fff665bd66582df2385a8e307
   filter(!is.na(phase) & !is.na(moodswing) & !is.na(fatigue)& !is.na(flow_color)& !is.na(flow_volume)& !is.na(appetite))
 ```
 
@@ -58,6 +63,8 @@ ggplot(hormone_avg, aes(x = phase)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
+
 Estrogen levels are highest in the fertility (ovulatory) phase, second highest in luteal, and relatively low in menstrual, gradually rising from follicular to lluteal. Overall, LH levels are much lower than estrogen, peaking sharply during fertility phase, and remaining low in the other phases.
 
 <br>
@@ -81,6 +88,8 @@ ggplot(hormone_symptoms_eda, aes(x = phase, y = moodswing_score, fill = phase)) 
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
+
 
 The violin plots show significant inter-individual variability. Menstrual phase has the highest mood swing intensity (right-skewed distribution, peak around 1.85), whereas luteal phase shows lower values with a wider base (more individuals with low mood swings).
 
@@ -121,6 +130,8 @@ ggplot(symptom_means, aes(x = phase, y = avg_moodswing, group = 1)) +
     panel.grid.major = element_line(color = "grey90")
   )
 ```
+
+
 Average mood swing intensity is highest in menstrual phase (1.85), lowest in luteal phase (1.41), with intermediate levels in follicular and fertility phases.
 
 <br>
@@ -181,6 +192,8 @@ ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
   )
 
 ```
+
+
 Menstrual phase has the highest average flow (2.38), whereas luteal is the lowest (0.03). Average flow during fertility and follicular phases is 0.07 and 0.23, respectively.
 
 <br>
