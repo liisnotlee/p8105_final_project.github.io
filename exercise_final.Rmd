@@ -1,9 +1,6 @@
 ---
-title: "Exercise"
-output:
-  html_document:
-    toc: false
-    toc_float: false
+title: "EXCERCISE"
+output: html_document
 ---
 <br>
 
@@ -33,9 +30,8 @@ options(
 
 <br>
 
-### Data Summary
-
-#### Data Quality Check
+## Data Quality Assessment
+### Outlier Detection
 Five observations showed extreme step counts (≥50,000) likely due to device errors. These were excluded from step count visualizations only, all analyses use the complete dataset as extreme values were isolated to step counts.These observations are retained in all descriptive statistics and statistical models to preserve the complete dataset. They are excluded only from the step count distribution plot to prevent visual distortion.
 
 ```{r}
@@ -57,7 +53,10 @@ extreme_obs = read.csv("./clean_data/all_daily_data.csv") |>
   kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-#### Descriptives: Exercise Metrics
+<br>
+
+## Descriptive Statistics
+### Exercise Metrics
 ```{r, message = FALSE, warning = FALSE}
 # Loading data
 all_daily_data = read.csv("./clean_data/all_daily_data.csv") |> 
@@ -101,6 +100,9 @@ overall_desc |>
 ```
 Overall, participants demonstrated moderate daily physical activity levels. The median daily step count was `r format(overall_desc$Median[1], big.mark = ",")` steps, with a mean of `r format(overall_desc$Mean[1], big.mark = ",")` steps (SD = `r format(overall_desc$SD[1], big.mark = ",")`). The large standard deviation and difference between mean and median indicate presence of extreme outlier observations (as identified earlier). Active exercise time averaged `r overall_desc$Mean[2]` minutes per day (Median = `r overall_desc$Median[2]` minutes), with participants burning an average of `r format(overall_desc$Mean[3], big.mark = ",")` calories per session (Median = `r format(overall_desc$Median[3], big.mark = ",")`). Most participants engaged in `r overall_desc$Mean[4]` exercise sessions per day (Median = `r overall_desc$Median[4]`). Physical activity was recorded on `r overall_desc$Percent[5]`% of study days, indicating high compliance with activity tracking.
 
+<br>
+
+### Exercise Metrics by Study Year
 ```{r, message = FALSE, warning = FALSE}
 # Comparison by study year
 year_comp = all_daily_data |> 
@@ -123,7 +125,9 @@ kable(year_comp,
 ```
 Exercise patterns differed substantially between study years. The 2024 cohort showed considerably higher activity levels compared to 2022 across all metrics. 2024 participants averaged `r year_comp$"Mean Active Min"[2]` active minutes per day compared to `r year_comp$"Mean Active Min"[1]` minutes in 2022. The proportion of days with recorded activity increased from `r year_comp$"% Days Active"[1]`% in 2022 to `r year_comp$"% Days Active"[2]`% in 2024.
 
-#### Descriptives: Symptom Severity
+<br>
+
+### Symptom Severity
 ```{r}
 # Symptom descriptives
 symptom_desc = all_daily_data |> 
@@ -152,9 +156,11 @@ kable(symptom_desc,
 ```
 Symptom severity varied across menstrual cycle phases and between individuals. Most physical symptoms showed low-to-moderate mean severity on the 0-5 scale: cramps (M = `r symptom_desc$mean[3]`, SD = `r symptom_desc$sd[3]`), fatigue (M = `r symptom_desc$mean[4]`, SD = `r symptom_desc$sd[4]`), and bloating (M = `r symptom_desc$mean[2]`, SD = `r symptom_desc$sd[2]`). Psychological symptoms including mood swings (M = `r symptom_desc$mean[8]`, SD = `r symptom_desc$sd[8]`) and appetite changes (M = `r symptom_desc$mean[1]`, SD = `r symptom_desc$sd[1]`) were similarly mild to moderate on average. The relatively large standard deviations across all symptoms reflect substantial variability in symptom experiences across the menstrual cycle.
 
+<br>
 
-### Distribution of Key Exercise Metrics
-```{r, fig.width = 13, fig.height = 12}
+## Visualizations
+### Distribution of Exercise Metrics
+```{r, fig.width = 14, fig.height = 13}
 
 exercise_analysis = all_daily_data
 
@@ -242,8 +248,9 @@ routines.
 These distributions collectively demonstrate substantial right-skew, and high 
 variability.
 
+<br>
 
-### Activity type distribution
+### Activity Type Distribution
 ```{r, fig.width = 11, fig.height = 11}
 # Preparing activity types data
 activities_long = exercise_analysis |> 
@@ -301,7 +308,9 @@ p1
 ```
 Walking dominated exercise routines in both study years (2022: 84.06%, 2024: 72.01%), accounting for the vast majority of recorded activity sessions. Beyond walking, participants engaged in diverse activities including aerobic workouts, general sport, and strength training (weights). The 2024 cohort showed greater diversity in activity types, with more structured exercises such as aerobic workouts and weight training compared to 2022. Activities like outdoor biking, running, treadmill, and swimming appeared in both years but at much lower frequencies. Notably, some activities (e.g., weights, treadmill, swim, workout, hike) appeared exclusively or predominantly in 2024.
 
-### Exercise patterns across menstrual cycle phases
+<br>
+
+### Exercise Patterns Across Menstrual Cycle Phases
 ```{r, fig.width = 10, fig.height = 10}
 
 p1 = ggplot(exercise_analysis |> filter(!is.na(phase), total_steps > 0, total_steps < 50000), 
@@ -336,8 +345,9 @@ p1 / p2 + plot_layout(guides = "collect")
 
 **Active Minutes:** Similar patterns emerged for active minutes. In 2022, all phases showed comparable median active time (~30-40 minutes). In 2024, the fertility phase showed higher active minutes (~ 70 minutes), while follicular, luteal and menstrual phases were lower (~50-60 minutes). Both years exhibited substantial individual variability, as evident by the wide spread of data points and multiple outliers, suggesting that not all participants followed the same phase-related activity patterns.
 
-### Exercise vs. menstrual symptoms
+<br>
 
+### Exercise and Symptom Associations
 ```{r, fig.width = 10, fig.height = 10, warning = FALSE, message = FALSE}
 symptoms_long = exercise_analysis |> 
   filter(total_active_min > 0) |> 
@@ -387,6 +397,7 @@ The scatterplots examine crude associations between daily  activity (exercise) a
 * **Indigestion**: Considerable downward trend suggests higher activity associates with lower indigestion
 
 **Flat relationships (no clear association):**
+
 * **Appetite, headaches, sleep issues, sore breasts**: Essentially flat line
 * **Cramps**: Near-horizontal line despite often being referred as one of the primary symptoms of menstruation
 * **Mood swings**: Nearly flat line
@@ -396,11 +407,12 @@ The scatterplots examine crude associations between daily  activity (exercise) a
 Across all panels, several key patterns emerge. First, the wide confidence bands indicate substantial uncertainty in all bivariate relationships. Second, many data points cluster at low activity levels (0-100 minutes), with sparser observations at higher activity, reflecting the right-skewed activity distribution. Third, symptoms generally concentrate at lower severity levels (0-2 on 0-5 scale), with relatively few observations at high severity, consistent with the descriptive statistics.Given the observable trends between daily activity and symptom severity, formal statistical modeling would be beneficial to quantify these associations and determine whether these relationships are statistically significant after accounting for potential confounders.
 
 
-# Modelling and inferential analysis
+## Modelling and inferential analysis
 
 We used linear mixed-effects models to test associations between daily physical activity and menstrual symptom severity. This modeling approach was necessary because our data violate the independence assumption of standard linear regression. However, mixed-effects models explicitly account for this hierarchical data structure through random effects.
 
 For each of 10 symptoms, we fit models with:
+
 *   **Outcome**: Symptom severity (Scale: 0 = None, 5 = Very High)
 *   **Predictor**: Total active exercise minutes per day
 *   **Covariate**: Menstrual cycle phase (Menstrual, Follicular, Fertility, Luteal)
@@ -409,7 +421,7 @@ For each of 10 symptoms, we fit models with:
 The random intercept for participant ID accounts for repeated measures within individuals across both days and study years, including the 20 participants (47.6%) who contributed data in both 2022 and 2024.
 
 Models were fit using the lme4 package in R with REML = FALSE. Statistical significance was assessed at α = 0.05.
-```{r}
+```{r, results = 'hide'}
 # Model 1: Exercise → cramps
 model_cramps = lmer(cramps_score ~ total_active_min + phase + (1|id), 
                      data = exercise_analysis,
@@ -513,7 +525,7 @@ Interestingly, cramps, the primary outcome of interest given its prominence in m
 
 ### Model Diagnostics
 
-```{r model-diagnostics, fig.width=10, fig.height=4}
+```{r, fig.width=10, fig.height=4}
 
 # Three essential plots
 par(mfrow = c(1, 3))
