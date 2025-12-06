@@ -710,7 +710,7 @@ The violin plots show significant inter-individual variability. Menstrual phase 
 #### Average Mood Swing Across Phases
 
 To understand general moodswing trends, we can summarize the average mood swing intensity across phases.
-```{r, warning= FALSE}
+```{r, warning= FALSE, fig.width=5, fig.height=3}
 symptom_means <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
@@ -749,7 +749,7 @@ Average mood swing intensity is highest in menstrual phase (1.85), lowest in lut
 #### Flow Volume Distribution Across Phases
 Here, we assess flow volume distribution patterns, and visualize flow volume variation across phases with violin plots.
 
-```{r, warning= FALSE}
+```{r, warning= FALSE, fig.width=5, fig.height=3}
 #violin
 ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score, fill = phase)) +
   geom_violin( alpha = 0.5) +  
@@ -773,7 +773,7 @@ Luteal phase shows a right-skewed distribution, indicating most low-flow observa
 
 #### Average Flow Volume Across Phases
 We looked at average flow volume to observe general trends across the menstrual cycle.
-```{r, warning= FALSE, fig.height = 7}
+```{r, warning= FALSE, fig.width=5, fig.height=3}
 cycle_avg <- hormone_symptoms_eda |>
   group_by(phase) |>
   summarise(
@@ -808,7 +808,7 @@ Menstrual phase has the highest average flow (2.38), whereas luteal is the lowes
 
 #### Average Appetite Across Phases
 Here, we looked at average appetite to observe general trends across the menstrual cycle.
-```{r, warning= FALSE, fig.height = 7}
+```{r, warning= FALSE, fig.width=5, fig.height=3.4}
 # Appetite
 ggplot(cycle_avg, aes(x = phase, y = avg_appetite, group = 1)) +
   geom_line(aes(color = "Appetite"), size = 1.2, show.legend = FALSE) +
