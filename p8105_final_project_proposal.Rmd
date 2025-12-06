@@ -1,5 +1,5 @@
 ---
-title: "Final Project ProposaL"
+title: "Final Project Proposal"
 date: "2025-11-07"
 ---
 ## Group members
@@ -31,6 +31,7 @@ The [mcPHASES dataset](https://physionet.org/content/mcphases/1.0.0/) contains m
 - `hormones_and_selfreport.csv`
 - `height_and_weight.csv`
 - `subject_info.csv`
+- `exercise.csv`
 - `stress_score.csv`
 - `sleep.csv`
 - `sleep_score.csv`
