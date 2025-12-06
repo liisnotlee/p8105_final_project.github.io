@@ -1,6 +1,9 @@
 ---
-title: "Sleep & stress"
-output: github_document
+title: "Sleep and Stress"
+output:
+  html_document:
+    toc: false
+    toc_float: false
 ---
 
 ```{r setup , include = FALSE}

@@ -1,7 +1,83 @@
 ---
 title: "Lifestyle Factors and Menstrual Cycle"
+output:
+  html_document:
+    toc: false
+    toc_float: false
 ---
 
 ## Data Science I Fall 2025 Final Project
 
+
+::: {.row}
+::: {.col-md-8}
+# Unlocking the Cycle
+Not just a monthly event, menstruation is a critical, often-overlooked indicator that impacts the productivity, mental well-being, and overall health of hundreds of millions of women globally. However, its symptoms often remain a complex, frustrating mystery. 
+
+In this project, we seek to uncover the correlations driving common menstruation symptoms by applying advanced analytical techniques to comprehensive lifestyle datasets, including detailed records of sleep sessions, stress levels, physical activity, and hormone fluctuations. 
+
+At its core, this project is dedicated to advancing the understanding and optimization of health for all women through the power of data.
+
+--------
+
+Website content:
+
+- **Report**: Access our final comprehensive research report
+- **Data**: Dive into the complete dataset used for our analysis, including a detailed outline of all data cleaning steps.
+- **Lifestyle Factor Analyses**: Navigate through sections covering our specific analysis of different factors' correlations with symptoms.
+- **Proposal**: Review the project's initial proposal and foundational design.
+
+----------
+
+::: 
+::: {.col-md-4}
 ![Image Source Credit: Alexander Sergienko](img/bg.jpg)
+::: 
+:::
+
+
+# Screencast: Take a Tour of Our Website!
+
+TODO youtube link
+
+
+
+# Powered by Women: Meet the All-Female Team
+::: {.row}
+::: {.col-md-2}
+![](img/menstrual-pants.png)
+
+### Muying Li, MS, RD
+PhD Student in the Department of Biomedical Informatics
+
+:::
+::: {.col-md-2}
+
+![](img/menstrual-cup.png)
+
+### Emily Brynn Weaver
+PhD Student in the Environmental Health Sciences Department
+:::
+::: {.col-md-2}
+![](img/calendar.png)
+
+### Yue Zhao
+
+Master Student in Epidemiology 
+:::
+::: {.col-md-2}
+![](img/medical-checkup.png)
+
+### Anu Singh
+Master student in Epidemiology
+:::
+::: {.col-md-2}
+![](img/pad.png)
+
+### Khue Nhu Nguyen
+Master student in Biostatistics
+:::
+:::
+
+----------
+Icons credited to [Flaticon](https://www.flaticon.com/authors/fancykeith)
