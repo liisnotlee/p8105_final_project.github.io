@@ -51,7 +51,7 @@ Because higher scores reflect lower perceived stress, these negative estimates i
 
 
 ```{r,message=FALSE, warning=FALSE}
-m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+m1 = lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m1, effects = "fixed", conf.int = TRUE)|>
   select(term, estimate, std.error,p.value, conf.low, conf.high) |>
   mutate(

@@ -11,7 +11,7 @@
 
 
 
-<title>EXCERCISE: STATISTICAL MODELLING</title>
+<title>Excercise Statistical Modelling</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -405,11 +405,14 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EXCERCISE: STATISTICAL MODELLING</h1>
+<h1 class="title toc-ignore">Excercise Statistical Modelling</h1>
 
 </div>
 
 
+<pre class="r"><code>all_daily_data = read.csv(&quot;./clean_data/all_daily_data.csv&quot;) |&gt; 
+  distinct(id, study_interval, day_in_study, .keep_all = TRUE)
+exercise_analysis = all_daily_data</code></pre>
 <p><br></p>
 <p>This analysis investigates whether daily physical activity predicts
 menstrual symptom severity. We fit linear mixed-effects models for 10
@@ -802,7 +805,7 @@ qqline(resid(model_cramps), col = &quot;red&quot;, lwd = 2)
 qqnorm(ranef(model_cramps)$id[,1], main = &quot;Q-Q Plot: Random Effects&quot;,
        pch = 16, col = rgb(0, 0, 0, 0.5))
 qqline(ranef(model_cramps)$id[,1], col = &quot;red&quot;, lwd = 2)</code></pre>
-<p><img src="exercise_final_modelling_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<p><img src="exercise_final_modelling_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
 <pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
 <p>Only the fatigue model showed a statistically significant
 association, so diagnostic checks were conducted for this model only.
@@ -850,7 +853,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
+  window.initializeCodeFolding("show" === "show");
 });
 </script>
 

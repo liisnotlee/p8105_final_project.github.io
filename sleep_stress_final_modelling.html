@@ -435,7 +435,7 @@ the fertility and luteal phases relative to the menstrual phase.
 Overall, the model suggests meaningful fluctuations in stress across the
 menstrual cycle, with perceived stress notably increased during the
 fertility and luteal phases.</p>
-<pre class="r"><code>m1 = lmer(stress_score ~ phase +(1 | id) + (1| study_interval), data = sleep_stress_df)
+<pre class="r"><code>m1 = lmer(stress_score ~ phase +(1 | id), data = sleep_stress_df)
 tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
   select(term, estimate, std.error,p.value, conf.low, conf.high) |&gt;
   mutate(
@@ -467,38 +467,38 @@ tidy(m1, effects = &quot;fixed&quot;, conf.int = TRUE)|&gt;
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">76.664</td>
-<td align="right">0.715</td>
+<td align="right">76.762</td>
+<td align="right">0.614</td>
 <td align="right">0.000</td>
-<td align="right">75.102</td>
-<td align="right">78.227</td>
+<td align="right">75.520</td>
+<td align="right">78.005</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phasefollicular</td>
-<td align="right">0.277</td>
-<td align="right">0.212</td>
-<td align="right">0.192</td>
-<td align="right">-0.139</td>
-<td align="right">0.694</td>
+<td align="right">0.291</td>
+<td align="right">0.213</td>
+<td align="right">0.172</td>
+<td align="right">-0.126</td>
+<td align="right">0.708</td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">phasefertility</td>
-<td align="right">-0.583</td>
+<td align="right">-0.594</td>
 <td align="right">0.211</td>
-<td align="right">0.006</td>
-<td align="right">-0.997</td>
-<td align="right">-0.170</td>
+<td align="right">0.005</td>
+<td align="right">-1.008</td>
+<td align="right">-0.180</td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">phaseluteal</td>
-<td align="right">-0.528</td>
-<td align="right">0.197</td>
-<td align="right">0.007</td>
-<td align="right">-0.915</td>
-<td align="right">-0.141</td>
+<td align="right">-0.525</td>
+<td align="right">0.198</td>
+<td align="right">0.008</td>
+<td align="right">-0.912</td>
+<td align="right">-0.137</td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
