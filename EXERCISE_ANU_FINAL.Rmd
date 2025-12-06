@@ -62,43 +62,39 @@ overall_desc = all_daily_data |>
   summarise(
     Variable = c("Daily Steps", "Active Minutes/Day", "Calories Burned", 
                  "Exercise Sessions/Day", "Days with Activity (%)"),
-    Mean = c(mean(total_steps, na.rm = TRUE),
-             mean(total_active_min, na.rm = TRUE),
-             mean(total_calories, na.rm = TRUE),
-             mean(n_sessions, na.rm = TRUE),
-             NA),
-    SD = c(sd(total_steps, na.rm = TRUE),
-           sd(total_active_min, na.rm = TRUE),
-           sd(total_calories, na.rm = TRUE),
-           sd(n_sessions, na.rm = TRUE),
-           NA),
-    Median = c(median(total_steps, na.rm = TRUE),
-               median(total_active_min, na.rm = TRUE),
-               median(total_calories, na.rm = TRUE),
-               median(n_sessions, na.rm = TRUE),
-               NA),
-    IQR = c(IQR(total_steps, na.rm = TRUE),
-            IQR(total_active_min, na.rm = TRUE),
-            IQR(total_calories, na.rm = TRUE),
-            IQR(n_sessions, na.rm = TRUE),
-            NA),
-    Percent = c(NA, NA, NA, NA,
-                mean(exercised_flag > 0, na.rm = TRUE) * 100)
-  ) |> 
-  mutate(
-    Mean = ifelse(!is.na(Mean), sprintf("%.1f", Mean), ""),
-    SD = ifelse(!is.na(SD), sprintf("%.1f", SD), ""),
-    Median = ifelse(!is.na(Median), sprintf("%.1f", Median), ""),
-    IQR = ifelse(!is.na(IQR), sprintf("%.1f", IQR), ""),
-    Percent = ifelse(!is.na(Percent), sprintf("%.1f%%", Percent), "")
+    Mean = round(c(mean(total_steps, na.rm = TRUE),
+                   mean(total_active_min, na.rm = TRUE),
+                   mean(total_calories, na.rm = TRUE),
+                   mean(n_sessions, na.rm = TRUE),
+                   NA), 2),
+    SD = round(c(sd(total_steps, na.rm = TRUE),
+                 sd(total_active_min, na.rm = TRUE),
+                 sd(total_calories, na.rm = TRUE),
+                 sd(n_sessions, na.rm = TRUE),
+                 NA), 2),
+    Median = round(c(median(total_steps, na.rm = TRUE),
+                     median(total_active_min, na.rm = TRUE),
+                     median(total_calories, na.rm = TRUE),
+                     median(n_sessions, na.rm = TRUE),
+                     NA), 2),
+    IQR = round(c(IQR(total_steps, na.rm = TRUE),
+                  IQR(total_active_min, na.rm = TRUE),
+                  IQR(total_calories, na.rm = TRUE),
+                  IQR(n_sessions, na.rm = TRUE),
+                  NA), 2),
+    Percent = round(c(NA, NA, NA, NA,
+                      mean(exercised_flag > 0, na.rm = TRUE) * 100), 2)
   )
 
-kable(overall_desc,
-      caption = "Descriptive Statistics: Exercise Metrics",
-      align = c("l", "r", "r", "r", "r", "r")) %>%
+# Displaying table (and making NAs blank)
+overall_desc |> 
+  mutate(across(where(is.numeric), ~ifelse(is.na(.), "", .))) |> 
+  kable(caption = "Descriptive Statistics: Exercise Metrics",
+        align = c("l", "r", "r", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
 ```
-Overall, participants demonstrated moderate daily physical activity levels. The median daily step count was `r format(round(overall_desc$median_steps, 0), big.mark = ",")` steps, with a mean of `r format(round(overall_desc$mean_steps, 1), big.mark = ",")` steps (SD = `r format(round(overall_desc$sd_steps, 1), big.mark = ",")`). The large standard deviation and difference between mean and median indicate presence of extreme outlier observations (as identified earlier). Active exercise time averaged `r round(overall_desc$mean_active, 1)` minutes per day (Median = `r round(overall_desc$median_active, 1)` minutes), with participants burning an average of `r format(round(overall_desc$mean_calories, 1), big.mark = ",")` calories per session (Median = `r format(round(overall_desc$median_calories, 0), big.mark = ",")`). Most participants engaged in `r round(overall_desc$mean_sessions, 1)` exercise sessions per day (Median = `r round(overall_desc$median_sessions, 1)`). Physical activity was recorded on `r round(overall_desc$pct_active, 1)`% of study days, indicating high compliance with activity tracking.
+```
+Overall, participants demonstrated moderate daily physical activity levels. The median daily step count was `r format(overall_desc$Median[1], big.mark = ",")` steps, with a mean of `r format(overall_desc$Mean[1], big.mark = ",")` steps (SD = `r format(overall_desc$SD[1], big.mark = ",")`). The large standard deviation and difference between mean and median indicate presence of extreme outlier observations (as identified earlier). Active exercise time averaged `r overall_desc$Mean[2]` minutes per day (Median = `r overall_desc$Median[2]` minutes), with participants burning an average of `r format(overall_desc$Mean[3], big.mark = ",")` calories per session (Median = `r format(overall_desc$Median[3], big.mark = ",")`). Most participants engaged in `r overall_desc$Mean[4]` exercise sessions per day (Median = `r overall_desc$Median[4]`). Physical activity was recorded on `r overall_desc$Percent[5]`% of study days, indicating high compliance with activity tracking.
 
 ```{r, message = FALSE, warning = FALSE}
 # Comparison by study year
@@ -107,11 +103,11 @@ year_comp = all_daily_data |>
   summarise(
     `N Days` = n(),
     `N Participants` = n_distinct(id),
-    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 0),
-    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 0),
-    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 1),
-    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 1),
-    `% Days Active` = round(mean(exercised_flag, na.rm = TRUE) * 100, 1)
+    `Mean Steps` = round(mean(total_steps, na.rm = TRUE), 2),
+    `SD Steps` = round(sd(total_steps, na.rm = TRUE), 2),
+    `Mean Active Min` = round(mean(total_active_min, na.rm = TRUE), 2),
+    `SD Active Min` = round(sd(total_active_min, na.rm = TRUE), 2),
+    `% Days Active` = round(mean(exercised_flag, na.rm = TRUE) * 100, 2)
   ) |> 
   rename(Year = study_interval)
 
