@@ -42,7 +42,7 @@ Website content:
 
 # Screencast: Take a Tour of Our Website!
 
-```{r, echo=FALSE}
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(vembedr)
 embed_url("https://youtu.be/eRsP4Qc-KAM")
 ```
