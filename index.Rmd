@@ -42,8 +42,14 @@ Website content:
 
 # Screencast: Take a Tour of Our Website!
 
-TODO youtube link
+```{r, echo=FALSE}
+library(vembedr)
+embed_url("https://youtu.be/eRsP4Qc-KAM")
+```
 
+<br>
+
+<br>
 <br>
 
 # Powered by Women: Meet the All-Female Team
