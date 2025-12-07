@@ -1046,6 +1046,7 @@ during the luteal phase.
 # plot the sleep vs stress score by phases
 plot_1 = 
   sleep_stress_df |>
+  filter(!is.na(phase)) |>
   group_by(phase) |>
   summarize(
     mean_sleep_score = mean(sleep_score, na.rm = TRUE),
@@ -1062,10 +1063,11 @@ plot_1 =
                     mean_sleep_score  = "Sleep Score",
                     mean_stress_score = "Stress Score")
   ) |>
+  
   ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
     geom_smooth(linewidth= 1) +
     geom_point(size = 3) +
-    labs(color = "Metric", y = "Mean Score", x = "Phase") +
+    labs(title="Sleep and Stress Score",color = "Metric", y = "Mean Score", x = "Phase") +
     labs(
     x = "Menstrual Phase",
     y = "Score"
@@ -1078,6 +1080,7 @@ plot_1 =
 coeff = 5.5
 plot_2  =
   sleep_stress_df |>
+  filter(!is.na(phase)) |>
   group_by(phase) |>
   summarize(
     mean_lh = mean(lh, na.rm = TRUE),
@@ -1099,6 +1102,7 @@ plot_2  =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+      title="Hormone Levels",
     x = "Menstrual Phase",
     y = "Level"
   ) +
@@ -1109,6 +1113,7 @@ plot_2  =
 # Plot the time in bed and deep sleep in minutes in phases
 plot_3 = 
   sleep_stress_df |>
+  filter(!is.na(phase)) |>
   group_by(phase)|>
    summarize(
      mean_timeinbed = mean(timeinbed_mean/60, na.rm = TRUE),
@@ -1129,6 +1134,7 @@ plot_3 =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+      title="Sleep Characteristics",
     x = "Menstrual Phase",
     y = "Level"
   ) +
@@ -1150,15 +1156,18 @@ plot_1 + plot_2 + plot_3
 # plot the variation of time in bed by menstrual phases
 timeinbed_plot =
   sleep_stress_df|>
+  
   #filter(!is.na(study_interval) & !is.na(phase)) |>
   group_by(phase, id) |>
   summarize(
     timeinbed = mean(timeinbed_mean/60)
   )|> 
+  filter(timeinbed != 0)|>
   ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Time in Bed Across Phases",
     x = " ",
     y = "Time in bed (hrs)"
   ) +
@@ -1171,10 +1180,12 @@ deep_sleep_plot =
   summarize(
     mean_deep_sleep = mean(deep_sleep_in_minutes/60)
   )|> 
+  filter(mean_deep_sleep != 0)|>
   ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+     title="Deep Sleep Across Phases",
     x = " ",
     y = "Deep sleep (hrs)"
   ) +
@@ -1182,11 +1193,13 @@ deep_sleep_plot =
 # plot the variation of sleep score by menstrual phases
 sleep_score_boxplot =
   sleep_stress_df |>
+  filter(sleep_score != 0)|>
   #filter(!is.na(study_interval) & !is.na(phase)) |>
   ggplot(aes(x = phase, y = sleep_score, fill = phase))+
  geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Sleep Score Across Phases",
     x = " ",
     y = "Sleep score"
   ) +
@@ -1200,6 +1213,7 @@ stress_score_boxplot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Stress Score Acorss Phases",
     x = " ",
     y = "Stress score"
   ) +
@@ -2065,6 +2079,7 @@ Second, the small sample size is a limitation and could be exaggerating the infl
 Finally, substantial individual heterogeneity likely exists in both symptom expression and cycle-related physiological responses; population-level models may therefore obscure meaningful subgroup or person-specific patterns. As a result, these findings should be viewed as indicative of phase-related trends rather than definitive causal effects.
 
 <br>
+
 # References
 1. Cooper, Poppy Alexandra, Emily R. Boniface, Blair G. Darney, et al. “Menstrual Cycle Phase and Its Association with COVID-19 Vaccine Side Effects and Subsequent Infection: A Study of Period Tracking App Users.” Preprint, Sexual and Reproductive Health, November 30, 2025. [Link](https://doi.org/10.1101/2025.11.26.25341088)
 2. Goodale, Brianna Mae, Mohaned Shilaih, Lisa Falco, Franziska Dammeier, Györgyi Hamvas, and Brigitte Leeners. “Wearable Sensors Reveal Menses-Driven Changes in Physiology and Enable Prediction of the Fertile Window: Observational Study.” Journal of Medical Internet Research 21, no. 4 (2019): e13404. [Link](https://doi.org/10.2196/13404)
