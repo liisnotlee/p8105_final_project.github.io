@@ -1062,10 +1062,11 @@ plot_1 =
                     mean_sleep_score  = "Sleep Score",
                     mean_stress_score = "Stress Score")
   ) |>
+  
   ggplot(aes(x = phase, y = value, color = metric, group = metric)) +
     geom_smooth(linewidth= 1) +
     geom_point(size = 3) +
-    labs(color = "Metric", y = "Mean Score", x = "Phase") +
+    labs(title="Sleep and Stress Score",color = "Metric", y = "Mean Score", x = "Phase") +
     labs(
     x = "Menstrual Phase",
     y = "Score"
@@ -1099,6 +1100,7 @@ plot_2  =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+      title="Hormone Levels",
     x = "Menstrual Phase",
     y = "Level"
   ) +
@@ -1129,6 +1131,7 @@ plot_3 =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+      title="Sleep Characteristics",
     x = "Menstrual Phase",
     y = "Level"
   ) +
@@ -1150,15 +1153,18 @@ plot_1 + plot_2 + plot_3
 # plot the variation of time in bed by menstrual phases
 timeinbed_plot =
   sleep_stress_df|>
+  
   #filter(!is.na(study_interval) & !is.na(phase)) |>
   group_by(phase, id) |>
   summarize(
     timeinbed = mean(timeinbed_mean/60)
   )|> 
+  filter(timeinbed != 0)|>
   ggplot(aes(x = phase, y = timeinbed, fill = phase)) +
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Time in Bed Across Phases",
     x = " ",
     y = "Time in bed (hrs)"
   ) +
@@ -1171,10 +1177,12 @@ deep_sleep_plot =
   summarize(
     mean_deep_sleep = mean(deep_sleep_in_minutes/60)
   )|> 
+  filter(mean_deep_sleep != 0)|>
   ggplot(aes(x = phase, y = mean_deep_sleep, fill = phase)) +
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+     title="Deep Sleep Across Phases",
     x = " ",
     y = "Deep sleep (hrs)"
   ) +
@@ -1182,11 +1190,13 @@ deep_sleep_plot =
 # plot the variation of sleep score by menstrual phases
 sleep_score_boxplot =
   sleep_stress_df |>
+  filter(sleep_score != 0)|>
   #filter(!is.na(study_interval) & !is.na(phase)) |>
   ggplot(aes(x = phase, y = sleep_score, fill = phase))+
  geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Sleep Score Across Phases",
     x = " ",
     y = "Sleep score"
   ) +
@@ -1200,6 +1210,7 @@ stress_score_boxplot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title="Stress Score Acorss Phases",
     x = " ",
     y = "Stress score"
   ) +
