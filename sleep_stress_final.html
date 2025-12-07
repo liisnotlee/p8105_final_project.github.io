@@ -427,6 +427,7 @@ participants have better sleep length, 7-8 hours.</p>
   geom_boxplot()+
   facet_grid(study_interval ~.) +
   labs(
+    title = &quot;Time in bed variation&quot;,
     x = &quot;Participant&quot;,
     y = &quot;Average time in bed (hours)&quot;
   ) </code></pre>
@@ -474,6 +475,7 @@ timeinbed_plot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+  title = &quot;Time in bed&quot;,
     x = &quot; &quot;,
     y = &quot;Time in bed (hrs)&quot;
   ) +
@@ -490,6 +492,7 @@ deep_sleep_plot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = &quot;Deep sleep time&quot;,
     x = &quot; &quot;,
     y = &quot;Deep sleep (hrs)&quot;
   ) +
@@ -502,6 +505,7 @@ sleep_score_boxplot =
  geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = &quot;Sleep score&quot;,
     x = &quot; &quot;,
     y = &quot;Sleep score&quot;
   ) +
@@ -515,6 +519,7 @@ stress_score_boxplot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = &quot;Stress score&quot;,
     x = &quot; &quot;,
     y = &quot;Stress score&quot;
   ) +
@@ -558,6 +563,7 @@ plot_1 =
     geom_point(size = 3) +
     labs(color = &quot;Metric&quot;, y = &quot;Mean Score&quot;, x = &quot;Phase&quot;) +
     labs(
+    title = &quot;Sleep and stress&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
     y = &quot;Score&quot;
   ) +
@@ -590,6 +596,7 @@ plot_2  =
     geom_point(size = 3) +
     labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
     labs(
+    title = &quot;Estrogen and LH&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
     y = &quot;Level&quot;
   ) +
@@ -620,6 +627,7 @@ plot_3 =
     geom_point(size = 3) +
     labs(color = &quot;Metric&quot;, y = &quot;level&quot;, x = &quot;Phase&quot;) +
     labs(
+    title = &quot;Time in bed and deep sleep&quot;,
     x = &quot;Menstrual Cycle Phase&quot;,
     y = &quot;Level&quot;
   ) +

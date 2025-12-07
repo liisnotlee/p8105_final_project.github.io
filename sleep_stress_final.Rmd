@@ -70,6 +70,7 @@ The average sleep time for each person is different each study interval and vari
   geom_boxplot()+
   facet_grid(study_interval ~.) +
   labs(
+    title = "Time in bed variation",
     x = "Participant",
     y = "Average time in bed (hours)"
   ) 
@@ -112,6 +113,7 @@ timeinbed_plot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+  title = "Time in bed",
     x = " ",
     y = "Time in bed (hrs)"
   ) +
@@ -128,6 +130,7 @@ deep_sleep_plot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = "Deep sleep time",
     x = " ",
     y = "Deep sleep (hrs)"
   ) +
@@ -140,6 +143,7 @@ sleep_score_boxplot =
  geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = "Sleep score",
     x = " ",
     y = "Sleep score"
   ) +
@@ -153,6 +157,7 @@ stress_score_boxplot =
   geom_violin(alpha = 0.5, width = 0.5)+
   geom_boxplot(width = 0.2)+
   labs(
+    title = "Stress score",
     x = " ",
     y = "Stress score"
   ) +
@@ -189,6 +194,7 @@ plot_1 =
     geom_point(size = 3) +
     labs(color = "Metric", y = "Mean Score", x = "Phase") +
     labs(
+    title = "Sleep and stress",
     x = "Menstrual Cycle Phase",
     y = "Score"
   ) +
@@ -221,6 +227,7 @@ plot_2  =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+    title = "Estrogen and LH",
     x = "Menstrual Cycle Phase",
     y = "Level"
   ) +
@@ -251,6 +258,7 @@ plot_3 =
     geom_point(size = 3) +
     labs(color = "Metric", y = "level", x = "Phase") +
     labs(
+    title = "Time in bed and deep sleep",
     x = "Menstrual Cycle Phase",
     y = "Level"
   ) +
