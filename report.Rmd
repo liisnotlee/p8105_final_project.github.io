@@ -1879,8 +1879,6 @@ physiology_model_table
 We only focused on symptoms that were reported as statistically significant above, which are `cramps`, `bloating`, and, `sorebreasts`.
 
 
-TODO
-
 *Effects of Demographics and Lifestyle Factors on Cramps*
 ```{r, message=FALSE}
 #Cramps and Demographic/Lifestyle Factors
