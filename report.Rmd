@@ -1958,9 +1958,9 @@ Several factors may explain these null findings. First, the predominance of walk
 
 ### Multivariate Associations
 
-We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. Interestingly, lifestyle characteristics were consistently among the most significant results in our models, particularly race, education, and BMI. 
+We found several associations between menstrual symptoms and lifestyle factors, biometric measurements, and demographic characteristics. For cramps, physical activity level, BMI, race, and menstrual phase were significantly associated, whereas for bloating, BMI and age were the primary significant predictors, and for sore breasts, age showed the strongest association. These results suggest that demographic and baseline physiological factors may play a larger role in shaping symptom severity than short-term hormonal fluctuations.
 
-Interestingly, some self-reported that might be expected to be linked with related quantitative variables were not positively associated. For example, self-reported fatigue and self-reported sleep issues were not significantly associated with the quantitative variable sleep score that aggregated bio metric data on sleep quality. This could suggest that menstruation creates feelings of fatigue that do not reflect true sleep quality. Similarly, minutes of activity was not positively associated with the reduction of any symptoms in our mixed-modal results. 
+Interestingly, several symptoms that might be expected to relate to biological or behavioral factors were not significantly associated. For example, cramps were not associated with estrogen or LH levels, and bloating and sore breasts were not significantly related to sleep, stress, or most hormonal measures. Similarly, physical activity was not associated with symptom reduction and, in the case of cramps, was weakly associated with higher symptom scores. Together, these findings suggest that some menstrual symptoms may reflect underlying individual susceptibility more than daily lifestyle or hormonal variation.
 
 <br>
 
