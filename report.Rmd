@@ -819,6 +819,63 @@ the other phases.
 
 ### Mood Swing
 
+```{r, include=FALSE}
+p_flow_violin =
+  ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score, fill = phase)) +
+  geom_violin(alpha = 0.5) +
+  labs(
+    title = "Distribution of Flow Volume",
+    x = "Phase", 
+    y = "Flow Volume (Scale: 0–6)"
+  ) +
+  scale_y_continuous(limits = c(0,5), breaks = 0:5) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+
+#plot2
+cycle_avg <- hormone_symptoms_eda |>
+  group_by(phase) |>
+  summarise(
+    avg_flow_volume = mean(flow_volume_score, na.rm = TRUE),
+    avg_appetite    = mean(appetite_score, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(label_y = ifelse(row_number() == 1,
+                          avg_flow_volume + 0.3,
+                          avg_flow_volume + 0.1))
+
+p_flow_line =
+  ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
+  geom_line(aes(color = "Flow Volume"), size = 1.2, show.legend = FALSE) +
+  geom_point(aes(color = "Flow Volume"), size = 3, show.legend = FALSE) +
+  geom_text(
+    aes(y = label_y, label = round(avg_flow_volume, 2)),
+    size = 4,
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Average Flow Volume",
+    subtitle = "Higher values indicate more severe flow volume (Scale: 0–5)",
+    x = "Phase",
+    y = "Flow Volume Score"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    plot.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+### ---- Combine (side-by-side) ----
+p_flow_violin | p_flow_line
+```
+
+
 ```{r, warning=FALSE}
 # violin Plot
 p_violin=
@@ -889,82 +946,6 @@ the menstrual phase (≈1.85), decrease through the follicular and
 fertility phases, and reach the lowest levels in the luteal phase
 (≈1.41). Overall, menstrual phase is associated with noticeably
 heightened mood swing intensity.
-
-<br>
-
-### Flow Volume
-
-```{r, warning=FALSE}
-p_flow_violin =
-  ggplot(hormone_symptoms_eda, aes(x = phase, y = flow_volume_score, fill = phase)) +
-  geom_violin(alpha = 0.5) +
-  labs(
-    title = "Distribution of Flow Volume",
-    x = "Phase", 
-    y = "Flow Volume (Scale: 0–6)"
-  ) +
-  scale_y_continuous(limits = c(0,5), breaks = 0:5) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = "bold"),
-    panel.grid.major = element_line(color = "grey90")
-  )
-
-
-#plot2
-cycle_avg <- hormone_symptoms_eda |>
-  group_by(phase) |>
-  summarise(
-    avg_flow_volume = mean(flow_volume_score, na.rm = TRUE),
-    avg_appetite    = mean(appetite_score, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  mutate(label_y = ifelse(row_number() == 1,
-                          avg_flow_volume + 0.3,
-                          avg_flow_volume + 0.1))
-
-p_flow_line =
-  ggplot(cycle_avg, aes(x = phase, y = avg_flow_volume, group = 1)) +
-  geom_line(aes(color = "Flow Volume"), size = 1.2, show.legend = FALSE) +
-  geom_point(aes(color = "Flow Volume"), size = 3, show.legend = FALSE) +
-  geom_text(
-    aes(y = label_y, label = round(avg_flow_volume, 2)),
-    size = 4,
-    fontface = "bold"
-  ) +
-  labs(
-    title = "Average Flow Volume",
-    subtitle = "Higher values indicate more severe flow volume (Scale: 0–5)",
-    x = "Phase",
-    y = "Flow Volume Score"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    plot.title = element_text(face = "bold"),
-    panel.grid.major = element_line(color = "grey90")
-  )
-
-### ---- Combine (side-by-side) ----
-p_flow_violin | p_flow_line
-
-```
-
-Flow volume varies substantially across menstrual cycle phases, with
-clear differences in both distribution and average levels. The violin
-plot shows that menstrual phase has a tall, narrow distribution,
-indicating consistently high flow volume with relatively low
-variability. In contrast, the luteal phase displays a right-skewed
-distribution: most observations cluster at very low flow, but a few
-higher values stretch the tail. The follicular and fertility phases show
-mostly low flow with modest spread. These distribution patterns align
-with the average flow volume plot, where the menstrual phase has the
-highest mean flow (≈2.38), while the luteal phase shows the lowest
-(≈0.03). The fertility (≈0.07) and follicular (≈0.23) phases fall in
-between. Together, these results show that flow volume peaks sharply
-during menstruation and remains minimal throughout the rest of the
-cycle.
 
 <br>
 
@@ -1589,41 +1570,6 @@ mood swings is highly individual.
 
 <br>
 
-### Flow volume vs LH
-
-Observing in exploratory scatter plots that self-reported flow volume
-scores appeared to follow an inverse pattern relative to luteinizing
-hormone (LH) levels, I conducted a linear mixed model analysis to
-formally test this visual hypothesis. The model was used to determine if
-this apparent inverse relationship was statistically significant when
-rigorously accounting for the repeated measures within each individual
-participant.
-
-*Associations Between Flow Volume and LH Level*
-
-```{r, warning= FALSE}
-flow_volume_model <- lmer(flow_volume_score ~ lh + (1 | id), data = hormone_symptoms_eda)
-
-flow_table <- create_model_table(flow_volume_model, "Flow Volume ~ LH")|>
-  knitr::kable(digits = 3)
-flow_table
-```
-
-Based on the linear mixed model, a significant but modest relationship
-exists between luteinizing hormone (LH) levels and perceived menstrual
-flow volume. For every one-unit increase in LH, the flow volume score is
-estimated to decrease by -0.01138 points (p \<0.01). While statistically
-significant, this effect is small in magnitude. The model indicates
-substantial individual differences, as the variation in scores within a
-single person over time (residual SD = 1.19) is much greater than the
-average differences between individuals' baselines (intercept SD =
-0.45). Therefore, while LH shows a significant inverse association with
-flow volume, within-person biological and measurement variability
-remains the dominant feature of the data.
-
-
-<br>
-
 ### Appetite vs Estrogen
 
 After observing in a scatter plot that average moodswing scores appeared
@@ -1876,47 +1822,52 @@ harmful effects.
 We ran a binomial regression between menstruation ("no" (0) or "yes"
 (1)) and self-reported symptoms. The results of our preliminary
 regression analysis show that menstruation was positively associated
-with `fatigue`, `cramps`, and `bloating`. There was a negative
-association between menstruation and reported `sleep issues` and
-`sore breasts` as well as measured `estrogen` and
-`luteinizing hormone (lh)`.
+with `fatigue`, `cramps`, `bloating`, and `sorebreasts`. There was a negative
+association between menstruation and reported `sleep issues`,
+ as well as measured `estrogen` and `lh`.
+ 
+More importantly, the results below showed that the `cramps` has the highest Odds Ratio (OR = 1.972), making it the most intensely associated symptom with being in the menstrual phase. While not as strong an indicator as cramping, `bloating` with OR = 1.221 and `sorebreasts` with OR = 1.187 still exhibit positive relationships with the menstrual phase, signifying its role as key symptoms.
 
-```{r, message=FALSE, warning=FALSE, results='hide'}
+
+*Associations between Menstruation and Symptom Severity*
+
+```{r, message=FALSE, warning=FALSE}
 merged_df_model = all_daily_data %>%
   left_join(subject_info, by = "id", relationship = "many-to-many")
 
 symptom_model = glmer(
   menstruation ~ fatigue_score + cramps_score + sleepissue_score + exerciselevel_score + appetite_score + bloating_score + moodswing_score + indigestion_score + sorebreasts_score + (1 | id), data = merged_df_model, family = binomial)
 
-summary(symptom_model)
-symptom_model_table = tidy(symptom_model) %>%
+beta_coefficients <- fixef(symptom_model)
+odds_ratios <- exp(beta_coefficients) |> broom::tidy()
+#odds_ratios 
+
+#summary(symptom_model)
+tidy(symptom_model) |> 
+  left_join(odds_ratios, by = c("term" = "names")) |> 
   mutate(
-  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
-  select(-group, -effect) %>%
+    significant = ifelse(p.value < 0.05, "Yes", "No"),
+    odds_ratio = x
+  ) |> 
+  select(-group, -effect, -x) %>%
   kable(digits = 3)
 
 
+```
+
+*Associations between Menstruation and Hormone Level*
+
+```{r, message=FALSE, warning = FALSE}
 physiology_model = glmer(
   menstruation ~ estrogen + lh + (1 | id), data = merged_df_model, family=binomial())
 
-summary(physiology_model)
 physiology_model_table = tidy(physiology_model) %>%
   mutate(
   significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
   select(-group, -effect) %>%
   kable(digits = 3)
-```
 
-*Associations between Menstruation and Symptom Severity*
-
-```{r, message=FALSE}
-#Symptom Model Table
-symptom_model_table
-```
-
-*Associations between Menstruation and Hormone Level*
-
-```{r, message=FALSE}
+#summary(physiology_model)
 #Hormone Model Table
 physiology_model_table
 ```
@@ -1925,40 +1876,16 @@ physiology_model_table
 
 ### Demographic and Lifestyle Factors and Symptoms
 
-We only focused on symptoms that were reported as statistically significant above, which are `fatigue`, `cramps`, `bloating`, `sleep issues` and, `sore breasts`.
+We only focused on symptoms that were reported as statistically significant above, which are `cramps`, `bloating`, and, `sorebreasts`.
 
 
-We found that self-reported fatigue was positively associated with
-having the educational attainment of High School (p \< 0.001) or Some
-College (p \< 0.001) compared to Bachelor's degree or higher. We found
-fatigue was negatively associated with being in the "Other" racial
-category, which was a broad category comprising of hispanic, african,
-and middle eastern participants. (p \< 0.001) There was also a
-correlation between higher BMI and fatigue (p \< 0.05), as well as
-stress_score and fatigue (p \< 0.05).
-
-*Effects of Demographics and Lifestyle Factors on Fatigue*
-
-```{r, message=FALSE}
-#Fatigue and Demographic/Lifestyle Factors
-fatigue_model = lmer( 
-  fatigue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
-
-#summary(fatigue_model)
-tidy(fatigue_model) %>%
-  mutate(
-  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
-  select(-group, -effect) %>%
-  kable(digits = 3) 
-```
-
-There is no significant associates found between demographic, lifestyle, or hormonal factors with cramps severity (all p > 0.05).
+TODO
 
 *Effects of Demographics and Lifestyle Factors on Cramps*
 ```{r, message=FALSE}
 #Cramps and Demographic/Lifestyle Factors
 cramps_model = lmer( 
-  cramps_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  cramps_score ~ total_active_min + sleep_score + stress_score + race_category + bmi + age + lh + estrogen + phase + (1 | id), data = merged_df_model, REML = FALSE)
 
 #summary(cramps_model)
 tidy(cramps_model) %>%
@@ -1980,7 +1907,7 @@ with estrogen (p \< 0.05).
 ```{r, message=FALSE}
 #Bloating and Demographic/Lifestyle Factors
 bloating_model = lmer( 
-  bloating_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  bloating_score ~ total_active_min + sleep_score + stress_score + race_category + bmi + age + lh + estrogen+ phase  + (1 | id), data = merged_df_model, REML = FALSE)
 
 #summary(bloating_model)
 tidy(bloating_model) %>%
@@ -1991,36 +1918,14 @@ tidy(bloating_model) %>%
 ```
 
 
-We found sleep issues to be positively associated with an educational
-attainment of high school (p \< 0.001) or college (p \< 0.001).
-Furthermore, we found that there was a positive association between
-higher BMI and reported sleep issues (p \< 0.001). We found sleep issues
-to be negatively associated with being categorized in the "other" race
-category (p \< 0.001).
-
-*Effects of Demographics and Lifestyle Factors on Sleep Issues*
-```{r, message=FALSE}
-#Sleep Issues and Demographic/Lifestyle Factors 
-sleepissues_model = lmer( 
-  sleepissue_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
-
-#summary(sleepissues_model)
-tidy(sleepissues_model) %>%
-  mutate(
-  significant = ifelse(p.value < 0.05, "Yes", "No")) |> 
-  select(-group, -effect) %>%
-  kable(digits = 3)
-```
-
 We found sore breasts to be only positively associated with older age (p
-\< 0.01). We did not find cramping symptoms to be associated with any
-biometric or demographic characteristic.
+\< 0.01).
 
 *Effects of Demographics and Lifestyle Factors on Sore Breasts*
 ```{r, message=FALSE}
 #Sore Breasts and Demographic/Lifestyle factors 
 sorebreasts_model = lmer( 
-  sorebreasts_score ~ total_active_min + sleep_score + stress_score + education_abrv + race_category + bmi + age + lh + estrogen + (1 | id), data = merged_df_model, REML = FALSE)
+  sorebreasts_score ~ total_active_min + sleep_score + stress_score + race_category + bmi + age + lh + estrogen + phase + (1 | id), data = merged_df_model, REML = FALSE)
 
 #summary(sorebreasts_model)
 tidy(sorebreasts_model) %>%
@@ -2039,10 +1944,9 @@ We noted that since the dataset are from two studies in two different times, yea
  Our analyses explored both overall trends and differences between menstrual phases, with particular attention to the menstrual, follicular, fertility, and luteal periods. In the following discussion, we interpret these findings in relation to known physiological changes across the cycle, highlight their implications for understanding menstrual health and daily functioning, and contextualize the results alongside the limitations of the dataset.
  
 ### Hormone & Symptoms
+We explored the association between menstrual cycle phases, key hormones, and self-reported symptoms. The hormone profiles followed expected physiological patterns, with estrogen peaking during the fertility phase and luteinizing hormone (LH) spiking sharply at ovulation. Symptom patterns also aligned with common clinical observations: mood swing intensity were highest during the menstrual phase, while appetite showed minimal fluctuation.
 
-We explored the association between menstrual cycle phases, key hormones, and self-reported symptoms. The hormone profiles followed expected physiological patterns, with estrogen peaking during the fertility phase and luteinizing hormone (LH) spiking sharply at ovulation. Symptom patterns also aligned with common clinical observations: mood swing intensity and flow volume were highest during the menstrual phase, while appetite showed minimal fluctuation.
-
-The linear mixed model for mood swings confirmed a statistically significant association with cycle phase but revealed that the individual differences between participants (random intercept SD = 0.98) accounted for variation comparable to the model's residual error. This underscores that baseline predisposition is a critical factor in symptom experience, often outweighing the phase effect itself. Similarly, the model testing the observed inverse relationship between LH and flow volume found a statistically significant result (β = -0.011, p = 0.001), but the effect size was very small. The substantial residual variation (SD = 1.19) indicates that LH levels alone explain only a minor portion of the daily variation in perceived flow. Contrary to the initial visual hypothesis, the model found no significant relationship between estrogen levels and appetite scores (p = 0.402), suggesting other factors drive appetite changes across the cycle.
+Mood swing intensity varies across menstrual phases, peaking during menstruation (mean = 1.77) and decreasing modestly in the follicular (−0.37, p < 0.001), fertility (−0.34, p < 0.001), and luteal phases (−0.24, p < 0.001), while individual baseline differences (SD = 0.98) account for substantial variability, highlighting the highly personalized nature of mood changes. In contrast, appetite shows no significant association with estrogen levels (β = 0.0001, p = 0.385), with within-person fluctuations largely unexplained by hormonal variation and baseline differences (SD = 0.415) contributing more to overall variation. These results suggest that menstrual phase significantly influences mood swings but not appetite in this cohort, and that individual factors often outweigh hormonal effects in daily symptom experiences.
 
 ### Sleep & Stress 
 We explored cyclical variations in sleep quality and perceived stress across the menstrual cycle using mixed-effects models to account for repeated measures within individuals. The findings demonstrate consistent and meaningful changes in both sleep and stress that align with known physiological fluctuations across the menstrual phases.
